@@ -11,11 +11,21 @@
 
     function __construct()
     {
-        parent::__construct('stores');
+        parent::__construct('usuarios');
     }
 
-    public function test(){
-      return $this->obtener('id',[['id','>=','100']],[['id','asc']],[1]);
+    public function existe($persona,$entidad)
+    {
+      $donde = [['persona','=',$person],['entidad','=',$entidad]];
+      $this->resultado = $this->obtener('id',$donde);
+      return count($this->resultado['datos']) > 0 ? $this->resultado['datos'][0]['id'] : false;
     }
+
+    public function entidades($persona)
+    {
+      $donde = [['persona','=',$persona],['activo','=','1']];
+      return $this->obtener('id,entidad',$donde);
+    }
+
   }
 ?>

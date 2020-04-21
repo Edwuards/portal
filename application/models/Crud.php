@@ -167,7 +167,13 @@
 
     private function limite(&$consulta,$limite)
     {
-      foreach ($ordenar as $clausura){ $consulta->limit($clausura[0],$clausura[1]); }
+      if(count($limite) == 2)
+      {
+        $consulta->limit($limite[0],$limite[1]);
+      }
+      else{
+        $consulta->limit($limite[0]);
+      }
     }
 
     public function obtener($selecionar = false, $donde = [],$ordenar = [],$limite = [])
@@ -197,7 +203,65 @@
 
     }
 
+    public function insertar($datos = [])
+    {
+      $this->db->insert($this->tabla,$datos);
+      $this->resultado['datos'] = ['id'=>$this->db->insert_id()];
+      return $this->resultado;
+    }
 
+    public function actualizar($datos = [],$donde = [])
+    {
+
+      if(gettype($datos) != 'array' || count($datos) == 0)
+      {
+        $this->resultado['error'] = 1;
+        $this->resultado['datos'] = 'el primer parametro debe ser un arreglo asociativo';
+      }
+
+      if(!$this->resultado['error']){ $consulta = $this->db->set($datos); }
+
+      if(!$this->resultado['error'] && ($donde != []) )
+      {
+        $this->revisarParametroDonde($donde);
+        if(!$this->resultado['error']){ $this->donde($consulta,$donde); }
+      }
+
+      if(!$this->resultado['error']){
+        $consulta->update($this->tabla);
+        if($this->db->affected_rows() == 0)
+        {
+          $this->resultado['error'] = 1;
+          $this->resultado['datos'] = 'No se realizo ninguna actualizacion con los parametros proporcionados';
+        }
+
+      }
+
+      return $this->resultado;
+
+    }
+
+    public function borrar($donde = []){
+
+      $consulta = $this->db;
+      if($donde != [])
+      {
+       $this->revisarParametroDonde($donde);
+       if(!$this->resultado['error']){ $this->donde($consulta,$donde); }
+      }
+
+      if(!$this->resultado['error']){
+        $consulta->delete($this->tabla);
+        if($this->db->affected_rows() == 0)
+        {
+          $this->resultado['error'] = 1;
+          $this->resultado['datos'] = 'No se borro ningun dato con los parametros proporcionados';
+        }
+      }
+
+
+      return $this->resultado;
+    }
 
   }
 ?>
