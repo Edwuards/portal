@@ -1,18 +1,14 @@
-import { Calendar } from '@fullcalendar/core';
-import esLocale from '@fullcalendar/core/locales/es';
-import dayGridPlugin from '@fullcalendar/daygrid';
+import { default as CalendarInit } from './calendar.js';
+import { default as NavInit } from './nav.js';
 import $ from 'jquery';
 
 $(document).ready(function(){
-  var calendarEl = document.getElementById('cal');
-
-  var calendar = new Calendar(calendarEl, {
-    plugins: [ dayGridPlugin ],
-    defaultView: 'dayGridMonth',
-    height: window.innerHeight,
-    locale: esLocale
-  })
-  calendar.render();
-  console.log(calendar);
-
+  const Calendar = CalendarInit();
+  const Nav = NavInit();
+  Nav.elements.date.html(Calendar.formatDate(
+    Calendar.getDate(),{ month: 'long', year: 'numeric'} )
+  );
+  let height = (window.innerHeight+1) - Nav.elements.nav.height()+24;
+  Calendar.setOption('height',height);
+  Calendar.render();
 })

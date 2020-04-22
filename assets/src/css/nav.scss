@@ -1,0 +1,11 @@
+nav{
+  height: 50px;
+  .icon{
+    height: 30px;
+    width: 30px;
+  }
+
+}
+[data="calendar"]{
+  width: calc( 100% - 90px);
+}

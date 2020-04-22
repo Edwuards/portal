@@ -1,5 +1,3 @@
-@import './index.css';
+@import 'bundle/base.css';
 @import '@fullcalendar/core/main.css';
 @import '@fullcalendar/daygrid/main.css';
-@import 'bootstrap/dist/css/bootstrap-reboot.css';
-@import 'bootstrap/dist/css/bootstrap.css'; 

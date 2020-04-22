@@ -1,33 +1,40 @@
 const gulp = require('gulp');
 const sass = require('gulp-sass');
+const postcss = require('gulp-postcss');
 const concat_css = require('gulp-concat-css');
+const tailwindcss = require('tailwindcss');
+
 const paths = {
-  styles: { src: './src/css/index.scss', dest: './src/css/' }
+  styles: {
+    frameworks: {src:'./src/css/base.css',dest:'./src/css/bundle/'},
+    bundle: {src:'./src/css/bundle.css',dest:'./public/css/'},
+    index: {src:'./src/css/index.scss',dest:'./public/css/'},
+   }
 }
 
 sass.compiler = require('node-sass')
 
 
-function sassBuild(){
-  return gulp.src(paths.styles.src)
-  .pipe(sass().on('error',sass.logError))
-  .pipe(gulp.dest(paths.styles.dest,{overwrite:true}));
+function css(){
+  return gulp.src(paths.styles.frameworks.src)
+  .pipe(postcss([
+    tailwindcss
+  ]))
+  .pipe(gulp.dest(paths.styles.frameworks.dest))
 }
 
-function cssBuild(){
-  return gulp.src('src/css/bundle.css')
-        .pipe(concat_css(
-          'index.css',
-          {
-            includePaths:['node_modules']
-          }
-        )).pipe(gulp.dest('public/css/'));
+function bundle(){
+  return gulp.src(paths.styles.bundle.src)
+  .pipe(concat_css('base.css',{includePaths:['node_modules']}))
+  .pipe(gulp.dest(paths.styles.bundle.dest))
 }
 
 function styles(){
-  sassBuild();
-  return cssBuild();
+  return gulp.src(paths.styles.index.src)
+  .pipe(sass().on('error',sass.logError))
+  .pipe(gulp.dest(paths.styles.index.dest))
 }
 
-exports.css = styles;
-exports.sass = sassBuild;
+exports.css = css;
+exports.styles = styles;
+exports.bundle = bundle;

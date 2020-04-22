@@ -1,7 +1,7 @@
-(function ($) {
+(function ($$1) {
   'use strict';
 
-  $ = $ && Object.prototype.hasOwnProperty.call($, 'default') ? $['default'] : $;
+  $$1 = $$1 && Object.prototype.hasOwnProperty.call($$1, 'default') ? $$1['default'] : $$1;
 
   /*!
   FullCalendar Core Package v4.4.0
@@ -9819,18 +9819,52 @@
       }
   });
 
-  $(document).ready(function(){
-    var calendarEl = document.getElementById('cal');
-
-    var calendar = new Calendar(calendarEl, {
+  function CalendarInit (){
+    const Options = {
       plugins: [ main ],
       defaultView: 'dayGridMonth',
-      height: window.innerHeight,
-      locale: es
-    });
-    calendar.render();
-    console.log(calendar);
+      locale: es,
+      header: { left: '', center: '', right: '' },
+      columnHeaderText: function(date) {
+        let short = window.innerWidth > 640;
+        date = CALENDAR.formatDate(date,{
+          locale:'es',
+          weekday:  short ? 'short' : 'narrow'
+        });
+        if(short){ date = date.split('.')[0]; }
+        return date;
+      }
+    };
+    const Elements = {
+      calendar: $('#calendar')
+    };
+    const CALENDAR = new Calendar(Elements.calendar[0],Options);
 
+    return CALENDAR
+  }
+
+  function NavInit (){
+    const Elements = {};
+    const Actions = {};
+    const State = {};
+
+    Elements.nav = $('nav');
+    Elements.date = Elements.nav.find('[data="date"]');
+    Elements.buttons = {};
+    Elements.nav.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
+
+    return {elements: Elements,actions: Actions,state: State}
+  }
+
+  $$1(document).ready(function(){
+    const Calendar = CalendarInit();
+    const Nav = NavInit();
+    Nav.elements.date.html(Calendar.formatDate(
+      Calendar.getDate(),{ month: 'long', year: 'numeric'} )
+    );
+    let height = (window.innerHeight+1) - Nav.elements.nav.height()+24;
+    Calendar.setOption('height',height);
+    Calendar.render();
   });
 
 }($));
