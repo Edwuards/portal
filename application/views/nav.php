@@ -1,4 +1,35 @@
-<nav class="navbar navbar-light bg-light justify-content-start">
-  <a class="navbar-brand" href="#"><i class="fas fa-bars"></i></a>
-  <a class="navbar-text" href="#">Abril</a>
+<nav class="flex justify-center items-center px-2">
+  <div class="icon flex justify-center items-center">
+    <button type="button" name="menu" class="">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <div data="calendar" class="flex justify-center items-center">
+
+    <button type="button" name="prev" class="mx-2">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <p data="date" class="mx-2">Septiembre 2020</p>
+    <button type="button" name="next" class="mx-2">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="flex justify-center items-center">
+    <button type="button" name="today" class="mx-2">
+      <i class="fas fa-calendar-day"></i>
+    </button>
+  </div>
+
+  <div class="flex justify-center items-center">
+    <button type="button" name="notifications" class="mx-2">
+      <i class="fas fa-bell"></i>
+    </button>
+  </div>
+
 </nav>
+
+<div class="">
+
+</div>

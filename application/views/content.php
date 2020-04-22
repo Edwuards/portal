@@ -1,6 +1,5 @@
 <main>
-  <div id="cal" class="">
+  <div id="calendar" class="">
 
   </div>
-  <?php echo $content; ?>
 </main>

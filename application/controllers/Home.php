@@ -16,9 +16,12 @@ class Home extends CI_Controller {
 	public function dashboard(){
 		$scripts = [
 			'js'=>['jquery','index'],
-			'css'=>['index']
+			'css'=>['base','index']
 		];
-		$views = ['nav'=>['content'=>'hello']];
+		$views = [
+			'nav'=>['content'=>'hello'],
+			'content'=>false
+		];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
