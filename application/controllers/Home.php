@@ -9,18 +9,16 @@ class Home extends CI_Controller {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->View = new View($this);
-
-
 	}
 
 	public function dashboard(){
 		$scripts = [
-			'js'=>['jquery','index'],
+			'js'=>['jquery','datepicker','index'],
 			'css'=>['base','index']
 		];
 		$views = [
-			'nav'=>['content'=>'hello'],
-			'content'=>false
+			'nav/navbar'=>'',
+			'dashboard/content'=>''
 		];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}

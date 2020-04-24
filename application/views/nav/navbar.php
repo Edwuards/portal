@@ -10,7 +10,7 @@
     <button type="button" name="prev" class="mx-2">
       <i class="fas fa-chevron-left"></i>
     </button>
-    <p data="date" class="mx-2">Septiembre 2020</p>
+    <p data="date" class="mx-2 text-sm"></p>
     <button type="button" name="next" class="mx-2">
       <i class="fas fa-chevron-right"></i>
     </button>
@@ -30,6 +30,4 @@
 
 </nav>
 
-<div class="">
-
-</div>
+<?php $this->load->view('nav/lateral'); ?>

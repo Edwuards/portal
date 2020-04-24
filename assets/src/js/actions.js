@@ -1,10 +1,14 @@
 import { default as calendarInit } from './calendar.js';
 import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
+import { default as modalInit } from './modal.js';
+import { default as formsInit } from './forms/forms.js';
 
 export default function(){
   const Calendar = calendarInit();
   const Nav = navInit();
+  const Modal = modalInit();
+  const Forms = formsInit();
   const Permisions = permisionsInit();
   const Actions = {};
   const Elements = {};
@@ -61,7 +65,20 @@ export default function(){
       };
     });
   }
+  Actions.open.form = function(){
+    let btn = $(this);
+    let form = Forms[btn.attr('name')];
+    form.init();
+    console.log(form);
+    Modal.actions.open({title: form.title, body: form.form });
+    Permisions.actions.close();
+    Modal.elements.buttons.close.on('click',()=>{
+      Modal.actions.close();
+      form.close();
+      Modal.elements.buttons.close.off('click')
+    })
 
+  };
 
   [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 

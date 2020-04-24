@@ -1,27 +1,5 @@
-const Forms = {};
-
-function Form(form){
-  this.inputs = {};
-  this.form = $(document.createElement('form'));
-  this.form.attr('data',form.name).addClass('w-ful');
-  this.form.html(form.html);
-
-  this.form.find('input').each(function(i,input){
-    input = $(input);
-    if(input.attr('data') == 'datepicker' ){ input.datetimepicker(); }
-    this.inputs[input.attr('name')] = input;
-  }.bind(this));
-
-  this.form.find('button').each(function(i,button){
-    button = $(button);
-    this.inputs[button.attr('name')] = button;
-  }.bind(this));
-
-}
-
-Forms.permision = {
-  name:'permision',
-  html: ()=>{
+const HTML = {
+  permision: ()=>{
     return `
     <div class="flex flex-col mb-4">
       <label class="mb-2"for="start">Inicio de fecha : </label>
@@ -37,12 +15,8 @@ Forms.permision = {
       </textarea>
     </div>
     `;
-  }
-}
-
-Forms.homeOffice = {
-  name:'homeOffice',
-  html: ()=>{
+  },
+  homeOffice:  ()=>{
     return `
     <div class="flex flex-col mb-4">
       <label class="mb-2"for="start">Inicio de fecha : </label>
@@ -58,12 +32,8 @@ Forms.homeOffice = {
       </textarea>
     </div>
     `;
-  }
-}
-
-Forms.vacation = {
-  name:'vacation',
-  html: ()=>{
+  },
+  vacation:()=>{
     return `
     <div class="flex flex-col mb-4">
       <label class="mb-2"for="start">Inicio de fecha : </label>
@@ -74,12 +44,8 @@ Forms.vacation = {
       <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
     </div>
     `;
-  }
-}
-
-Forms.sick = {
-  name:'sick',
-  html: ()=>{
+  },
+  sick: ()=>{
     return `
     <div class="flex flex-col mb-4">
       <label class="mb-2"for="start">Inicio de fecha : </label>
@@ -100,8 +66,7 @@ Forms.sick = {
     </div>
     `;
   }
+
 }
 
-for (let name in Forms) { Forms[name] = new Form(Forms[name]); }
-
-export { Forms };
+export { HTML }

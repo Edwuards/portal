@@ -34,10 +34,18 @@ nav {
   background-color: rgba(255, 255, 255, 0.9); }
 
 #modal-cont {
+  top: -100%;
+  opacity: 0;
+  transition: top 1s, opacity 1s;
+  overflow: hidden;
   background-color: #949494ad; }
   #modal-cont #modal .body {
     height: calc(100% - 128px);
     overflow-y: scroll; }
+
+#modal-cont.open {
+  top: 0px;
+  opacity: 1; }
 
 body, main {
   overflow: hidden;

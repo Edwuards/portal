@@ -1,4 +1,8 @@
 #modal-cont{
+  top: -100%;
+  opacity: 0;
+  transition: top 1s, opacity 1s;
+  overflow: hidden;
   background-color: #949494ad;
   #modal{
     .body{
@@ -6,4 +10,9 @@
       overflow-y: scroll;
     }
   }
+}
+
+#modal-cont.open{
+  top: 0px;
+  opacity: 1;
 }

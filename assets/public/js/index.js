@@ -9885,9 +9885,197 @@
     return {elements: Elements, actions: Actions, state: State};
   }
 
+  function modalInit(){
+    const Actions = {};
+    const Elements = {
+      container : $('#modal-cont'),
+      modal: $('#modal'),
+      header: $('#modal > .header'),
+      body: $('#modal > .body'),
+      footer: $('#modal > .footer')
+    };
+
+    Elements.title = Elements.header.find('.title > p');
+    Elements.buttons = {};
+
+    Elements.footer.find('button').each(function(){
+      let el = $(this);
+      Elements.buttons[el.attr('name')] = el;
+    });
+    Elements.buttons.close = Elements.header.find('button[name="close"]');
+
+    Actions.open = (data)=>{
+      Elements.container.addClass('open');
+      Elements.title.html(data.title);
+      Elements.body.html(data.body);
+
+    };
+
+    Actions.close = ()=>{
+      Elements.container.removeClass('open');
+      Elements.title.html('');
+      Elements.body.html('');
+
+    };
+
+
+    return { elements: Elements, actions: Actions}
+
+  }
+
+  const HTML = {
+    permision: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Motivo : </label>
+      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
+      </textarea>
+    </div>
+    `;
+    },
+    homeOffice:  ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Objetivos : </label>
+      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
+      </textarea>
+    </div>
+    `;
+    },
+    vacation:()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    `;
+    },
+    sick: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Receta Medica : </label>
+      <input class="hidden" type="file" name="img" value="">
+      <div class="w-1/2 m-auto">
+        <button type="button" name="upload">
+          <img class="w-full" src="https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png" alt="">
+        </button>
+      </div>
+    </div>
+    `;
+    }
+
+  };
+
+  const Forms = {};
+
+  function Form(form){
+    this.title = form.title;
+    this.inputs = {};
+    this.buttons = {};
+    this.form = $(document.createElement('form'));
+    this.form.attr('data',form.name).addClass('w-ful');
+    this.form.html(form.html);
+
+    this.init = function(){
+      if(form.init != undefined){ form.init.call(this); }
+      for (let name in this.inputs) {
+        let input = this.inputs[name];
+        if(input.attr('data') == 'datepicker'){ input.datetimepicker(); }
+      }
+    };
+
+    this.close = function(){
+      this.form[0].reset();
+      if(form.close != undefined){ form.close.call(this); }
+    };
+
+    this.form.find('input').each(function(i,input){
+      input = $(input);
+      this.inputs[input.attr('name')] = input;
+    }.bind(this));
+
+    this.form.find('button').each(function(i,button){
+      button = $(button);
+      this.buttons[button.attr('name')] = button;
+    }.bind(this));
+
+  }
+
+  function previewImg(input,img){
+    let file = input[0].files[0];
+    let reader = new FileReader();
+    reader.onload = function(e){ img.attr('src',e.target.result); };
+    reader.readAsDataURL(file);
+  }
+
+  Forms.permision = {
+    name:'permision',
+    title: 'Permiso',
+    html: HTML.permision
+  };
+
+  Forms.homeOffice = {
+    name:'homeOffice',
+    title:'Home Office',
+    html: HTML.homeOffice
+  };
+
+  Forms.vacation = {
+    name:'vacation',
+    title: 'Vacación',
+    html: HTML.vacation
+  };
+
+  Forms.sick = {
+    name:'sick',
+    title:'Enfermedad',
+    html: HTML.sick,
+    init: function(){
+      let inputs = this.inputs;
+      let img = this.buttons.upload.children('img');
+      this.buttons.upload.on('click',()=>{
+        inputs.img[0].value = '';
+        inputs.img.trigger('click');
+      });
+      this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+    }
+  };
+
+  var formsInit = ()=>{ for (let name in Forms) { Forms[name] = new Form(Forms[name]); } return Forms };
+
   function actionsInit(){
     const Calendar = calendarInit();
     const Nav = navInit();
+    const Modal = modalInit();
+    const Forms = formsInit();
     const Permisions = permisionsInit();
     const Actions = {};
     const Elements = {};
@@ -9943,128 +10131,39 @@
           Permisions.elements.container.off('click');
         }    });
     };
+    Actions.open.form = function(){
+      let btn = $(this);
+      let form = Forms[btn.attr('name')];
+      form.init();
+      console.log(form);
+      Modal.actions.open({title: form.title, body: form.form });
+      Permisions.actions.close();
+      Modal.elements.buttons.close.on('click',()=>{
+        Modal.actions.close();
+        form.close();
+        Modal.elements.buttons.close.off('click');
+      });
 
+    };
 
     [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
   }
 
-  const Forms = {};
-
-  function Form(form){
-    this.inputs = {};
-    this.form = $(document.createElement('form'));
-    this.form.attr('data',form.name).addClass('w-ful');
-    this.form.html(form.html);
-
-    this.form.find('input').each(function(i,input){
-      input = $(input);
-      if(input.attr('data') == 'datepicker' ){ input.datetimepicker(); }
-      this.inputs[input.attr('name')] = input;
-    }.bind(this));
-
-    this.form.find('button').each(function(i,button){
-      button = $(button);
-      this.inputs[button.attr('name')] = button;
-    }.bind(this));
-
-  }
-
-  Forms.permision = {
-    name:'permision',
-    html: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Motivo : </label>
-      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
-      </textarea>
-    </div>
-    `;
-    }
-  };
-
-  Forms.homeOffice = {
-    name:'homeOffice',
-    html: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Objetivos : </label>
-      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
-      </textarea>
-    </div>
-    `;
-    }
-  };
-
-  Forms.vacation = {
-    name:'vacation',
-    html: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    `;
-    }
-  };
-
-  Forms.sick = {
-    name:'sick',
-    html: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Receta Medica : </label>
-      <input class="hidden" type="file" name="img" value="">
-      <div class="w-1/2 m-auto">
-        <button type="button" name="upload">
-          <img class="w-full" src="https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png" alt="">
-        </button>
-      </div>
-    </div>
-    `;
-    }
-  };
-
-  for (let name in Forms) { Forms[name] = new Form(Forms[name]); }
-
   function Events(){
     const {actions,elements} = actionsInit();
-    $('#modal > .body').html(Forms.vacation.form);
+
     actions.calendar.render();
     elements.nav.buttons.menu.on('click',actions.open.menu);
     elements.nav.buttons.next.on('click',actions.calendar.next);
     elements.nav.buttons.prev.on('click',actions.calendar.prev);
     elements.nav.buttons.today.on('click',actions.calendar.today);
     elements.permisions.buttons.open.on('click',actions.open.permisions);
+    elements.permisions.buttons.homeOffice.on('click',actions.open.form);
+    elements.permisions.buttons.sick.on('click',actions.open.form);
+    elements.permisions.buttons.vacation.on('click',actions.open.form);
+    elements.permisions.buttons.permision.on('click',actions.open.form);
   }
 
   $$1(document).ready(Events);
