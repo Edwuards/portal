@@ -1,9 +1,14 @@
 @import 'overwrite';
 @import 'nav';
+@import 'permisions';
+@import 'modal';
 
 body,main{
   overflow: hidden;
   width: 100%;
-  height: calc(100vh);
+  height: 100vh;
   font-family: 'Open sans';
+}
+main{
+  height: calc(100vh - 50px);
 }

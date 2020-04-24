@@ -1,0 +1,9 @@
+#modal-cont{
+  background-color: #949494ad;
+  #modal{
+    .body{
+      height: calc(100% - 128px);
+      overflow-y: scroll;
+    }
+  }
+}

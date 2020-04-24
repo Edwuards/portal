@@ -9819,7 +9819,7 @@
       }
   });
 
-  function CalendarInit (){
+  function calendarInit (){
     const Options = {
       plugins: [ main ],
       defaultView: 'dayGridMonth',
@@ -9843,7 +9843,7 @@
     return CALENDAR
   }
 
-  function NavInit (){
+  function navInit (){
     const Elements = {};
     const Actions = {};
     const State = {};
@@ -9852,19 +9852,221 @@
     Elements.date = Elements.nav.find('[data="date"]');
     Elements.buttons = {};
     Elements.nav.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
+    Elements.lateral = {};
+    Elements.lateral.container = $('#side-menu');
+    Elements.lateral.buttons = {};
+    Elements.lateral.container.find('button').each(function(){ let el = $(this); Elements.lateral.container[el.attr('name')] = el; });
 
     return {elements: Elements,actions: Actions,state: State}
   }
 
-  $$1(document).ready(function(){
-    const Calendar = CalendarInit();
-    const Nav = NavInit();
-    Nav.elements.date.html(Calendar.formatDate(
-      Calendar.getDate(),{ month: 'long', year: 'numeric'} )
-    );
-    let height = (window.innerHeight+1) - Nav.elements.nav.height()+24;
-    Calendar.setOption('height',height);
-    Calendar.render();
-  });
+  function permisionsInit(){
+    const Actions = {};
+    const State = {};
+    const Elements = {};
+
+    Elements.container = $('#permisions');
+    Elements.buttons = {};
+    Elements.container.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
+    Elements.actions = Elements.container.find('.action');
+
+    Actions.open = ()=>{
+      Elements.container.addClass('active');
+      Elements.buttons.open.addClass('hidden');
+      Elements.actions.removeClass('hidden');
+    };
+
+    Actions.close = ()=>{
+      Elements.container.removeClass('active');
+      Elements.actions.addClass('hidden');
+      Elements.buttons.open.removeClass('hidden');
+    };
+
+    return {elements: Elements, actions: Actions, state: State};
+  }
+
+  function actionsInit(){
+    const Calendar = calendarInit();
+    const Nav = navInit();
+    const Permisions = permisionsInit();
+    const Actions = {};
+    const Elements = {};
+
+    Actions.open = {};
+    Actions.update = {};
+    Actions.update.date = (format)=>{
+      if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
+      Nav.elements.date.html(Calendar.formatDate(Calendar.getDate(),format));
+    };
+    Actions.calendar = {};
+    Actions.calendar.render = ()=>{
+      Actions.update.date();
+      /*
+        Se le suma un pixel debido al border top del contendor del Calendar.
+        Se le suma 24 pixels por el alto del header que contiene los dias
+        dentro del calendar.
+        su total son 25 pixels para que se ajuste al tamaño de la pantalla.
+      */
+      let height = (window.innerHeight+25) - Nav.elements.nav.height();
+      Calendar.setOption('height',height);
+      Calendar.render();
+    };
+    Actions.calendar.next = ()=>{
+      Calendar.next();
+      Actions.update.date();
+    };
+    Actions.calendar.prev = ()=>{
+      Calendar.prev();
+      Actions.update.date();
+    };
+    Actions.calendar.today = ()=>{
+      Calendar.today();
+      Actions.update.date();
+    };
+    Actions.open.menu = ()=>{
+      let lateral = Nav.elements.lateral.container;
+      lateral.addClass('open');
+      lateral.on('click',function(e){
+        let target = $(e.target);
+        if(target.attr('id') == 'side-menu'){
+          lateral.removeClass('open');
+          lateral.off('click');
+        }
+      });
+    };
+    Actions.open.permisions = ()=>{
+      Permisions.actions.open();
+      Permisions.elements.container.on('click',function(e){
+        let target = $(e.target);
+        if(target.hasClass('button-cont')){
+          Permisions.actions.close();
+          Permisions.elements.container.off('click');
+        }    });
+    };
+
+
+    [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
+
+    return {actions:Actions, elements: Elements}
+  }
+
+  const Forms = {};
+
+  function Form(form){
+    this.inputs = {};
+    this.form = $(document.createElement('form'));
+    this.form.attr('data',form.name).addClass('w-ful');
+    this.form.html(form.html);
+
+    this.form.find('input').each(function(i,input){
+      input = $(input);
+      if(input.attr('data') == 'datepicker' ){ input.datetimepicker(); }
+      this.inputs[input.attr('name')] = input;
+    }.bind(this));
+
+    this.form.find('button').each(function(i,button){
+      button = $(button);
+      this.inputs[button.attr('name')] = button;
+    }.bind(this));
+
+  }
+
+  Forms.permision = {
+    name:'permision',
+    html: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Motivo : </label>
+      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
+      </textarea>
+    </div>
+    `;
+    }
+  };
+
+  Forms.homeOffice = {
+    name:'homeOffice',
+    html: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Objetivos : </label>
+      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
+      </textarea>
+    </div>
+    `;
+    }
+  };
+
+  Forms.vacation = {
+    name:'vacation',
+    html: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    `;
+    }
+  };
+
+  Forms.sick = {
+    name:'sick',
+    html: ()=>{
+      return `
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Inicio de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Fin de fecha : </label>
+      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+    </div>
+    <div class="flex flex-col mb-4">
+      <label class="mb-2"for="start">Receta Medica : </label>
+      <input class="hidden" type="file" name="img" value="">
+      <div class="w-1/2 m-auto">
+        <button type="button" name="upload">
+          <img class="w-full" src="https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png" alt="">
+        </button>
+      </div>
+    </div>
+    `;
+    }
+  };
+
+  for (let name in Forms) { Forms[name] = new Form(Forms[name]); }
+
+  function Events(){
+    const {actions,elements} = actionsInit();
+    $('#modal > .body').html(Forms.vacation.form);
+    actions.calendar.render();
+    elements.nav.buttons.menu.on('click',actions.open.menu);
+    elements.nav.buttons.next.on('click',actions.calendar.next);
+    elements.nav.buttons.prev.on('click',actions.calendar.prev);
+    elements.nav.buttons.today.on('click',actions.calendar.today);
+    elements.permisions.buttons.open.on('click',actions.open.permisions);
+  }
+
+  $$1(document).ready(Events);
 
 }($));
