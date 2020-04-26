@@ -11,18 +11,21 @@
       </div>
     </div>
     <div class="w-full mt-6" >
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="perfil">
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="profile">
           <i class="text-xl far fa-user-circle"></i>
           <p class="ml-2">Perfil</p>
       </button>
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="avisos">
-        <i class="text-xl fas fa-clipboard-list"></i>
-        <p class="ml-2">Avisos</p>
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="myAvisos">
+        <i class="fas fa-envelope"></i>
+        <p class="ml-2">Mis Avisos</p>
       </button>
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="avisos">
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="users">
         <i class="text-xl fas fa-users"></i>
-
         <p class="ml-2">Usuarios</p>
+      </button>
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="userAvisos">
+        <i class="text-xl fas fa-clipboard-list"></i>
+        <p class="ml-2">Avisos de usuarios</p>
       </button>
     </div>
   </div>

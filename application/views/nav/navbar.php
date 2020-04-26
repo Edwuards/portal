@@ -30,4 +30,4 @@
 
 </nav>
 
-<?php $this->load->view('nav/lateral'); ?>
+<?php $this->load->view('nav/menu'); ?>
