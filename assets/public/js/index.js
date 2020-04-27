@@ -9852,10 +9852,10 @@
     Elements.date = Elements.nav.find('[data="date"]');
     Elements.buttons = {};
     Elements.nav.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
-    Elements.lateral = {};
-    Elements.lateral.container = $('#side-menu');
-    Elements.lateral.buttons = {};
-    Elements.lateral.container.find('button').each(function(){ let el = $(this); Elements.lateral.container[el.attr('name')] = el; });
+    Elements.menu = {};
+    Elements.menu.container = $('#side-menu');
+    Elements.menu.buttons = {};
+    Elements.menu.container.find('button').each(function(){ let el = $(this); Elements.menu.buttons[el.attr('name')] = el; });
 
     return {elements: Elements,actions: Actions,state: State}
   }
@@ -9923,75 +9923,40 @@
 
   }
 
+  function base_url(url){
+  return `${window.location.origin}/index.php/${url}`;
+  }const Services = {};
+  Services.get = {};
+  Services.get.form = (name)=>{
+    let html = '';
+    let settings = {
+      url: base_url(`home/forms/${name}`),
+      method: 'GET',
+      async: false,
+      success:(data)=>{ html = data; }
+    };
+
+    $.ajax(settings);
+
+    return html;
+  };
+
   const HTML = {
     permision: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Motivo : </label>
-      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
-      </textarea>
-    </div>
-    `;
+      return Services.get.form('permision');
     },
     homeOffice:  ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Objetivos : </label>
-      <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
-      </textarea>
-    </div>
-    `;
+      return Services.get.form('homeOffice');
     },
     vacation:()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    `;
+      return Services.get.form('vacation');
     },
     sick: ()=>{
-      return `
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Inicio de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Fin de fecha : </label>
-      <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-    </div>
-    <div class="flex flex-col mb-4">
-      <label class="mb-2"for="start">Receta Medica : </label>
-      <input class="hidden" type="file" name="img" value="">
-      <div class="w-1/2 m-auto">
-        <button type="button" name="upload">
-          <img class="w-full" src="https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png" alt="">
-        </button>
-      </div>
-    </div>
-    `;
+      return Services.get.form('sick');
+    },
+    profile: ()=>{
+      return Services.get.form('profile');
     }
-
   };
 
   const Forms = {};
@@ -10066,6 +10031,31 @@
         inputs.img.trigger('click');
       });
       this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+    },
+    close: function(){
+      // remplazar el src por una ruta relativa de un img placeholder
+      let img = this.buttons.upload.children('img');
+      img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+    }
+  };
+
+  Forms.myProfile = {
+    name:'profile',
+    title:'Mi Perfil',
+    html: HTML.profile,
+    init: function(){
+      let inputs = this.inputs;
+      let img = this.buttons.upload.children('img');
+      this.buttons.upload.on('click',()=>{
+        inputs.img[0].value = '';
+        inputs.img.trigger('click');
+      });
+      this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+    },
+    close: function(){
+      // remplazar el src por una ruta relativa de un img placeholder
+      let img = this.buttons.upload.children('img');
+      img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
     }
   };
 
@@ -10079,6 +10069,8 @@
     const Permisions = permisionsInit();
     const Actions = {};
     const Elements = {};
+
+    console.log(Modal);
 
     Actions.open = {};
     Actions.update = {};
@@ -10112,13 +10104,13 @@
       Actions.update.date();
     };
     Actions.open.menu = ()=>{
-      let lateral = Nav.elements.lateral.container;
-      lateral.addClass('open');
-      lateral.on('click',function(e){
+      let menu = Nav.elements.menu.container;
+      menu.addClass('open');
+      menu.on('click',function(e){
         let target = $(e.target);
         if(target.attr('id') == 'side-menu'){
-          lateral.removeClass('open');
-          lateral.off('click');
+          menu.removeClass('open');
+          menu.off('click');
         }
       });
     };
@@ -10135,7 +10127,6 @@
       let btn = $(this);
       let form = Forms[btn.attr('name')];
       form.init();
-      console.log(form);
       Modal.actions.open({title: form.title, body: form.form });
       Permisions.actions.close();
       Modal.elements.buttons.close.on('click',()=>{
@@ -10145,7 +10136,19 @@
       });
 
     };
-
+    Actions.open.myProfile = ()=>{
+      let form = Forms.myProfile;
+      Nav.elements.menu.container.trigger('click');
+      Modal.elements.buttons.edit.removeClass('hidden');
+      Modal.elements.buttons.accept.addClass('hidden');
+      Modal.actions.open({title: form.title, body: form.form });
+      Modal.elements.buttons.close.on('click',()=>{
+        Modal.actions.close();
+        Modal.elements.buttons.edit.removeClass('hidden');
+        Modal.elements.buttons.accept.addClass('hidden');
+        Modal.elements.buttons.close.off('click');
+      });
+    };
     [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
@@ -10154,11 +10157,13 @@
   function Events(){
     const {actions,elements} = actionsInit();
 
+    console.log(Services);
     actions.calendar.render();
     elements.nav.buttons.menu.on('click',actions.open.menu);
     elements.nav.buttons.next.on('click',actions.calendar.next);
     elements.nav.buttons.prev.on('click',actions.calendar.prev);
     elements.nav.buttons.today.on('click',actions.calendar.today);
+    elements.nav.menu.buttons.profile.on('click',actions.open.myProfile);
     elements.permisions.buttons.open.on('click',actions.open.permisions);
     elements.permisions.buttons.homeOffice.on('click',actions.open.form);
     elements.permisions.buttons.sick.on('click',actions.open.form);

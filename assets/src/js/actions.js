@@ -13,6 +13,8 @@ export default function(){
   const Actions = {};
   const Elements = {};
 
+  console.log(Modal);
+
   Actions.open = {};
   Actions.update = {};
   Actions.update.date = (format)=>{
@@ -45,13 +47,13 @@ export default function(){
     Actions.update.date();
   }
   Actions.open.menu = ()=>{
-    let lateral = Nav.elements.lateral.container;
-    lateral.addClass('open');
-    lateral.on('click',function(e){
+    let menu = Nav.elements.menu.container;
+    menu.addClass('open');
+    menu.on('click',function(e){
       let target = $(e.target);
       if(target.attr('id') == 'side-menu'){
-        lateral.removeClass('open');
-        lateral.off('click');
+        menu.removeClass('open');
+        menu.off('click');
       }
     })
   }
@@ -69,7 +71,6 @@ export default function(){
     let btn = $(this);
     let form = Forms[btn.attr('name')];
     form.init();
-    console.log(form);
     Modal.actions.open({title: form.title, body: form.form });
     Permisions.actions.close();
     Modal.elements.buttons.close.on('click',()=>{
@@ -79,7 +80,19 @@ export default function(){
     })
 
   };
-
+  Actions.open.myProfile = ()=>{
+    let form = Forms.myProfile;
+    Nav.elements.menu.container.trigger('click');
+    Modal.elements.buttons.edit.removeClass('hidden');
+    Modal.elements.buttons.accept.addClass('hidden');
+    Modal.actions.open({title: form.title, body: form.form });
+    Modal.elements.buttons.close.on('click',()=>{
+      Modal.actions.close();
+      Modal.elements.buttons.edit.removeClass('hidden');
+      Modal.elements.buttons.accept.addClass('hidden');
+      Modal.elements.buttons.close.off('click')
+    });
+  }
   [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 
   return {actions:Actions, elements: Elements}

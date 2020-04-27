@@ -72,6 +72,31 @@ Forms.sick = {
       inputs.img.trigger('click');
     });
     this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+  },
+  close: function(){
+    // remplazar el src por una ruta relativa de un img placeholder
+    let img = this.buttons.upload.children('img');
+    img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+  }
+}
+
+Forms.myProfile = {
+  name:'profile',
+  title:'Mi Perfil',
+  html: HTML.profile,
+  init: function(){
+    let inputs = this.inputs;
+    let img = this.buttons.upload.children('img');
+    this.buttons.upload.on('click',()=>{
+      inputs.img[0].value = '';
+      inputs.img.trigger('click');
+    });
+    this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+  },
+  close: function(){
+    // remplazar el src por una ruta relativa de un img placeholder
+    let img = this.buttons.upload.children('img');
+    img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
   }
 }
 
