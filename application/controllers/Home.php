@@ -23,4 +23,11 @@ class Home extends CI_Controller {
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
+	public function forms($name){
+		$html = $this->load->view('forms/'.$name,'',true);
+		$this->output
+		->set_content_type('text/html')
+		->set_output($html);
+	}
+
 }
