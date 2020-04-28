@@ -9,13 +9,13 @@ export default function(){
   }
 
   Elements.title = Elements.header.find('.title > p');
-  Elements.buttons = {};
+  Elements.button = {};
 
   Elements.footer.find('button').each(function(){
     let el = $(this);
-    Elements.buttons[el.attr('name')] = el;
+    Elements.button[el.attr('name')] = el;
   });
-  Elements.buttons.close = Elements.header.find('button[name="close"]');
+  Elements.button.close = Elements.header.find('button[name="close"]');
 
   Actions.open = (data)=>{
     Elements.container.addClass('open');

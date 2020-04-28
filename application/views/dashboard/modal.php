@@ -1,4 +1,4 @@
-<div id="modal-cont" class="flex w-screen h-screen justify-center absolute z-50 sm:py-12">
+<div id="modal-cont" class="flex w-screen h-full justify-center absolute z-50 sm:py-12">
   <div id="modal" class="w-full h-full bg-white sm:max-w-md ">
     <div class="header flex w-full h-16 justify-start items-center shadow-md">
       <button class="flex w-16 h-16 justify-center items-center" name="close">
@@ -9,8 +9,6 @@
       </div>
     </div>
     <div class="body p-4">
-      
-
 
     </div>
     <div class="footer flex w-full h-16 px-4 justify-start items-center ">

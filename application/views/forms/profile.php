@@ -17,7 +17,7 @@
 </div>
 <div class="flex flex-col mb-4">
   <label class="mb-2"for="start">Descripción :</label>
-  <textarea class="bg-gray-300 h-10 px-4 py-2" type="text" name="description" value=""></textarea>
+  <textarea class="bg-gray-300 h-24 px-4 py-2" type="text" name="description" value=""></textarea>
 </div>
 <div class="flex flex-col mb-4">
   <label class="mb-2"for="start">Area de Trabajo :</label>

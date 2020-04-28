@@ -17,7 +17,6 @@ class Home extends CI_Controller {
 			'css'=>['base','index']
 		];
 		$views = [
-			'nav/navbar'=>'',
 			'dashboard/content'=>''
 		];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);

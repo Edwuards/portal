@@ -34,9 +34,9 @@ nav {
   background-color: rgba(255, 255, 255, 0.9); }
 
 #modal-cont {
-  top: -100%;
+  top: -150%;
   opacity: 0;
-  transition: top 1s, opacity 1s;
+  transition: top .5s, opacity .5s;
   overflow: hidden;
   background-color: #949494ad; }
   #modal-cont #modal .body {
@@ -47,11 +47,14 @@ nav {
   top: 0px;
   opacity: 1; }
 
+#dataTable > .body {
+  height: calc(100% - 128px); }
+
+#dataTable [data-table] .body, #dataTable [data-table] .header {
+  background-color: white; }
+
 body, main {
   overflow: hidden;
   width: 100%;
-  height: 100vh;
-  font-family: 'Open sans'; }
-
-main {
-  height: calc(100vh - 50px); }
+  font-family: 'Open sans';
+  position: relative; }

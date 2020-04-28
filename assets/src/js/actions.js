@@ -13,8 +13,6 @@ export default function(){
   const Actions = {};
   const Elements = {};
 
-  console.log(Modal);
-
   Actions.open = {};
   Actions.update = {};
   Actions.update.date = (format)=>{
@@ -73,26 +71,28 @@ export default function(){
     form.init();
     Modal.actions.open({title: form.title, body: form.form });
     Permisions.actions.close();
-    Modal.elements.buttons.close.on('click',()=>{
+    Modal.elements.button.close.on('click',()=>{
       Modal.actions.close();
       form.close();
-      Modal.elements.buttons.close.off('click')
+      Modal.elements.button.close.off('click')
     })
 
   };
-  Actions.open.myProfile = ()=>{
-    let form = Forms.myProfile;
+  Actions.open.profile = ()=>{
+    let form = Forms.profile;
     Nav.elements.menu.container.trigger('click');
-    Modal.elements.buttons.edit.removeClass('hidden');
-    Modal.elements.buttons.accept.addClass('hidden');
+    Modal.elements.button.edit.removeClass('hidden');
+    Modal.elements.button.accept.addClass('hidden');
     Modal.actions.open({title: form.title, body: form.form });
-    Modal.elements.buttons.close.on('click',()=>{
+    Modal.elements.button.close.on('click',()=>{
       Modal.actions.close();
-      Modal.elements.buttons.edit.removeClass('hidden');
-      Modal.elements.buttons.accept.addClass('hidden');
-      Modal.elements.buttons.close.off('click')
+      Modal.elements.button.edit.removeClass('hidden');
+      Modal.elements.button.accept.addClass('hidden');
+      Modal.elements.button.close.off('click')
     });
   }
+
+
   [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 
   return {actions:Actions, elements: Elements}

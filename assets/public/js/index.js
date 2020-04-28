@@ -9850,12 +9850,12 @@
 
     Elements.nav = $('nav');
     Elements.date = Elements.nav.find('[data="date"]');
-    Elements.buttons = {};
-    Elements.nav.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
+    Elements.button = {};
+    Elements.nav.find('button').each(function(){ let el = $(this); Elements.button[el.attr('name')] = el; });
     Elements.menu = {};
     Elements.menu.container = $('#side-menu');
-    Elements.menu.buttons = {};
-    Elements.menu.container.find('button').each(function(){ let el = $(this); Elements.menu.buttons[el.attr('name')] = el; });
+    Elements.menu.button = {};
+    Elements.menu.container.find('button').each(function(){ let el = $(this); Elements.menu.button[el.attr('name')] = el; });
 
     return {elements: Elements,actions: Actions,state: State}
   }
@@ -9866,20 +9866,20 @@
     const Elements = {};
 
     Elements.container = $('#permisions');
-    Elements.buttons = {};
-    Elements.container.find('button').each(function(){ let el = $(this); Elements.buttons[el.attr('name')] = el; });
+    Elements.button = {};
+    Elements.container.find('button').each(function(){ let el = $(this); Elements.button[el.attr('name')] = el; });
     Elements.actions = Elements.container.find('.action');
 
     Actions.open = ()=>{
       Elements.container.addClass('active');
-      Elements.buttons.open.addClass('hidden');
+      Elements.button.open.addClass('hidden');
       Elements.actions.removeClass('hidden');
     };
 
     Actions.close = ()=>{
       Elements.container.removeClass('active');
       Elements.actions.addClass('hidden');
-      Elements.buttons.open.removeClass('hidden');
+      Elements.button.open.removeClass('hidden');
     };
 
     return {elements: Elements, actions: Actions, state: State};
@@ -9896,13 +9896,13 @@
     };
 
     Elements.title = Elements.header.find('.title > p');
-    Elements.buttons = {};
+    Elements.button = {};
 
     Elements.footer.find('button').each(function(){
       let el = $(this);
-      Elements.buttons[el.attr('name')] = el;
+      Elements.button[el.attr('name')] = el;
     });
-    Elements.buttons.close = Elements.header.find('button[name="close"]');
+    Elements.button.close = Elements.header.find('button[name="close"]');
 
     Actions.open = (data)=>{
       Elements.container.addClass('open');
@@ -9962,17 +9962,16 @@
   const Forms = {};
 
   function Form(form){
+    const Inputs = ['input','button','textarea','select'];
     this.title = form.title;
-    this.inputs = {};
-    this.buttons = {};
     this.form = $(document.createElement('form'));
     this.form.attr('data',form.name).addClass('w-ful');
     this.form.html(form.html);
 
     this.init = function(){
       if(form.init != undefined){ form.init.call(this); }
-      for (let name in this.inputs) {
-        let input = this.inputs[name];
+      for (let name in this.input) {
+        let input = this.input[name];
         if(input.attr('data') == 'datepicker'){ input.datetimepicker(); }
       }
     };
@@ -9982,14 +9981,9 @@
       if(form.close != undefined){ form.close.call(this); }
     };
 
-    this.form.find('input').each(function(i,input){
-      input = $(input);
-      this.inputs[input.attr('name')] = input;
-    }.bind(this));
-
-    this.form.find('button').each(function(i,button){
-      button = $(button);
-      this.buttons[button.attr('name')] = button;
+    Inputs.forEach(function(type){
+      this.form.find(type).each(function(i,element){ element = $(element);
+      this[type] = {}; this[type][element.attr('name')] = element; }.bind(this));
     }.bind(this));
 
   }
@@ -10024,37 +10018,37 @@
     title:'Enfermedad',
     html: HTML.sick,
     init: function(){
-      let inputs = this.inputs;
-      let img = this.buttons.upload.children('img');
-      this.buttons.upload.on('click',()=>{
-        inputs.img[0].value = '';
-        inputs.img.trigger('click');
+      let input = this.input;
+      let img = this.button.upload.children('img');
+      this.button.upload.on('click',()=>{
+        input.img[0].value = '';
+        input.img.trigger('click');
       });
-      this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+      this.input.img.on('input',function(){ previewImg(input.img,img); });
     },
     close: function(){
       // remplazar el src por una ruta relativa de un img placeholder
-      let img = this.buttons.upload.children('img');
+      let img = this.button.upload.children('img');
       img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
     }
   };
 
-  Forms.myProfile = {
+  Forms.profile = {
     name:'profile',
     title:'Mi Perfil',
     html: HTML.profile,
     init: function(){
-      let inputs = this.inputs;
-      let img = this.buttons.upload.children('img');
-      this.buttons.upload.on('click',()=>{
-        inputs.img[0].value = '';
-        inputs.img.trigger('click');
+      let input = this.input;
+      let img = this.button.upload.children('img');
+      this.button.upload.on('click',()=>{
+        input.img[0].value = '';
+        input.img.trigger('click');
       });
-      this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+      this.input.img.on('input',function(){ previewImg(input.img,img); });
     },
     close: function(){
       // remplazar el src por una ruta relativa de un img placeholder
-      let img = this.buttons.upload.children('img');
+      let img = this.button.upload.children('img');
       img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
     }
   };
@@ -10069,8 +10063,6 @@
     const Permisions = permisionsInit();
     const Actions = {};
     const Elements = {};
-
-    console.log(Modal);
 
     Actions.open = {};
     Actions.update = {};
@@ -10129,26 +10121,28 @@
       form.init();
       Modal.actions.open({title: form.title, body: form.form });
       Permisions.actions.close();
-      Modal.elements.buttons.close.on('click',()=>{
+      Modal.elements.button.close.on('click',()=>{
         Modal.actions.close();
         form.close();
-        Modal.elements.buttons.close.off('click');
+        Modal.elements.button.close.off('click');
       });
 
     };
-    Actions.open.myProfile = ()=>{
-      let form = Forms.myProfile;
+    Actions.open.profile = ()=>{
+      let form = Forms.profile;
       Nav.elements.menu.container.trigger('click');
-      Modal.elements.buttons.edit.removeClass('hidden');
-      Modal.elements.buttons.accept.addClass('hidden');
+      Modal.elements.button.edit.removeClass('hidden');
+      Modal.elements.button.accept.addClass('hidden');
       Modal.actions.open({title: form.title, body: form.form });
-      Modal.elements.buttons.close.on('click',()=>{
+      Modal.elements.button.close.on('click',()=>{
         Modal.actions.close();
-        Modal.elements.buttons.edit.removeClass('hidden');
-        Modal.elements.buttons.accept.addClass('hidden');
-        Modal.elements.buttons.close.off('click');
+        Modal.elements.button.edit.removeClass('hidden');
+        Modal.elements.button.accept.addClass('hidden');
+        Modal.elements.button.close.off('click');
       });
     };
+
+
     [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
@@ -10157,18 +10151,17 @@
   function Events(){
     const {actions,elements} = actionsInit();
 
-    console.log(Services);
     actions.calendar.render();
-    elements.nav.buttons.menu.on('click',actions.open.menu);
-    elements.nav.buttons.next.on('click',actions.calendar.next);
-    elements.nav.buttons.prev.on('click',actions.calendar.prev);
-    elements.nav.buttons.today.on('click',actions.calendar.today);
-    elements.nav.menu.buttons.profile.on('click',actions.open.myProfile);
-    elements.permisions.buttons.open.on('click',actions.open.permisions);
-    elements.permisions.buttons.homeOffice.on('click',actions.open.form);
-    elements.permisions.buttons.sick.on('click',actions.open.form);
-    elements.permisions.buttons.vacation.on('click',actions.open.form);
-    elements.permisions.buttons.permision.on('click',actions.open.form);
+    elements.nav.button.menu.on('click',actions.open.menu);
+    elements.nav.button.next.on('click',actions.calendar.next);
+    elements.nav.button.prev.on('click',actions.calendar.prev);
+    elements.nav.button.today.on('click',actions.calendar.today);
+    elements.nav.menu.button.profile.on('click',actions.open.profile);
+    elements.permisions.button.open.on('click',actions.open.permisions);
+    elements.permisions.button.homeOffice.on('click',actions.open.form);
+    elements.permisions.button.sick.on('click',actions.open.form);
+    elements.permisions.button.vacation.on('click',actions.open.form);
+    elements.permisions.button.permision.on('click',actions.open.form);
   }
 
   $$1(document).ready(Events);

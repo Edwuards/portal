@@ -1,5 +1,7 @@
-<main>
-  <div id="calendar" class=""></div>
-  <?php $this->load->view('dashboard/avisar'); ?>
-  <?php $this->load->view('dashboard/modal'); ?>
-</main>
+<?php $this->load->view('nav/navbar'); ?>
+<section id="content">
+  <?php $this->load->view('nav/menu'); ?>
+  <div class="body">
+    <div id="calendar" class=""></div>
+  </div>
+</section>

@@ -3,17 +3,16 @@ import { HTML } from './templates.js';
 const Forms = {};
 
 function Form(form){
+  const Inputs = ['input','button','textarea','select'];
   this.title = form.title;
-  this.inputs = {};
-  this.buttons = {};
   this.form = $(document.createElement('form'));
   this.form.attr('data',form.name).addClass('w-ful');
   this.form.html(form.html);
 
   this.init = function(){
     if(form.init != undefined){ form.init.call(this); }
-    for (let name in this.inputs) {
-      let input = this.inputs[name];
+    for (let name in this.input) {
+      let input = this.input[name];
       if(input.attr('data') == 'datepicker'){ input.datetimepicker(); }
     }
   }
@@ -21,16 +20,11 @@ function Form(form){
   this.close = function(){
     this.form[0].reset();
     if(form.close != undefined){ form.close.call(this); }
-  }
+  };
 
-  this.form.find('input').each(function(i,input){
-    input = $(input);
-    this.inputs[input.attr('name')] = input;
-  }.bind(this));
-
-  this.form.find('button').each(function(i,button){
-    button = $(button);
-    this.buttons[button.attr('name')] = button;
+  Inputs.forEach(function(type){
+    this.form.find(type).each(function(i,element){ element = $(element);
+    this[type] = {}; this[type][element.attr('name')] = element; }.bind(this));
   }.bind(this));
 
 }
@@ -65,37 +59,37 @@ Forms.sick = {
   title:'Enfermedad',
   html: HTML.sick,
   init: function(){
-    let inputs = this.inputs;
-    let img = this.buttons.upload.children('img');
-    this.buttons.upload.on('click',()=>{
-      inputs.img[0].value = '';
-      inputs.img.trigger('click');
+    let input = this.input;
+    let img = this.button.upload.children('img');
+    this.button.upload.on('click',()=>{
+      input.img[0].value = '';
+      input.img.trigger('click');
     });
-    this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+    this.input.img.on('input',function(){ previewImg(input.img,img); });
   },
   close: function(){
     // remplazar el src por una ruta relativa de un img placeholder
-    let img = this.buttons.upload.children('img');
+    let img = this.button.upload.children('img');
     img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
   }
 }
 
-Forms.myProfile = {
+Forms.profile = {
   name:'profile',
   title:'Mi Perfil',
   html: HTML.profile,
   init: function(){
-    let inputs = this.inputs;
-    let img = this.buttons.upload.children('img');
-    this.buttons.upload.on('click',()=>{
-      inputs.img[0].value = '';
-      inputs.img.trigger('click');
+    let input = this.input;
+    let img = this.button.upload.children('img');
+    this.button.upload.on('click',()=>{
+      input.img[0].value = '';
+      input.img.trigger('click');
     });
-    this.inputs.img.on('input',function(){ previewImg(inputs.img,img); });
+    this.input.img.on('input',function(){ previewImg(input.img,img); });
   },
   close: function(){
     // remplazar el src por una ruta relativa de un img placeholder
-    let img = this.buttons.upload.children('img');
+    let img = this.button.upload.children('img');
     img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
   }
 }

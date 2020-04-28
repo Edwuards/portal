@@ -1,7 +1,7 @@
 #modal-cont{
-  top: -100%;
+  top: -150%;
   opacity: 0;
-  transition: top 1s, opacity 1s;
+  transition: top .5s, opacity .5s;
   overflow: hidden;
   background-color: #949494ad;
   #modal{

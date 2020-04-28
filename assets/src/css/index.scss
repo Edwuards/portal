@@ -2,13 +2,14 @@
 @import 'nav';
 @import 'permisions';
 @import 'modal';
+@import 'dataTable';
 
 body,main{
   overflow: hidden;
   width: 100%;
-  height: 100vh;
   font-family: 'Open sans';
+  position: relative;
 }
 main{
-  height: calc(100vh - 50px);
+  // height: calc(100% - 50px);
 }
