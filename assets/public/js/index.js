@@ -9846,16 +9846,41 @@
   function navInit (){
     const Elements = {};
     const Actions = {};
-    const State = {};
+    const State = {
+      menu: false,
+    };
 
-    Elements.nav = $('nav');
-    Elements.date = Elements.nav.find('[data="date"]');
-    Elements.button = {};
-    Elements.nav.find('button').each(function(){ let el = $(this); Elements.button[el.attr('name')] = el; });
+    Elements.container = $('nav');
+    Elements.content = $('#content');
+    Elements.date = Elements.container.find('[data="date"]');
+    Elements.bar = {};
     Elements.menu = {};
-    Elements.menu.container = $('#side-menu');
+    Elements.menu.container = $('#menu');
     Elements.menu.button = {};
+    Elements.button = {};
+    Elements.button.menu = Elements.container.find('button[name="menu"]');
+    Elements.container.find('[data-nav]').each(function(){
+      let nav = $(this);
+      let type = nav.attr('data-nav');
+      Elements.bar[type]  = {};
+      Elements.bar[type].button = {};
+      nav.find('button').each(function(){
+        let el = $(this);
+        Elements.bar[type].button[el.attr('name')] = el;
+      });
+    });
     Elements.menu.container.find('button').each(function(){ let el = $(this); Elements.menu.button[el.attr('name')] = el; });
+
+    Actions.openMenu = ()=>{
+      Elements.content.addClass('open');
+      Elements.button.menu.children('i').removeClass('fa-bars').addClass('fa-times');
+      State.menu = true;
+    };
+    Actions.closeMenu = ()=>{
+      Elements.content.removeClass('open');
+      Elements.button.menu.children('i').removeClass('fa-times').addClass('fa-bars');
+      State.menu = false;
+    };
 
     return {elements: Elements,actions: Actions,state: State}
   }
@@ -10063,7 +10088,7 @@
     const Permisions = permisionsInit();
     const Actions = {};
     const Elements = {};
-
+    console.log(Nav);
     Actions.open = {};
     Actions.update = {};
     Actions.update.date = (format)=>{
@@ -10079,7 +10104,7 @@
         dentro del calendar.
         su total son 25 pixels para que se ajuste al tamaño de la pantalla.
       */
-      let height = (window.innerHeight+25) - Nav.elements.nav.height();
+      let height = (window.innerHeight+25) - Nav.elements.container.height();
       Calendar.setOption('height',height);
       Calendar.render();
     };
@@ -10096,15 +10121,8 @@
       Actions.update.date();
     };
     Actions.open.menu = ()=>{
-      let menu = Nav.elements.menu.container;
-      menu.addClass('open');
-      menu.on('click',function(e){
-        let target = $(e.target);
-        if(target.attr('id') == 'side-menu'){
-          menu.removeClass('open');
-          menu.off('click');
-        }
-      });
+      if(Nav.state.menu){ Nav.actions.closeMenu();}
+      else { Nav.actions.openMenu();}
     };
     Actions.open.permisions = ()=>{
       Permisions.actions.open();
@@ -10153,15 +10171,15 @@
 
     actions.calendar.render();
     elements.nav.button.menu.on('click',actions.open.menu);
-    elements.nav.button.next.on('click',actions.calendar.next);
-    elements.nav.button.prev.on('click',actions.calendar.prev);
-    elements.nav.button.today.on('click',actions.calendar.today);
+    elements.nav.bar.calendar.button.next.on('click',actions.calendar.next);
+    elements.nav.bar.calendar.button.prev.on('click',actions.calendar.prev);
+    elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
     elements.nav.menu.button.profile.on('click',actions.open.profile);
-    elements.permisions.button.open.on('click',actions.open.permisions);
-    elements.permisions.button.homeOffice.on('click',actions.open.form);
-    elements.permisions.button.sick.on('click',actions.open.form);
-    elements.permisions.button.vacation.on('click',actions.open.form);
-    elements.permisions.button.permision.on('click',actions.open.form);
+    // elements.permisions.button.open.on('click',actions.open.permisions);
+    // elements.permisions.button.homeOffice.on('click',actions.open.form);
+    // elements.permisions.button.sick.on('click',actions.open.form);
+    // elements.permisions.button.vacation.on('click',actions.open.form);
+    // elements.permisions.button.permision.on('click',actions.open.form);
   }
 
   $$1(document).ready(Events);

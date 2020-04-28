@@ -1,5 +1,4 @@
-<div id="side-menu" class="w-screen h-screen absolute z-20">
-  <div class="max-w-sm w-9/12 h-full p-4 bg-white">
+<div id="menu" class="bg-white h-full p-4">
     <div class="flex w-full mb-4"> <p>Avisame</p> </div>
     <div class="flex w-full mb-2 items-center">
       <div class="avatar w-10 h-10">
@@ -28,5 +27,4 @@
         <p class="ml-2">Avisos de usuarios</p>
       </button>
     </div>
-  </div>
 </div>

@@ -4,24 +4,6 @@
 .fc-dayGrid-view .fc-day-number {
   margin-right: 5px; }
 
-nav {
-  height: 50px; }
-  nav .icon {
-    height: 30px;
-    width: 30px; }
-
-[data="calendar"] {
-  width: calc( 100% - 90px); }
-
-#side-menu {
-  background-color: rgba(0, 0, 0, 0.5);
-  top: 0px;
-  left: -100%;
-  transition: left 1s; }
-
-#side-menu.open {
-  left: 0; }
-
 #permisions {
   transition: all .5s;
   background-color: rgba(255, 255, 255, 0); }
@@ -53,8 +35,22 @@ nav {
 #dataTable [data-table] .body, #dataTable [data-table] .header {
   background-color: white; }
 
-body, main {
+body, html {
   overflow: hidden;
   width: 100%;
+  height: 100%;
   font-family: 'Open sans';
   position: relative; }
+
+#content {
+  height: calc(100% - 64px);
+  width: calc(100vw + 320px);
+  left: -320px;
+  position: relative;
+  transition: left 1s; }
+
+#content.open {
+  left: 0px; }
+
+#menu {
+  width: 320px; }

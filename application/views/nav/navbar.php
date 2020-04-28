@@ -1,33 +1,8 @@
-<nav class="flex justify-around items-center px-2 z-10">
-  <div class="icon flex justify-center items-center">
-    <button class="w-full h-full" type="button" name="menu" class="">
-      <i class="fas fa-bars"></i>
-    </button>
-  </div>
-
-  <div data="calendar" class="flex justify-center items-center">
-
-    <button type="button" name="prev" class="mx-2">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <p data="date" class="mx-2 text-sm"></p>
-    <button class="" type="button" name="next" class="mx-2">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-  </div>
-
-  <div class="icon flex justify-center items-center">
-    <button class="w-full h-full" type="button" name="today" class="mx-2">
-      <i class="fas fa-calendar-day"></i>
-    </button>
-  </div>
-
-  <div class="icon flex justify-center items-center">
-    <button class="w-full h-full" type="button" name="notifications" class="mx-2">
-      <i class="fas fa-bell"></i>
-    </button>
-  </div>
+<nav class="flex h-16 items-center px-2">
+  <button class="w-10 h-10" type="button" name="menu" class="">
+    <i class="text-sm sm:text-xl fas fa-bars"></i>
+  </button>
+  <?php $this->load->view('nav/calendar'); ?>
+  <?php $this->load->view('nav/users'); ?>
 
 </nav>
-
-<?php $this->load->view('nav/menu'); ?>

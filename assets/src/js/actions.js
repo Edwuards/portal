@@ -12,7 +12,7 @@ export default function(){
   const Permisions = permisionsInit();
   const Actions = {};
   const Elements = {};
-
+  console.log(Nav);
   Actions.open = {};
   Actions.update = {};
   Actions.update.date = (format)=>{
@@ -28,7 +28,7 @@ export default function(){
       dentro del calendar.
       su total son 25 pixels para que se ajuste al tamaño de la pantalla.
     */
-    let height = (window.innerHeight+25) - Nav.elements.nav.height();
+    let height = (window.innerHeight+25) - Nav.elements.container.height();
     Calendar.setOption('height',height);
     Calendar.render();
   }
@@ -45,15 +45,8 @@ export default function(){
     Actions.update.date();
   }
   Actions.open.menu = ()=>{
-    let menu = Nav.elements.menu.container;
-    menu.addClass('open');
-    menu.on('click',function(e){
-      let target = $(e.target);
-      if(target.attr('id') == 'side-menu'){
-        menu.removeClass('open');
-        menu.off('click');
-      }
-    })
+    if(Nav.state.menu){ Nav.actions.closeMenu();}
+    else{ Nav.actions.openMenu();}
   }
   Actions.open.permisions = ()=>{
     Permisions.actions.open();
