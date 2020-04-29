@@ -8,7 +8,7 @@ const paths = {
   styles: {
     frameworks: {src:'./src/css/base.css',dest:'./src/css/bundle/'},
     bundle: {src:'./src/css/bundle.css',dest:'./public/css/'},
-    index: {src:'./src/css/index.scss',dest:'./public/css/'},
+    index: {src:'./src/css/index.sass',dest:'./public/css/'},
    }
 }
 

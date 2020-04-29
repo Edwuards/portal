@@ -1,9 +1,0 @@
-#dataTable{
-  > .body{
-    height: calc(100% - 128px);
-  }
-
-  [data-table]{
-    .body,.header{ background-color: white;}
-  }
-}

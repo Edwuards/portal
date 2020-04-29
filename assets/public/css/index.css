@@ -1,14 +1,30 @@
-.fc-toolbar.fc-header-toolbar {
-  display: none; }
-
-.fc-dayGrid-view .fc-day-number {
-  margin-right: 5px; }
-
 #permisions {
   transition: all .5s;
   background-color: rgba(255, 255, 255, 0); }
   #permisions button[name="abrir"] {
     z-index: 9; }
+  #permisions .action {
+    opacity: 0; }
+    #permisions .action p {
+      opacity: 0;
+      transition: opacity .5s; }
+    #permisions .action p.active {
+      opacity: 1; }
+  #permisions .action:nth-child(1) {
+    top: 64px;
+    transition: top 1s, opacity 1s; }
+  #permisions .action:nth-child(2) {
+    top: 128px;
+    transition: top 1s, opacity 1s; }
+  #permisions .action:nth-child(3) {
+    top: 192px;
+    transition: top 1s, opacity 1s; }
+  #permisions .action:nth-child(4) {
+    top: 256px;
+    transition: top 1s, opacity 1s; }
+  #permisions .action.active {
+    opacity: 1;
+    top: 0px; }
 
 #permisions.active {
   width: 100%;
@@ -34,6 +50,12 @@
 
 #dataTable [data-table] .body, #dataTable [data-table] .header {
   background-color: white; }
+
+.fc-toolbar.fc-header-toolbar {
+  display: none; }
+
+.fc-dayGrid-view .fc-day-number {
+  margin-right: 5px; }
 
 body, html {
   overflow: hidden;

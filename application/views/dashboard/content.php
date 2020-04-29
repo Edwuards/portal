@@ -5,3 +5,4 @@
     <div id="calendar" class="w-full"></div>
   </div>
 </section>
+<?php $this->load->view('dashboard/action_button'); ?>

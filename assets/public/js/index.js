@@ -9887,8 +9887,10 @@
 
   function permisionsInit(){
     const Actions = {};
-    const State = {};
     const Elements = {};
+    const State = {
+      open:false
+    };
 
     Elements.container = $('#permisions');
     Elements.button = {};
@@ -9896,15 +9898,21 @@
     Elements.actions = Elements.container.find('.action');
 
     Actions.open = ()=>{
+      State.open = true;
       Elements.container.addClass('active');
-      Elements.button.open.addClass('hidden');
-      Elements.actions.removeClass('hidden');
+      Elements.button.open.children('i')
+      .removeClass('fa-plus')
+      .addClass('fa-times');
+      Elements.actions.addClass('active').children('p').addClass('active');
     };
 
     Actions.close = ()=>{
+      State.open = false;
       Elements.container.removeClass('active');
-      Elements.actions.addClass('hidden');
-      Elements.button.open.removeClass('hidden');
+      Elements.actions.removeClass('active').children('p').removeClass('active');
+      Elements.button.open.children('i')
+      .removeClass('fa-times')
+      .addClass('fa-plus');
     };
 
     return {elements: Elements, actions: Actions, state: State};
@@ -10125,13 +10133,7 @@
       else { Nav.actions.openMenu();}
     };
     Actions.open.permisions = ()=>{
-      Permisions.actions.open();
-      Permisions.elements.container.on('click',function(e){
-        let target = $(e.target);
-        if(target.hasClass('button-cont')){
-          Permisions.actions.close();
-          Permisions.elements.container.off('click');
-        }    });
+      Permisions.actions[Permisions.state.open ? 'close' : 'open']();
     };
     Actions.open.form = function(){
       let btn = $(this);
@@ -10175,11 +10177,11 @@
     elements.nav.bar.calendar.button.prev.on('click',actions.calendar.prev);
     elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
     elements.nav.menu.button.profile.on('click',actions.open.profile);
-    // elements.permisions.button.open.on('click',actions.open.permisions);
-    // elements.permisions.button.homeOffice.on('click',actions.open.form);
-    // elements.permisions.button.sick.on('click',actions.open.form);
-    // elements.permisions.button.vacation.on('click',actions.open.form);
-    // elements.permisions.button.permision.on('click',actions.open.form);
+    elements.permisions.button.open.on('click',actions.open.permisions);
+    elements.permisions.button.homeOffice.on('click',actions.open.form);
+    elements.permisions.button.sick.on('click',actions.open.form);
+    elements.permisions.button.vacation.on('click',actions.open.form);
+    elements.permisions.button.permision.on('click',actions.open.form);
   }
 
   $$1(document).ready(Events);

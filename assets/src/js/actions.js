@@ -49,14 +49,7 @@ export default function(){
     else{ Nav.actions.openMenu();}
   }
   Actions.open.permisions = ()=>{
-    Permisions.actions.open();
-    Permisions.elements.container.on('click',function(e){
-      let target = $(e.target);
-      if(target.hasClass('button-cont')){
-        Permisions.actions.close();
-        Permisions.elements.container.off('click');
-      };
-    });
+    Permisions.actions[Permisions.state.open ? 'close' : 'open']();
   }
   Actions.open.form = function(){
     let btn = $(this);
