@@ -1,9 +1,13 @@
 #permisions
-  transition: all .5s;
   background-color: rgba(255,255,255,0);
+  transition: all 1s;
 
-  button[name="abrir"]
-    z-index: 9;
+  > div:nth-child(1)
+    transition: width .5s;
+    transition-delay: 1s;
+
+  > div:nth-child(1).active
+    transition-delay: 0s;
 
   .action
     opacity: 0;
@@ -21,6 +25,13 @@
   .action.active
     opacity: 1;
     top: 0px;
+
+  .open
+    right: 0px;
+    transition: right 1s;
+
+  .open.hide
+    right: -100%;
 
 #permisions.active
   width: 100%;

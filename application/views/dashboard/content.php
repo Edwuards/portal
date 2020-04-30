@@ -6,3 +6,4 @@
   </div>
 </section>
 <?php $this->load->view('dashboard/action_button'); ?>
+<?php $this->load->view('dashboard/modal'); ?>

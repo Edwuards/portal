@@ -1,6 +1,6 @@
 <div id="menu" class="bg-gray-200 h-full p-4">
     <div class="flex w-full mb-4"> <p>Avisame</p> </div>
-    <div class="flex w-full mb-2 items-center">
+    <div class="flex w-full mb-2 px-2 items-center">
       <div class="avatar w-10 h-10">
         <img class="w-full" src="http://nails5stars.ca/wp-content/uploads/2019/01/avatar-373-456325.png" alt="">
       </div>

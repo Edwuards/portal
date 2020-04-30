@@ -1,4 +1,4 @@
-<nav class="flex h-16 items-center px-2">
+<nav class="flex h-16 items-center px-2 bg-blue-700 text-white">
   <button class="w-10 h-10" type="button" name="menu" class="">
     <i class="text-sm sm:text-xl fas fa-bars"></i>
   </button>

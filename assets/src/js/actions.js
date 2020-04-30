@@ -28,8 +28,8 @@ export default function(){
       dentro del calendar.
       su total son 25 pixels para que se ajuste al tamaño de la pantalla.
     */
-    let height = (window.innerHeight+25) - Nav.elements.container.height();
-    Calendar.setOption('height',height);
+    let height = window.innerHeight - 64;
+    Calendar.setOption('contentHeight',height);
     Calendar.render();
   }
   Actions.calendar.next = ()=>{
@@ -45,8 +45,14 @@ export default function(){
     Actions.update.date();
   }
   Actions.open.menu = ()=>{
-    if(Nav.state.menu){ Nav.actions.closeMenu();}
-    else{ Nav.actions.openMenu();}
+    if(Nav.state.menu){
+      Nav.actions.closeMenu();
+      Permisions.actions.show();
+    }
+    else{
+      Nav.actions.openMenu();
+      Permisions.actions.hide();
+    }
   }
   Actions.open.permisions = ()=>{
     Permisions.actions[Permisions.state.open ? 'close' : 'open']();

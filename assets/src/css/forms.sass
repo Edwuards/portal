@@ -1,0 +1,65 @@
+select,
+select:focus,
+select:active,
+button,
+button:focus,
+button:active,
+input,
+input:focus,
+input:active,
+textarea,
+textarea:focus,
+textarea:active,
+  outline: none;
+
+
+form
+  input,
+  select,
+  option,
+  textarea
+    background: transparent;
+
+  label
+    bottom: 0px;
+    transition: all 1s,;
+
+  .input,
+  .select,
+  .textarea
+    color: black;
+    border-bottom: 3px solid #C8C8C8;
+    background-color: #E8E8E8;
+    transition: border-bottom-color 1s, color 1s;
+
+  .select
+      color: transparent;
+
+  .input:hover,
+  .select:hover,
+  .textarea:hover,
+  .input.active,
+  .select.active,
+    background-color: #DCDCDC;
+    color: black;
+    label
+      bottom: 20px;
+
+  .textarea:hover,
+    label
+      bottom: 36px;
+
+  .input.active,
+  .select.active,
+  .textarea.active,
+    color: black;
+    border-bottom-color: #2b6cb0;
+
+  .input.disabled,
+  .textarea.disabled,
+  .select.disabled
+    border-bottom-color: #BEBEBE;
+    background-color: #D3D3D3;
+    color: #808080;
+    label
+      color: #808080;
