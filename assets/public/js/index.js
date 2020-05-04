@@ -9864,8 +9864,11 @@
       let type = nav.attr('data-nav');
       Elements.bar[type]  = {};
       Elements.bar[type].button = {};
+      Elements.bar[type].container = nav;
+
       nav.find('button').each(function(){
         let el = $(this);
+
         Elements.bar[type].button[el.attr('name')] = el;
       });
     });
@@ -9880,6 +9883,16 @@
       Elements.content.removeClass('open');
       Elements.button.menu.children('i').removeClass('fa-times').addClass('fa-bars');
       State.menu = false;
+    };
+    Actions.changeNavBar = (bar)=>{
+      for (let name in Elements.bar) {
+        Elements.bar[name].container[bar == name ? 'removeClass' : 'addClass' ]('hidden');
+      }
+    };
+    Actions.updateMenu = (selected)=>{
+      for (let name in Elements.menu.button) {
+        Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('hidden');
+      }
     };
 
     return {elements: Elements,actions: Actions,state: State}
@@ -9947,27 +9960,33 @@
 
     Elements.title = Elements.header.find('.title > p');
     Elements.button = {};
-
+    Elements.errors = Elements.container.find('.errors');
     Elements.footer.find('button').each(function(){
       let el = $(this);
       Elements.button[el.attr('name')] = el;
     });
+    Elements.allButtons = Elements.footer.find('button');
     Elements.button.close = Elements.header.find('button[name="close"]');
 
     Actions.open = (data)=>{
-      Elements.container.addClass('open');
       Elements.title.html(data.title);
       Elements.body.html(data.body);
 
+      Elements.container.removeClass('hidden')
+      .animate({'opacity': 1},1000,()=>{
+        Elements.modal.addClass('active');
+      });
     };
 
     Actions.close = ()=>{
-      Elements.container.removeClass('open');
-      Elements.title.html('');
-      Elements.body.html('');
-
+      Elements.container.animate({'opacity': 0},1000,()=>{
+        Elements.container.addClass('hidden');
+        Elements.modal.removeClass('active');
+        Elements.title.html('');
+        Elements.body.html('');
+        Elements.allButtons.addClass('hidden');
+      });
     };
-
 
     return { elements: Elements, actions: Actions}
 
@@ -10009,72 +10028,379 @@
     }
   };
 
-  const Forms = {};
-
   function Form(form){
-    const Inputs = ['input','button','textarea','select'];
+    const Events = [];
+    const INPUTS = ['input','button','textarea','select'];
+    const Exe = {
+      open: []
+    };
+    let Init = false;
+
+    this.addEvent = (el,type,fn)=>{
+      Events.push({el,type,fn});
+      el.on(type,fn);
+    };
     this.title = form.title;
+    this.setButtons = function(buttons){
+      for (let name in buttons) {
+        this.buttons[name] = buttons[name];
+        if(name !== 'close'){
+          this.buttons[name].addClass('hidden');
+        }
+      }
+    };
+    this.buttons = {};
     this.form = $(document.createElement('form'));
     this.form.attr('data',form.name).addClass('w-ful');
     this.form.html(form.html);
+    this.group = {};
+    this.createDateInput = function(Inputs){
+      let obj = dateInput(Inputs);
+      Exe.open.push(dateInputEvents.bind(this,Inputs));
+      return obj
+    };
+    this.createTimeInput = function(Inputs){
+      let obj = timeInput(Inputs);
+      Exe.open.push(timeInputEvents.bind(this,Inputs));
+      return obj;
+    };
+    this.previewImg = function(input,button,img){
+      this.addEvent(button,'click',()=>{
+        input[0].value = '';
+        input.trigger('click');
+      });
+      this.addEvent(input,'input',()=>{
+        input.previewImg(img);
+      });
+    };
 
-    this.init = function(){
-      if(form.init != undefined){ form.init.call(this); }
-      for (let name in this.input) {
-        let input = this.input[name];
-        if(input.attr('data') == 'datepicker'){ input.datetimepicker(); }
-      }
+    this.send = form.send;
+
+    this.open = function(){
+      if(Init == false && form.init !== undefined){
+        Init = true;
+        form.init.call(this);
+      }    if(form.open !== undefined){ form.open.call(this); }
+      Exe.open.forEach((fn)=>{ fn(); });
+
     };
 
     this.close = function(){
       this.form[0].reset();
       if(form.close != undefined){ form.close.call(this); }
+      Events.forEach((e)=>{ e.el.off(e.type); });
     };
 
-    Inputs.forEach(function(type){
-      this.form.find(type).each(function(i,element){ element = $(element);
-      this[type] = {}; this[type][element.attr('name')] = element; }.bind(this));
+    INPUTS.forEach(function(type){
+
+      this[type] = {};
+
+      this.form.find(type).each(function(i,element){
+        element = $(element);
+        let parent = element.parent();
+        organize.call(this,element,type);
+        if(type == 'input' && element.attr('type') == 'file'){
+          element.previewImg = previewImg$1;
+        }
+
+        element.error = (on)=>{
+          if(on === true){
+            parent.addClass('error');
+          }
+          else if(on === false){
+            parent.removeClass('error');
+          }
+
+        };
+        element.active = (on)=>{
+          if(on !== undefined){
+            parent.removeClass('notEmtpy');
+            parent[ on ? 'addClass' : 'removeClass' ]('active');
+            parent.data('active',on);
+            if(!on){
+              let value = element.val();
+              if(typeof value == 'string'){ value = value.trim(); }            if(Boolean(value)){
+                parent.addClass('notEmtpy');
+              }
+            }
+          }
+
+          return parent.data('active')
+        };
+        Exe.open.push(function(){
+          this.addEvent(element,'focus',()=>{ element.active(true); });
+          this.addEvent(element,'blur',()=>{ element.active(false); });
+
+        }.bind(this));
+
+      }.bind(this));
+
     }.bind(this));
 
   }
 
-  function previewImg(input,img){
-    let file = input[0].files[0];
+  function organize(element,type){
+    let group = element.attr('data-group');
+    let name = element.attr('name');
+    if(group != undefined && group != '' ){
+      if(this[type][group] == undefined){ this[type][group] = {}; }
+      if(this.group[group] == undefined){ this.group[group] = {}; }
+      this[type][group][name] = element;
+      this.group[group][name] = element;
+    }
+    else {
+      this[type][name] = element;
+    }
+  }
+
+  function timeInput(Inputs){
+    let option = undefined;
+    ['am','pm'].forEach((str,i)=>{
+      option = $(document.createElement('option'));
+      option.attr('value',str).text(str.toUpperCase());
+      if(i == 1){option.attr('selected','selected'); }
+      Inputs.amPm.append(option);
+    });
+    Inputs.amPm.parent().addClass('notEmtpy');
+
+    return {
+      inputs:Inputs,
+      time: ()=>{
+        let afternoon = Inputs.amPm.val() == 'pm';
+        let hour = Number(Inputs.hour.val());
+        if(hour != '' || hour != 0){
+          hour = afternoon ? (hour+12) : hour ;
+        }
+        let minutes = Inputs.minutes.val();
+        return {hour,minutes,time: `${hour}:${minutes}` }
+      }
+    }
+
+  }
+
+  function timeInputEvents(Inputs){
+    const MaxMinConstraints = (min,max,input)=>{
+      let value = Number(input.val());
+      if(value < min || value == NaN){ value = `0${1}`; }
+      else if(value < 10){ value = `0${String(value)}`;  }
+      else if(value > max){ value = max; }
+
+
+      input.val(value);
+    };
+
+    const change = (max,min,input)=>{
+      return ()=>{
+        input.off('input');
+        MaxMinConstraints(max,min,input);
+        input.on('input',change(max,min,input));
+      }
+    };
+
+    const focus = function(input){
+      return ()=>{
+        let value = input.val();
+        if(value == ''){
+          input.val(input.attr('name') == 'minutes' ? '00' : '01');
+        }
+      }
+    };
+
+    [
+      [Inputs.hour,1,12],
+      [Inputs.minutes,0,59]
+    ].forEach(function(data){
+      this.addEvent(data[0],'focus',focus(data[0]));
+      this.addEvent(data[0],'input',change(data[1],data[2],data[0]));
+    }.bind(this));
+  }
+
+  function dateInputEvents(Inputs){
+    const addDays = (diff,days)=>{
+      let option = undefined;
+      while(diff){
+        days++;
+        option = Inputs.day.find(`[value="${days}"]`);
+        if(option.length){ option.removeClass('hidden'); }
+        else {
+          option = $(document.createElement('option'));
+          option.attr('value',days).text(days);
+          Inputs.day.append(option);
+        }
+        diff--;
+      }    Inputs.month.data('days',days);
+    };
+
+    const removeDays = (diff,days)=>{
+      while(diff){
+        Inputs.day.find(`[value="${days}"]`).addClass('hidden');
+        days--;
+        diff--;
+      }    Inputs.month.data('days',days);
+    };
+
+    const update = ()=>{
+      let value = Inputs.month.val();
+      let days = Inputs.month.data('days');
+      let year = Inputs.month.data('year');
+      let updateDays = new Date(year,value,0).getDate();
+      Inputs.day.find('[selected="selected"]').removeAttr('selected');
+      Inputs.day.find('[value="1"]').attr('selected','selected');
+      if(updateDays > days){ addDays((updateDays - days),days); }
+      else if(updateDays < days){ removeDays((days - updateDays),days); }
+    };
+
+    this.addEvent(Inputs.month,'change',update);
+
+  }
+
+  function dateInput(Inputs){
+    let date = new Date(Date.now());
+    let year = date.getFullYear();
+    let days = undefined,
+    option = undefined;
+
+    for (var i = 0; i < 12; i++) {
+      let month = date.getMonth();
+      let html = new Intl.DateTimeFormat('es-MX',{month:'long'}).format(new Date(year,i));
+      option = $(document.createElement('option'));
+      if(month == i){
+        option.attr('selected','selected');
+        days = new Date(year,month,0).getDate();
+        Inputs.month.data('days',days);
+      }
+      option.attr('value',i+1).html(html);
+      Inputs.month.append(option);
+    }
+
+    for (var i = 0; i < days; i++) {
+      option = $(document.createElement('option'));
+      option.attr('value',i+1).text(i+1);
+      Inputs.day.append(option);
+    }
+
+    Inputs.month.data('year',year);
+
+    option = $(document.createElement('option'));
+    option.text(year).attr('value',year).attr('selected','selected');
+    Inputs.year.append(option);
+
+    option = $(document.createElement('option'));
+    option.text(String(Number(year)+1)).attr('value',year);
+    Inputs.year.append(option);
+
+    ['month','day','year'].forEach((name)=>{
+      Inputs[name].parent().addClass('notEmtpy');
+    });
+
+    return {
+      date: ()=>{
+        return new Date(Inputs.year.val(),Inputs.month.val()-1,Inputs.day.val())
+      }
+    }
+
+  }
+
+  function previewImg$1(img){
     let reader = new FileReader();
     reader.onload = function(e){ img.attr('src',e.target.result); };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(this[0].files[0]);
   }
+
+  const Rules = {};
+
+  Rules.timeEmpty = (data)=>{
+    let error = false;
+    const { hour, minutes } = data.inputs;
+    const parent = {
+      hour: hour.parent(),
+      minutes: minutes.parent()
+    };
+    const time = data.time();
+
+    parent.hour.removeClass('error');
+    parent.minutes.removeClass('error');
+
+    if(!Boolean(time.hour)){
+      parent.hour.addClass('error').siblings('.helper').text('Vacio');
+      error = true;
+    }
+    if(time.minutes == '' || time.minutes == undefined){
+      parent.minutes.addClass('error').siblings('.helper').text('Vacio');
+      error = true;
+    }
+
+    return error;
+
+  };
+
+  Rules.textEmpty = (input)=>{
+    let p = input.parent();
+    let error = false;
+    const value = input.val().trim();
+    p.removeClass('error');
+
+    if(value == '' || value == undefined){
+      p.addClass('error').siblings('.helper').text('Vacio');
+      error = true;
+    }
+
+    return error;
+  };
+
+  const Forms = {};
 
   Forms.permision = {
     name:'permision',
     title: 'Permiso',
-    html: HTML.permision
+    html: HTML.permision,
+    buttons: ['accept'],
+    init: function(){
+      this.group.date = this.createDateInput(this.group.date);
+      this.group.hour_start = this.createTimeInput(this.group.hour_start);
+      this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
+    },
+    open: function(){
+      this.buttons.send.removeClass('hidden');
+    },
+    send: function(){
+      let a = Rules.timeEmpty(this.group.hour_start);
+      if(a){ console.log(this.group.hour_start.time());}
+    }
   };
 
   Forms.homeOffice = {
     name:'homeOffice',
     title:'Home Office',
-    html: HTML.homeOffice
+    html: HTML.homeOffice,
+    buttons: ['accept'],
+    init: function(){
+      this.group.date = this.createDateInput(this.group.date);
+      this.group.hour_start = this.createTimeInput(this.group.hour_start);
+      this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
+    },
   };
 
   Forms.vacation = {
     name:'vacation',
     title: 'Vacación',
-    html: HTML.vacation
+    html: HTML.vacation,
+    buttons: ['accept'],
+    init: function(){
+      this.group.date_start = this.createDateInput(this.group.date_start);
+      this.group.date_finish = this.createDateInput(this.group.date_finish);
+    },
   };
 
   Forms.sick = {
     name:'sick',
     title:'Enfermedad',
     html: HTML.sick,
+    buttons: ['accept'],
     init: function(){
-      let input = this.input;
-      let img = this.button.upload.children('img');
-      this.button.upload.on('click',()=>{
-        input.img[0].value = '';
-        input.img.trigger('click');
-      });
-      this.input.img.on('input',function(){ previewImg(input.img,img); });
+      this.group.date_start = this.createDateInput(this.group.date_start);
+      this.group.date_finish = this.createDateInput(this.group.date_finish);
+      this.previewImg(this.input.img,this.button.upload,this.button.upload.children('img'));
     },
     close: function(){
       // remplazar el src por una ruta relativa de un img placeholder
@@ -10087,6 +10413,7 @@
     name:'profile',
     title:'Mi Perfil',
     html: HTML.profile,
+    buttons: ['edit'],
     init: function(){
       let input = this.input;
       let img = this.button.upload.children('img');
@@ -10105,15 +10432,46 @@
 
   var formsInit = ()=>{ for (let name in Forms) { Forms[name] = new Form(Forms[name]); } return Forms };
 
+  function tablesInit (){
+    const Actions = {};
+    const Elements = {};
+    const State = {};
+
+    Elements.container = $('#dataTable');
+    Elements.tables = {};
+    Elements.container.find('[data-table]').each(function(){
+      let el = $(this);
+      Elements.tables[el.attr('data-table')] = el;
+    });
+
+    Actions.changeTable = (table)=>{
+      for (let name in Elements.tables) {
+        console.log(table == name);
+        Elements.tables[name][table == name ? 'removeClass' : 'addClass' ]('hidden');
+      }
+    };
+    Actions.open = (table)=>{
+      Elements.container.addClass('active');
+      Actions.changeTable(table);
+    };
+    Actions.close = ()=>{
+      Elements.container.removeClass('active');
+      Actions.changeTable(false);
+    };
+
+    return {actions: Actions, elements: Elements, state: State}
+
+  }
+
   function actionsInit(){
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
     const Forms = formsInit();
     const Permisions = permisionsInit();
+    const Tables = tablesInit();
     const Actions = {};
     const Elements = {};
-    console.log(Nav);
     Actions.open = {};
     Actions.update = {};
     Actions.update.date = (format)=>{
@@ -10123,12 +10481,7 @@
     Actions.calendar = {};
     Actions.calendar.render = ()=>{
       Actions.update.date();
-      /*
-        Se le suma un pixel debido al border top del contendor del Calendar.
-        Se le suma 24 pixels por el alto del header que contiene los dias
-        dentro del calendar.
-        su total son 25 pixels para que se ajuste al tamaño de la pantalla.
-      */
+      // la barra de navegación mide 64px en altura por eso se la resta.
       let height = window.innerHeight - 64;
       Calendar.setOption('contentHeight',height);
       Calendar.render();
@@ -10161,7 +10514,9 @@
     Actions.open.form = function(){
       let btn = $(this);
       let form = Forms[btn.attr('name')];
-      form.init();
+      form.setButtons(Modal.elements.button);
+      console.log(form);
+      form.open();
       Modal.actions.open({title: form.title, body: form.form });
       Permisions.actions.close();
       Modal.elements.button.close.on('click',()=>{
@@ -10169,24 +10524,24 @@
         form.close();
         Modal.elements.button.close.off('click');
       });
+    };
+    Actions.open.table = function(){
+      let name = $(this).attr('name');
+      Nav.elements.button.menu.trigger('click');
+      Nav.actions.updateMenu(name);
+      Nav.actions.changeNavBar(name);
+      Tables.actions.open(name);
 
     };
-    Actions.open.profile = ()=>{
-      let form = Forms.profile;
-      Nav.elements.menu.container.trigger('click');
-      Modal.elements.button.edit.removeClass('hidden');
-      Modal.elements.button.accept.addClass('hidden');
-      Modal.actions.open({title: form.title, body: form.form });
-      Modal.elements.button.close.on('click',()=>{
-        Modal.actions.close();
-        Modal.elements.button.edit.removeClass('hidden');
-        Modal.elements.button.accept.addClass('hidden');
-        Modal.elements.button.close.off('click');
-      });
+    Actions.open.calendar = function(){
+      Nav.elements.button.menu.trigger('click');
+      Nav.actions.updateMenu('calendar');
+      Nav.actions.changeNavBar('calendar');
+      Nav.actions.closeMenu();
+      Tables.actions.close();
     };
 
-
-    [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
+    [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
   }
@@ -10199,12 +10554,16 @@
     elements.nav.bar.calendar.button.next.on('click',actions.calendar.next);
     elements.nav.bar.calendar.button.prev.on('click',actions.calendar.prev);
     elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
-    elements.nav.menu.button.profile.on('click',actions.open.profile);
+    elements.nav.menu.button.users.on('click',actions.open.table);
+    elements.nav.menu.button.myAvisos.on('click',actions.open.table);
+    elements.nav.menu.button.userAvisos.on('click',actions.open.table);
+    elements.nav.menu.button.calendar.on('click',actions.open.calendar);
     elements.permisions.button.open.on('click',actions.open.permisions);
     elements.permisions.button.homeOffice.on('click',actions.open.form);
     elements.permisions.button.sick.on('click',actions.open.form);
     elements.permisions.button.vacation.on('click',actions.open.form);
     elements.permisions.button.permision.on('click',actions.open.form);
+    elements.modal.errors.on('modalError',actions.modalError);
   }
 
   $$1(document).ready(Events);

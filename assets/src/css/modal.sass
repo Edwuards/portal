@@ -1,17 +1,17 @@
 #modal-cont
-  top: -150%;
   opacity: 0;
-  transition: top .5s, opacity .5s;
   overflow: hidden;
   background-color: #949494ad;
   #modal
+    height: 20px;
+    width: 20px;
+    transition: height 1s ,width 1s 1s;
     .header
       .title
         width: calc(100% - 48px);
     .body
       height: calc(100% - 128px);
       overflow-y: scroll;
-
-#modal-cont.open
-  top: 0px;
-  opacity: 1;
+  #modal.active
+    height: 100%;
+    width: 100%;

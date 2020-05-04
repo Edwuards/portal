@@ -19,14 +19,15 @@
     [
       'type'=>'select',
       'css'=>'w-1/3 mx-1',
-      'label'=>'AM/PM',
-      'name'=>'year'
+      'label'=>'<i class="far fa-clock"></i>',
+      'name'=>'amPm'
     ]
   ];
 
   $html = '';
 
   foreach ($inputs as $data) {
+    $data['group'] = $group;
     $html .= $this->load->view('forms/inputs/'.$data['type'],$data,true);
   }
 

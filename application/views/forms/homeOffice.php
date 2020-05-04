@@ -1,13 +1,24 @@
-<div class="flex flex-col mb-4">
-  <label class="mb-2"for="start">Inicio de fecha : </label>
-  <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+<?php
+
+$html = [
+  'date' => $this->load->view('forms/inputs/date',['group'=>'date'],true),
+  'hour_start' => $this->load->view('forms/inputs/time',['group'=>'hour_start'],true),
+  'hour_finish' => $this->load->view('forms/inputs/time',['group'=>'hour_finish'],true),
+  'textarea' => $this->load->view('forms/inputs/textarea',[
+    'label'=>'Descrpción',
+    'name'=>'description',
+    'css'=>'w-full',
+    'group'=>''
+  ],true)
+];
+ ?>
+
+<div class="w-full mb-2">
+  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha</p>
+  <?php echo $html['date']; ?>
 </div>
-<div class="flex flex-col mb-4">
-  <label class="mb-2"for="start">Fin de fecha : </label>
-  <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
-</div>
-<div class="flex flex-col mb-4">
-  <label class="mb-2"for="start">Objetivos : </label>
-  <textarea class="bg-gray-300 h-24 px-4 py-2" name="comments" value="">
-  </textarea>
+
+<div class="w-full mb-2">
+  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Asunto</p>
+  <?php echo $html['textarea']; ?>
 </div>

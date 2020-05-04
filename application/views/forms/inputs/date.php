@@ -20,6 +20,7 @@
   $html = '';
 
   foreach ($select as $data) {
+    $data['group'] = $group;
     $html .= $this->load->view('forms/inputs/select',$data,true);
   }
 

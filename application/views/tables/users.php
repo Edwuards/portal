@@ -1,4 +1,4 @@
-<div data-table="users" class="mmin-w-full h-full bg-gray-200 absolute p-10">
+<div data-table="users" class="min-w-full h-full bg-gray-200 absolute p-10 hidden">
   <div class="header flex items-center w-full h-12 px-4 border-b">
     <div class="w-10 mx-2">
 

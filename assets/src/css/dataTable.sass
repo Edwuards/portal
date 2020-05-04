@@ -1,7 +1,8 @@
 #dataTable
-  > .body
-    height: calc(100% - 128px);
-
+  top: 100%;
+  transition: top 1s;
   [data-table]
     .body,.header
       background-color: white;
+#dataTable.active
+  top: 0px;

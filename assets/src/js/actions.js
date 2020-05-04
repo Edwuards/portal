@@ -3,6 +3,7 @@ import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
 import { default as formsInit } from './forms/forms.js';
+import { default as tablesInit } from './dataTable.js';
 
 export default function(){
   const Calendar = calendarInit();
@@ -10,9 +11,9 @@ export default function(){
   const Modal = modalInit();
   const Forms = formsInit();
   const Permisions = permisionsInit();
+  const Tables = tablesInit();
   const Actions = {};
   const Elements = {};
-  console.log(Nav);
   Actions.open = {};
   Actions.update = {};
   Actions.update.date = (format)=>{
@@ -22,12 +23,7 @@ export default function(){
   Actions.calendar = {};
   Actions.calendar.render = ()=>{
     Actions.update.date();
-    /*
-      Se le suma un pixel debido al border top del contendor del Calendar.
-      Se le suma 24 pixels por el alto del header que contiene los dias
-      dentro del calendar.
-      su total son 25 pixels para que se ajuste al tamaño de la pantalla.
-    */
+    // la barra de navegación mide 64px en altura por eso se la resta.
     let height = window.innerHeight - 64;
     Calendar.setOption('contentHeight',height);
     Calendar.render();
@@ -60,7 +56,9 @@ export default function(){
   Actions.open.form = function(){
     let btn = $(this);
     let form = Forms[btn.attr('name')];
-    form.init();
+    form.setButtons(Modal.elements.button);
+    console.log(form);
+    form.open();
     Modal.actions.open({title: form.title, body: form.form });
     Permisions.actions.close();
     Modal.elements.button.close.on('click',()=>{
@@ -68,24 +66,24 @@ export default function(){
       form.close();
       Modal.elements.button.close.off('click')
     })
+  };
+  Actions.open.table = function(){
+    let name = $(this).attr('name');
+    Nav.elements.button.menu.trigger('click');
+    Nav.actions.updateMenu(name);
+    Nav.actions.changeNavBar(name);
+    Tables.actions.open(name);
 
   };
-  Actions.open.profile = ()=>{
-    let form = Forms.profile;
-    Nav.elements.menu.container.trigger('click');
-    Modal.elements.button.edit.removeClass('hidden');
-    Modal.elements.button.accept.addClass('hidden');
-    Modal.actions.open({title: form.title, body: form.form });
-    Modal.elements.button.close.on('click',()=>{
-      Modal.actions.close();
-      Modal.elements.button.edit.removeClass('hidden');
-      Modal.elements.button.accept.addClass('hidden');
-      Modal.elements.button.close.off('click')
-    });
-  }
+  Actions.open.calendar = function(){
+    Nav.elements.button.menu.trigger('click');
+    Nav.actions.updateMenu('calendar');
+    Nav.actions.changeNavBar('calendar');
+    Nav.actions.closeMenu();
+    Tables.actions.close();
+  };
 
-
-  [['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
+  [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 
   return {actions:Actions, elements: Elements}
 }

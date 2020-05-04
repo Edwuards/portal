@@ -14,6 +14,10 @@
         <i class="w-10 text-xl far fa-user-circle"></i>
         <p class="ml-2">Perfil</p>
       </button>
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="calendar">
+        <i class="w-10 text-xl far fa-calendar"></i>
+        <p class="ml-2">Calendario</p>
+      </button>
       <button class="flex w-full mb-2 p-2 items-center" type="button" name="myAvisos">
         <i class="w-10 fas fa-envelope"></i>
         <p class="ml-2">Mis Avisos</p>

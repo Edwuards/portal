@@ -10,27 +10,33 @@ export default function(){
 
   Elements.title = Elements.header.find('.title > p');
   Elements.button = {};
-
+  Elements.errors = Elements.container.find('.errors');
   Elements.footer.find('button').each(function(){
     let el = $(this);
     Elements.button[el.attr('name')] = el;
   });
+  Elements.allButtons = Elements.footer.find('button');
   Elements.button.close = Elements.header.find('button[name="close"]');
 
   Actions.open = (data)=>{
-    Elements.container.addClass('open');
     Elements.title.html(data.title);
     Elements.body.html(data.body);
 
+    Elements.container.removeClass('hidden')
+    .animate({'opacity': 1},1000,()=>{
+      Elements.modal.addClass('active');
+    });
   }
 
   Actions.close = ()=>{
-    Elements.container.removeClass('open');
-    Elements.title.html('');
-    Elements.body.html('');
-
+    Elements.container.animate({'opacity': 0},1000,()=>{
+      Elements.container.addClass('hidden');
+      Elements.modal.removeClass('active');
+      Elements.title.html('');
+      Elements.body.html('');
+      Elements.allButtons.addClass('hidden');
+    });
   }
-
 
   return { elements: Elements, actions: Actions}
 

@@ -1,26 +1,31 @@
 <?php
-  $date = $this->load->view('forms/inputs/date','',true);
-  $time = $this->load->view('forms/inputs/time','',true);
-  $textarea = $this->load->view('forms/inputs/textarea',[
+
+$html = [
+  'date' => $this->load->view('forms/inputs/date',['group'=>'date'],true),
+  'hour_start' => $this->load->view('forms/inputs/time',['group'=>'hour_start'],true),
+  'hour_finish' => $this->load->view('forms/inputs/time',['group'=>'hour_finish'],true),
+  'textarea' => $this->load->view('forms/inputs/textarea',[
     'label'=>'Descrpción',
     'name'=>'description',
     'css'=>'w-full',
-  ],true);
+    'group'=>''
+  ],true)
+];
  ?>
 
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha</p>
-  <?php echo $date; ?>
+  <?php echo $html['date']; ?>
 </div>
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Horario de salida</p>
-  <?php echo $time; ?>
+  <?php echo $html['hour_start']; ?>
 </div>
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Horario de regreso</p>
-  <?php echo $time; ?>
+  <?php echo $html['hour_finish']; ?>
 </div>
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Asunto</p>
-  <?php echo $textarea; ?>
+  <?php echo $html['textarea']; ?>
 </div>

@@ -1,8 +1,16 @@
-<div class="flex flex-col mb-4">
-  <label class="mb-2"for="start">Inicio de fecha : </label>
-  <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_start" value="">
+<?php
+
+$html = [
+  'date_start' => $this->load->view('forms/inputs/date',['group'=>'date_start'],true),
+  'date_finish' => $this->load->view('forms/inputs/date',['group'=>'date_finish'],true)
+];
+ ?>
+
+<div class="w-full mb-2">
+  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha de salida</p>
+  <?php echo $html['date_start']; ?>
 </div>
-<div class="flex flex-col mb-4">
-  <label class="mb-2"for="start">Fin de fecha : </label>
-  <input data="datepicker" class="bg-gray-300 h-10 px-4 py-2" type="text" name="date_finish" value="">
+<div class="w-full mb-2">
+  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha de regreso</p>
+  <?php echo $html['date_finish']; ?>
 </div>

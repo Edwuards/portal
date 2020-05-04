@@ -53,6 +53,24 @@ textarea:focus,
 textarea:active {
   outline: none; }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #E8E8E8 inset !important; }
+
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #E8E8E8 inset !important; }
+
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #E8E8E8 inset !important; }
+
 form input,
 form select,
 form option,
@@ -62,6 +80,13 @@ form textarea {
 form label {
   bottom: 0px;
   transition: all 1s; }
+
+form .helper {
+  font-size: 11px;
+  color: transparent; }
+
+form .helper.active {
+  color: #808080; }
 
 form .input,
 form .select,
@@ -74,28 +99,177 @@ form .textarea {
 form .select {
   color: transparent; }
 
+form .input.error + .helper,
+form .select.error + .helper,
+form .textarea.error + .helper {
+  color: red; }
+
 form .input:hover,
 form .select:hover,
 form .textarea:hover,
 form .input.active,
-form .select.active {
+form .select.active,
+form .input.notEmtpy,
+form .select.notEmtpy,
+form .textarea.notEmtpy {
   background-color: #DCDCDC;
   color: black; }
   form .input:hover label,
   form .select:hover label,
   form .textarea:hover label,
   form .input.active label,
-  form .select.active label {
-    bottom: 20px; }
+  form .select.active label,
+  form .input.notEmtpy label,
+  form .select.notEmtpy label,
+  form .textarea.notEmtpy label {
+    font-size: 11px;
+    bottom: 50%; }
+  form .input:hover input,
+  form .select:hover input,
+  form .textarea:hover input,
+  form .input.active input,
+  form .select.active input,
+  form .input.notEmtpy input,
+  form .select.notEmtpy input,
+  form .textarea.notEmtpy input {
+    z-index: 11; }
+  form .input:hover input:-webkit-autofill,
+  form .input:hover input:-webkit-autofill:hover,
+  form .input:hover input:-webkit-autofill:focus,
+  form .input:hover input:-webkit-autofill:active,
+  form .select:hover input:-webkit-autofill,
+  form .select:hover input:-webkit-autofill:hover,
+  form .select:hover input:-webkit-autofill:focus,
+  form .select:hover input:-webkit-autofill:active,
+  form .textarea:hover input:-webkit-autofill,
+  form .textarea:hover input:-webkit-autofill:hover,
+  form .textarea:hover input:-webkit-autofill:focus,
+  form .textarea:hover input:-webkit-autofill:active,
+  form .input.active input:-webkit-autofill,
+  form .input.active input:-webkit-autofill:hover,
+  form .input.active input:-webkit-autofill:focus,
+  form .input.active input:-webkit-autofill:active,
+  form .select.active input:-webkit-autofill,
+  form .select.active input:-webkit-autofill:hover,
+  form .select.active input:-webkit-autofill:focus,
+  form .select.active input:-webkit-autofill:active,
+  form .input.notEmtpy input:-webkit-autofill,
+  form .input.notEmtpy input:-webkit-autofill:hover,
+  form .input.notEmtpy input:-webkit-autofill:focus,
+  form .input.notEmtpy input:-webkit-autofill:active,
+  form .select.notEmtpy input:-webkit-autofill,
+  form .select.notEmtpy input:-webkit-autofill:hover,
+  form .select.notEmtpy input:-webkit-autofill:focus,
+  form .select.notEmtpy input:-webkit-autofill:active,
+  form .textarea.notEmtpy input:-webkit-autofill,
+  form .textarea.notEmtpy input:-webkit-autofill:hover,
+  form .textarea.notEmtpy input:-webkit-autofill:focus,
+  form .textarea.notEmtpy input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #DCDCDC inset !important; }
+  form .input:hover select,
+  form .select:hover select,
+  form .textarea:hover select,
+  form .input.active select,
+  form .select.active select,
+  form .input.notEmtpy select,
+  form .select.notEmtpy select,
+  form .textarea.notEmtpy select {
+    z-index: 11; }
+  form .input:hover select:-webkit-autofill,
+  form .input:hover select:-webkit-autofill:hover,
+  form .input:hover select:-webkit-autofill:focus,
+  form .input:hover select:-webkit-autofill:active,
+  form .select:hover select:-webkit-autofill,
+  form .select:hover select:-webkit-autofill:hover,
+  form .select:hover select:-webkit-autofill:focus,
+  form .select:hover select:-webkit-autofill:active,
+  form .textarea:hover select:-webkit-autofill,
+  form .textarea:hover select:-webkit-autofill:hover,
+  form .textarea:hover select:-webkit-autofill:focus,
+  form .textarea:hover select:-webkit-autofill:active,
+  form .input.active select:-webkit-autofill,
+  form .input.active select:-webkit-autofill:hover,
+  form .input.active select:-webkit-autofill:focus,
+  form .input.active select:-webkit-autofill:active,
+  form .select.active select:-webkit-autofill,
+  form .select.active select:-webkit-autofill:hover,
+  form .select.active select:-webkit-autofill:focus,
+  form .select.active select:-webkit-autofill:active,
+  form .input.notEmtpy select:-webkit-autofill,
+  form .input.notEmtpy select:-webkit-autofill:hover,
+  form .input.notEmtpy select:-webkit-autofill:focus,
+  form .input.notEmtpy select:-webkit-autofill:active,
+  form .select.notEmtpy select:-webkit-autofill,
+  form .select.notEmtpy select:-webkit-autofill:hover,
+  form .select.notEmtpy select:-webkit-autofill:focus,
+  form .select.notEmtpy select:-webkit-autofill:active,
+  form .textarea.notEmtpy select:-webkit-autofill,
+  form .textarea.notEmtpy select:-webkit-autofill:hover,
+  form .textarea.notEmtpy select:-webkit-autofill:focus,
+  form .textarea.notEmtpy select:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #DCDCDC inset !important; }
+  form .input:hover textarea,
+  form .select:hover textarea,
+  form .textarea:hover textarea,
+  form .input.active textarea,
+  form .select.active textarea,
+  form .input.notEmtpy textarea,
+  form .select.notEmtpy textarea,
+  form .textarea.notEmtpy textarea {
+    z-index: 11; }
+  form .input:hover textarea:-webkit-autofill,
+  form .input:hover textarea:-webkit-autofill:hover,
+  form .input:hover textarea:-webkit-autofill:focus,
+  form .input:hover textarea:-webkit-autofill:active,
+  form .select:hover textarea:-webkit-autofill,
+  form .select:hover textarea:-webkit-autofill:hover,
+  form .select:hover textarea:-webkit-autofill:focus,
+  form .select:hover textarea:-webkit-autofill:active,
+  form .textarea:hover textarea:-webkit-autofill,
+  form .textarea:hover textarea:-webkit-autofill:hover,
+  form .textarea:hover textarea:-webkit-autofill:focus,
+  form .textarea:hover textarea:-webkit-autofill:active,
+  form .input.active textarea:-webkit-autofill,
+  form .input.active textarea:-webkit-autofill:hover,
+  form .input.active textarea:-webkit-autofill:focus,
+  form .input.active textarea:-webkit-autofill:active,
+  form .select.active textarea:-webkit-autofill,
+  form .select.active textarea:-webkit-autofill:hover,
+  form .select.active textarea:-webkit-autofill:focus,
+  form .select.active textarea:-webkit-autofill:active,
+  form .input.notEmtpy textarea:-webkit-autofill,
+  form .input.notEmtpy textarea:-webkit-autofill:hover,
+  form .input.notEmtpy textarea:-webkit-autofill:focus,
+  form .input.notEmtpy textarea:-webkit-autofill:active,
+  form .select.notEmtpy textarea:-webkit-autofill,
+  form .select.notEmtpy textarea:-webkit-autofill:hover,
+  form .select.notEmtpy textarea:-webkit-autofill:focus,
+  form .select.notEmtpy textarea:-webkit-autofill:active,
+  form .textarea.notEmtpy textarea:-webkit-autofill,
+  form .textarea.notEmtpy textarea:-webkit-autofill:hover,
+  form .textarea.notEmtpy textarea:-webkit-autofill:focus,
+  form .textarea.notEmtpy textarea:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #DCDCDC inset !important; }
 
-form .textarea:hover label {
-  bottom: 36px; }
+form .textarea:hover label,
+form .textarea.notEmtpy label {
+  bottom: 60%; }
 
+form .input:hover,
+form .select:hover,
+form .textarea:hover,
 form .input.active,
 form .select.active,
 form .textarea.active {
   color: black;
   border-bottom-color: #2b6cb0; }
+  form .input:hover label,
+  form .select:hover label,
+  form .textarea:hover label,
+  form .input.active label,
+  form .select.active label,
+  form .textarea.active label {
+    z-index: 10; }
 
 form .input.disabled,
 form .textarea.disabled,
@@ -109,26 +283,30 @@ form .select.disabled {
     color: #808080; }
 
 #modal-cont {
-  top: -150%;
   opacity: 0;
-  transition: top .5s, opacity .5s;
   overflow: hidden;
   background-color: #949494ad; }
-  #modal-cont #modal .header .title {
-    width: calc(100% - 48px); }
-  #modal-cont #modal .body {
-    height: calc(100% - 128px);
-    overflow-y: scroll; }
+  #modal-cont #modal {
+    height: 20px;
+    width: 20px;
+    transition: height 1s ,width 1s 1s; }
+    #modal-cont #modal .header .title {
+      width: calc(100% - 48px); }
+    #modal-cont #modal .body {
+      height: calc(100% - 128px);
+      overflow-y: scroll; }
+  #modal-cont #modal.active {
+    height: 100%;
+    width: 100%; }
 
-#modal-cont.open {
-  top: 0px;
-  opacity: 1; }
+#dataTable {
+  top: 100%;
+  transition: top 1s; }
+  #dataTable [data-table] .body, #dataTable [data-table] .header {
+    background-color: white; }
 
-#dataTable > .body {
-  height: calc(100% - 128px); }
-
-#dataTable [data-table] .body, #dataTable [data-table] .header {
-  background-color: white; }
+#dataTable.active {
+  top: 0px; }
 
 .fc-toolbar.fc-header-toolbar {
   display: none; }

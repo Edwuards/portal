@@ -1,71 +1,60 @@
 import { HTML } from './templates.js';
+import { Form } from './form.js';
+import { Rules } from './rules.js';
 
 const Forms = {};
-
-function Form(form){
-  const Inputs = ['input','button','textarea','select'];
-  this.title = form.title;
-  this.form = $(document.createElement('form'));
-  this.form.attr('data',form.name).addClass('w-ful');
-  this.form.html(form.html);
-
-  this.init = function(){
-    if(form.init != undefined){ form.init.call(this); }
-    for (let name in this.input) {
-      let input = this.input[name];
-      if(input.attr('data') == 'datepicker'){ input.datetimepicker(); }
-    }
-  }
-
-  this.close = function(){
-    this.form[0].reset();
-    if(form.close != undefined){ form.close.call(this); }
-  };
-
-  Inputs.forEach(function(type){
-    this.form.find(type).each(function(i,element){ element = $(element);
-    this[type] = {}; this[type][element.attr('name')] = element; }.bind(this));
-  }.bind(this));
-
-}
-
-function previewImg(input,img){
-  let file = input[0].files[0];
-  let reader = new FileReader();
-  reader.onload = function(e){ img.attr('src',e.target.result); }
-  reader.readAsDataURL(file);
-}
 
 Forms.permision = {
   name:'permision',
   title: 'Permiso',
-  html: HTML.permision
+  html: HTML.permision,
+  buttons: ['accept'],
+  init: function(){
+    this.group.date = this.createDateInput(this.group.date);
+    this.group.hour_start = this.createTimeInput(this.group.hour_start);
+    this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
+  },
+  open: function(){
+    this.buttons.send.removeClass('hidden');
+  },
+  send: function(){
+    let a = Rules.timeEmpty(this.group.hour_start);
+    if(a){ console.log(this.group.hour_start.time())}
+  }
 }
 
 Forms.homeOffice = {
   name:'homeOffice',
   title:'Home Office',
-  html: HTML.homeOffice
+  html: HTML.homeOffice,
+  buttons: ['accept'],
+  init: function(){
+    this.group.date = this.createDateInput(this.group.date);
+    this.group.hour_start = this.createTimeInput(this.group.hour_start);
+    this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
+  },
 }
 
 Forms.vacation = {
   name:'vacation',
   title: 'Vacación',
-  html: HTML.vacation
+  html: HTML.vacation,
+  buttons: ['accept'],
+  init: function(){
+    this.group.date_start = this.createDateInput(this.group.date_start);
+    this.group.date_finish = this.createDateInput(this.group.date_finish);
+  },
 }
 
 Forms.sick = {
   name:'sick',
   title:'Enfermedad',
   html: HTML.sick,
+  buttons: ['accept'],
   init: function(){
-    let input = this.input;
-    let img = this.button.upload.children('img');
-    this.button.upload.on('click',()=>{
-      input.img[0].value = '';
-      input.img.trigger('click');
-    });
-    this.input.img.on('input',function(){ previewImg(input.img,img); });
+    this.group.date_start = this.createDateInput(this.group.date_start);
+    this.group.date_finish = this.createDateInput(this.group.date_finish);
+    this.previewImg(this.input.img,this.button.upload,this.button.upload.children('img'));
   },
   close: function(){
     // remplazar el src por una ruta relativa de un img placeholder
@@ -78,6 +67,7 @@ Forms.profile = {
   name:'profile',
   title:'Mi Perfil',
   html: HTML.profile,
+  buttons: ['edit'],
   init: function(){
     let input = this.input;
     let img = this.button.upload.children('img');
