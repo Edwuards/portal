@@ -271,6 +271,9 @@ function DateInput(MONTH,DAY,YEAR){
         });
       }
     },
+    'format':{
+      get: ()=>{}
+    }
     'value': {
       configurable: true,
       get: ()=>{ return DATE; }
