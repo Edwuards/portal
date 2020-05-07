@@ -19,6 +19,8 @@ function Events(){
   elements.permisions.button.vacation.on('click',actions.open.form);
   elements.permisions.button.permision.on('click',actions.open.form);
   elements.modal.errors.on('modalError',actions.modalError);
+
+
 }
 
 export { Events }

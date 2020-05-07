@@ -1,4 +1,4 @@
-(function ($$1) {
+var index = (function (exports, $$1) {
   'use strict';
 
   $$1 = $$1 && Object.prototype.hasOwnProperty.call($$1, 'default') ? $$1['default'] : $$1;
@@ -10307,46 +10307,33 @@
     reader.readAsDataURL(this[0].files[0]);
   }
 
-  const Rules = {};
+  function success(res){
 
-  Rules.timeEmpty = (data)=>{
-    let error = false;
-    const { hour, minutes } = data.inputs;
-    const parent = {
-      hour: hour.parent(),
-      minutes: minutes.parent()
-    };
-    const time = data.time();
+    let message = $(document.createElement('div'));
+    message.addClass('lateral-message flex text-md p-2 pt-2 z-20 bg-green-700 text-white').html(`
+    <i class="fas fa-paper-plane"></i>
+    <p class="mx-2">Solicitud enviada </p>
+  `);
+    $('body').append(message);
+    setTimeout(()=>{
+      message.addClass('active');
+      setTimeout(()=>{
+        message.css('opacity','0');
+        setTimeout(()=>{ message.remove(); },1000);
+      },1000);
+    },100);
+  }
 
-    parent.hour.removeClass('error');
-    parent.minutes.removeClass('error');
+  function send(opt,fn){
+    $.ajax({
+      url: `${window.location.origin}/${opt.url}`,
+      async: (opt.aysnc ? opt.async : true),
+      method: 'post',
+      data: opt.data,
+      success: (fn == undefined ? success : fn)
+    });
 
-    if(!Boolean(time.hour)){
-      parent.hour.addClass('error').siblings('.helper').text('Vacio');
-      error = true;
-    }
-    if(time.minutes == '' || time.minutes == undefined){
-      parent.minutes.addClass('error').siblings('.helper').text('Vacio');
-      error = true;
-    }
-
-    return error;
-
-  };
-
-  Rules.textEmpty = (input)=>{
-    let p = input.parent();
-    let error = false;
-    const value = input.val().trim();
-    p.removeClass('error');
-
-    if(value == '' || value == undefined){
-      p.addClass('error').siblings('.helper').text('Vacio');
-      error = true;
-    }
-
-    return error;
-  };
+  }
 
   const Forms = {};
 
@@ -10354,7 +10341,7 @@
     name:'permision',
     title: 'Permiso',
     html: HTML.permision,
-    buttons: ['accept'],
+    buttons: ['send'],
     init: function(){
       this.group.date = this.createDateInput(this.group.date);
       this.group.hour_start = this.createTimeInput(this.group.hour_start);
@@ -10364,8 +10351,29 @@
       this.buttons.send.removeClass('hidden');
     },
     send: function(){
-      let a = Rules.timeEmpty(this.group.hour_start);
-      if(a){ console.log(this.group.hour_start.time());}
+      let time = {};
+      let date = {};
+      let description = this.textarea.description.val().trim();
+      time.start = this.group.hour_start.time();
+      time.finish = this.group.hour_finish.time();
+      date.start = this.group.date.date();
+      date.finish = this.group.date.date();
+
+      date.start.setHours(time.start.hour,time.start.minutes);
+      date.finish.setHours(time.finish.hour,time.finish.minutes);
+
+      date.start = this.group.date.format(date.start);
+      date.finish = this.group.date.format(date.finish);
+
+      let data = {
+        notice: 1,
+        date_start: date.start,
+        date_finish: date.finish,
+        comments: description,
+      };
+
+      send({url:'permisions/create',data});
+
     }
   };
 
@@ -10373,39 +10381,106 @@
     name:'homeOffice',
     title:'Home Office',
     html: HTML.homeOffice,
-    buttons: ['accept'],
+    buttons: ['send'],
     init: function(){
       this.group.date = this.createDateInput(this.group.date);
-      this.group.hour_start = this.createTimeInput(this.group.hour_start);
-      this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
     },
+    open: function(){
+      this.buttons.send.removeClass('hidden');
+    },
+    send: function(){
+
+      let date = {};
+      let description = this.textarea.description.val().trim();
+      date.start = this.group.date.date();
+      date.finish = this.group.date.date();
+
+      date.start.setHours(10);
+      date.finish.setHours(19);
+
+      date.start = this.group.date.format(date.start);
+      date.finish = this.group.date.format(date.finish);
+
+      let data = {
+        notice: 2,
+        date_start: date.start,
+        date_finish: date.finish,
+        comments: description,
+      };
+
+      send({url:'permisions/create',data});
+    }
   };
 
   Forms.vacation = {
     name:'vacation',
     title: 'Vacación',
     html: HTML.vacation,
-    buttons: ['accept'],
+    buttons: ['send'],
     init: function(){
       this.group.date_start = this.createDateInput(this.group.date_start);
       this.group.date_finish = this.createDateInput(this.group.date_finish);
     },
+    open: function(){
+      this.buttons.send.removeClass('hidden');
+    },
+    send:function(){
+      let date = {};
+      date.start = this.group.date_start.date();
+      date.finish = this.group.date_finish.date();
+
+      date.start.setHours(10);
+      date.finish.setHours(10);
+
+      date.start = this.group.date_start.format(date.start);
+      date.finish = this.group.date_finish.format(date.finish);
+
+      let data = {
+        notice: 3,
+        date_start: date.start,
+        date_finish: date.finish,
+      };
+
+      send({url:'permisions/create',data});
+    }
   };
 
   Forms.sick = {
     name:'sick',
     title:'Enfermedad',
     html: HTML.sick,
-    buttons: ['accept'],
+    buttons: ['send'],
     init: function(){
       this.group.date_start = this.createDateInput(this.group.date_start);
       this.group.date_finish = this.createDateInput(this.group.date_finish);
       this.previewImg(this.input.img,this.button.upload,this.button.upload.children('img'));
     },
+    open: function(){
+      this.buttons.send.removeClass('hidden');
+    },
     close: function(){
       // remplazar el src por una ruta relativa de un img placeholder
       let img = this.button.upload.children('img');
       img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+    },
+    send: function(){
+      let date = {};
+      date.start = this.group.date_start.date();
+      date.finish = this.group.date_finish.date();
+
+      date.start.setHours(10);
+      date.finish.setHours(19);
+
+      date.start = this.group.date_start.format(date.start);
+      date.finish = this.group.date_finish.format(date.finish);
+
+      let data = {
+        notice: 4,
+        date_start: date.start,
+        date_finish: date.finish,
+      };
+
+      send({url:'permisions/create',data});
     }
   };
 
@@ -10564,8 +10639,533 @@
     elements.permisions.button.vacation.on('click',actions.open.form);
     elements.permisions.button.permision.on('click',actions.open.form);
     elements.modal.errors.on('modalError',actions.modalError);
+
+
+  }
+
+  /*
+    All RULES must have a test and message property
+    All test must return true if passed or false if failed.
+    If test returns false the message will be available to log
+    All test function can not be anonymous
+    Rule = {
+      message: string
+      test: (value)=>{ return false || true }
+    }
+  */
+  const Rules = {};
+  const RULES = {};
+
+
+  RULES.is = {};
+  RULES.has = {};
+  RULES.validate = {};
+
+  // RULES FOR IS TYPE
+
+  RULES.is.object = {
+    message: 'The parameter is not an object type',
+    test: function(value){
+      if( Array.isArray(value) || typeof value !== 'object' ){ return false; }    return true;
+    }
+  };
+
+  RULES.is.notDuplicateProperty = {
+    message: 'The property already exist inside the object ',
+    test: function(property,object){
+      let test = this.rules.is.string(property);
+      if(!test.passed){this.message = test.error; return false; }
+
+      test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false; }
+
+
+      if(object[property] !== undefined ){
+        return false
+      }
+      return true
+    }
+  };
+
+  RULES.is.string = {
+    message: 'The parameter is not a string type',
+    test: function(value){
+      if(typeof value !== 'string'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.notEmpty = {
+    message: 'The parameter is empty',
+    test: function(value){
+      if(value == '' || value == undefined){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.number = {
+    message: 'The parameter is not a number type',
+    test: function(value){
+      if(typeof value !== 'number'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.array = {
+    message: 'The paramter is not an Array type',
+    test: function(value){ return Array.isArray(value); }
+  };
+
+  RULES.is.instanceOf = {
+    message: 'The object given is not an instance of',
+    test: function(compare,against){
+      let test = this.rules.is.object(compare);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.function(against);{
+      if(!test.passed){ this.message = test.error; return false; }}
+
+      if(!(compare instanceof against)){
+        this.message = `${this.message} ${against.name}`;
+        return false
+      }
+
+      return true
+    }
+  };
+
+  RULES.is.instanceOfAny = {
+    message: 'The object is not an instance of any of the following : ',
+    test: function(compare,against){
+      let test = undefined;
+      let names = '';
+      test = this.rules.is.array(against);{
+      if(!test.passed){ this.message = test.error; return false; }}
+
+      test = against.every(function(obj){
+        names += obj.constructor.name+' ';
+        return !this.rules.is.instanceOf(compare,obj).passed;
+      }.bind(this));
+
+      if(test){ this.message = `${this.message} ${names}`; }
+
+      return !test;
+
+    }
+  };
+
+  RULES.is.function = {
+    message: 'The property is not a function',
+    test: function(value){
+      if(typeof value !== 'function'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.greaterThan = {
+    message: 'The value',
+    test: function(check,against){
+      this.message = 'The value';
+
+      let test = this.rules.is.number(check);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(against);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(check < against || check == against){
+        this.message = `${this.message} ${check} is not greater than ${against}`;
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.is.lessThan = {
+    message: 'The value',
+    test: function(check,against){
+      this.message = 'The value';
+      
+      let test = this.rules.is.number(check);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(against);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(check > against || check == against){
+        this.message = `${this.message} ${check} is not less than ${against}`;
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.is.htmlChildren = {
+    message: 'The followin object does not posses an array property with HTMLElement instances ',
+    test: function(children){
+      if(!Array.isArray(children)){ return false }    if(children.some((child)=>{ return !(child instanceof HTMLElement) })){ return false }
+      return true;
+    }
+  };
+
+  RULES.is.defined = {
+    message: 'The following property is not defined ',
+    test: function(property,object){
+      let test = this.rules.is.string(property);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(object[property] === undefined ){ this.message += 'property'; return false; }
+      return true;
+    }
+  };
+
+  RULES.is.notEmptyArray = {
+    message: 'The given array is empty',
+    test: function(array){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      return array.length != 0
+    }
+  };
+
+  // RULES FOR HAS TYPE
+
+  RULES.has.arrayLength = {
+    message:'The array must have a length of ',
+    test: function(array,length){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false}
+
+      test = this.rules.is.number(length);
+      if(!test.passed){ this.message = test.error; return false}
+
+      if(array.length !== length){ return false }
+      return true
+    }
+  };
+
+  RULES.has.properties = {
+    message: 'The object does not have all of the following properties ',
+    test: function(properties,object){
+      let test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false }
+
+      test = this.rules.is.array(properties);
+      if(!test.passed){ this.message = test.error; return false }
+
+      (function(properties){
+
+        properties.every(function(prop){
+          test = this.rules.is.string(prop);
+          return test.passed
+        }.bind(this));
+
+        return test;
+
+      }.bind(this))(properties);
+
+      if(!test.passed){ this.message = test.error; return false }
+
+
+      if(properties.some((property)=>{ return object[property] === undefined })){
+        properties.forEach(function(property){ this.message = this.message+property+' '; }.bind(this));
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.has.index = {
+    message: 'The index is undefined for the given array.',
+    test: function(array,index){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(index);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(array[index] === undefined){ return false; }
+      return true;
+    }
+  };
+
+  for (let type in RULES) {
+    for(let name in RULES[type]){
+      let rule = RULES[type][name];
+      if(Rules[type] == undefined){ Rules[type] = {}; }
+      let context = { message: rule.message, rules: Rules };
+      Rules[type][name] = function(){ return new Rule(context,rule,arguments) };
+    }
+  }
+
+  function Rule(context,rule,args){
+    this.passed = rule.test.apply(context,args);
+    this.error = this.passed ? undefined : new Error(context.message);
+  }
+
+  function Test(tests){
+    let test = undefined, rule = undefined, args = undefined;
+    test = Rules.is.array(tests);
+    if(!test.passed){ return test }  tests.every((check,i)=>{
+
+      test = Rules.is.array(check);
+      if(!test.passed){ return false; }
+
+      test = Rules.has.arrayLength(check,2);
+      if(!test.passed){ return false; }
+
+      rule = check[0]; args = check[1];
+
+      test = Rules.is.array(args);
+      if(!test.passed){ return false; }
+
+      test = Rules.is.function(rule);
+      if(!test.passed){ return false; }
+
+      rule = rule.apply(null,args);
+
+      test = Rules.is.instanceOf(rule,Rule);
+      if(!test.passed){ return false; }
+
+      test = rule;
+
+      return test.passed
+
+
+    });
+
+    return test
+  }
+
+  function Observer(events){
+    const Events = {};
+
+    this.event = {
+      create: (event)=>{
+        let test = undefined;
+    	  [
+      		Rules.is.string(event),
+      		Rules.is.notDuplicateProperty(event,Events)
+    	  ].some((check)=>{ test = check ; return !test.passed; });
+
+        if(!test.passed){ throw test.error; }
+        Events[event] = [];
+      },
+      delete: (event)=>{
+        let test = undefined ;
+    	  [
+      		Rules.is.string(event),
+      		Rules.is.defined(event,Events)
+    	  ].some((check)=>{ test = check; return !test.passed });
+
+      	if(!test.passed){ throw test.error; }
+
+        delete Events[event];
+      },
+      get: ()=>{ return Object.keys(Events); }
+    };
+
+    this.notify = (event,update)=>{
+      let test = Rules.is.defined(event,Events);
+      if(!test.passed){ throw test.error; }
+      Events[event].forEach((notify)=>{ notify.apply(null,update); });
+    };
+
+    this.register = (event,subscriber)=>{
+    	let test = Test([
+        [Rules.is.defined,[event,Events]],
+        [Rules.is.function,[subscriber]]
+      ]);
+
+      if(!test.passed){ throw test.error; }
+
+      return Events[event].push(subscriber) - 1;
+    };
+
+    this.unregister = (event,index)=>{
+    	let test = undefined ;
+  	  [
+        Rules.is.defined(event,Events),
+        Rules.has.index(Events[event],index)
+      ].some((check)=>{ test = check ; return !test.passed; });
+
+  	  if(!test.passed){ throw test.error; }
+
+      Events[event]  = Events[event].reduce((a,c,i)=>{
+        if(i !== index){ a.push(c); }
+        return a;
+
+      },[]);
+    };
+
+    if(Rules.is.array(events).passed){
+  	  events.forEach(this.event.create);
+    }
+
+  }
+
+  function Input(INPUT){
+
+    let jquery = INPUT instanceof window.$;
+    let test = Rules.is.instanceOfAny(
+      (jquery ? INPUT[0] : INPUT),
+      [HTMLInputElement,HTMLSelectElement,HTMLTextAreaElement]
+    );
+
+    if(!test.passed){ throw test.error; }
+
+    const TEST = {
+      rules: [],
+      map: {},
+      addRule: (rule)=>{
+        TEST.map[rule.name] = TEST.rules.push([rule.test,rule.args]) - 1;
+      },
+      removeRule: (name)=>{
+        let index = TEST.map[name];
+        if(index !== undefined){
+          TEST.rules  = TEST.rules.reduce((a,c,i)=>{
+            if(i !== index){ a.push(c); }
+            return a;
+          },[]);
+        }
+      },
+      run: ()=>{
+        let rules = TEST.rules.map((check)=>{
+          let copy = [check[0],[]];
+          if(Array.isArray(check[1])){ copy[1] = copy[1].concat(check[1]); }
+          copy[1].unshift(INSTANCE.value);
+          return copy;
+        });
+
+        return Test(rules);
+      }
+    };
+
+    const SUBJECT = new Observer();
+
+    const INSTANCE = this;
+
+    const EVENTS = {
+      state: {},
+      on: (type)=>{
+        if(!EVENTS.state[type]){
+          EVENTS.state[type] = true;
+          let update = (type)=>{
+            return function(){
+              INPUT.off(type);
+              SUBJECT.notify(type,arguments);
+              INPUT.on(type,update(type));
+            }
+          };
+          INPUT.on(type,update(type));
+        }
+      },
+      off: (type)=>{
+        EVENTS.state[type] = false;
+        INPUT.off(type);
+      }
+    };
+
+    const METHODS = {
+      'element': {
+        writable: false,
+        value: INPUT
+      },
+      'on': {
+        writable: false,
+        value: function(){
+          EVENTS.on('component.init');
+          this.element.trigger('component.init');
+        }
+      },
+      'off': {
+        writable: false,
+        value: ()=>{
+          SUBJECT.event.get().forEach(EVENTS.off);
+        }
+      },
+      'events': {
+        writable: false,
+        value: {
+          on: (type,fn)=>{
+            if(SUBJECT.event.get().indexOf(type) == -1){
+              SUBJECT.event.create(type);
+            }
+            let index = SUBJECT.register(type,fn.bind(INSTANCE));
+            if(!EVENTS.state[type]){ EVENTS.on(type); }
+            return index;
+          },
+          off: EVENTS.off,
+          unregister: SUBJECT.unregister
+        }
+      },
+      'disable':{
+        writable: true,
+        value: function(on){
+          this.element[on ? 'attr' : 'removeAttr' ]('disabled','disabled');
+        }
+      },
+      'rules': {
+        writable: false,
+        value: {
+          add: TEST.addRule,
+          remove: TEST.removeRule,
+          test: TEST.run
+        }
+      },
+      'value': {
+        configurable: true,
+        get: ()=>{ return this.element.val().trim(); }
+      }
+    };
+
+    ['component.init','focus','input','blur'].forEach(SUBJECT.event.create);
+
+    SUBJECT.register('component.init',function(){
+      let types = SUBJECT.event.get().reduce((a,c)=>{
+        if(c != 'component.init'){ a.push(c); }
+        return a;
+      },[]);
+      types.forEach(EVENTS.on);
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function SelectInput(INPUT){
+    Input.call(this,INPUT);
+    const OPTIONS = {
+      add: (option)=>{
+        let el = $(document.createElement('option'));
+        el.text(option.text).val(option.value);
+        this.element.append(el);
+      },
+      remove: (value)=>{
+        this.element.find(`[value="${value}"]`).remove();
+      },
+      get: ()=>{ return this.element.children(); }
+    };
+
+    const METHODS = {
+      'options':{
+        writable: false,
+        value: OPTIONS
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
   }
 
   $$1(document).ready(Events);
 
-}($));
+  exports.SelectInput = SelectInput;
+
+  return exports;
+
+}({}, $));

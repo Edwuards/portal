@@ -24,13 +24,13 @@ function Observer(events){
     	if(!test.passed){ throw test.error; }
 
       delete Events[event];
-    }
+    },
+    get: ()=>{ return Object.keys(Events); }
   }
 
   this.notify = (event,update)=>{
     let test = Rules.is.defined(event,Events);
     if(!test.passed){ throw test.error; }
-    // could use the call function for each notification this way the parameters can be ambigous in length .
     Events[event].forEach((notify)=>{ notify.apply(null,update); });
   }
 

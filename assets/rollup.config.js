@@ -1,5 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import handlebars from 'rollup-plugin-handlebars-plus';
 
 export default {
   input: './src/js/index.js',
@@ -11,6 +12,10 @@ export default {
       'jquery':'$'
     }
   },
-  plugins: [resolve(),commonjs()],
+  plugins: [
+    resolve(),
+    commonjs({include: 'node_modules/**'}),
+    handlebars()
+  ],
   external: ['jquery']
 };

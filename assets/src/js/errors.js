@@ -51,6 +51,14 @@ RULES.is.string = {
   }
 }
 
+RULES.is.notEmpty = {
+  message: 'The parameter is empty',
+  test: function(value){
+    if(value == '' || value == undefined){ return false; }
+    return true;
+  }
+}
+
 RULES.is.number = {
   message: 'The parameter is not a number type',
   test: function(value){
@@ -77,7 +85,28 @@ RULES.is.instanceOf = {
       this.message = `${this.message} ${against.name}`;
       return false
     }
+
     return true
+  }
+}
+
+RULES.is.instanceOfAny = {
+  message: 'The object is not an instance of any of the following : ',
+  test: function(compare,against){
+    let test = undefined;
+    let names = '';
+    test = this.rules.is.array(against);{
+    if(!test.passed){ this.message = test.error; return false; }}
+
+    test = against.every(function(obj){
+      names += obj.constructor.name+' ';
+      return !this.rules.is.instanceOf(compare,obj).passed;
+    }.bind(this));
+
+    if(test){ this.message = `${this.message} ${names}`; }
+
+    return !test;
+
   }
 }
 
@@ -92,14 +121,35 @@ RULES.is.function = {
 RULES.is.greaterThan = {
   message: 'The value',
   test: function(check,against){
+    this.message = 'The value';
+
     let test = this.rules.is.number(check);
     if(!test.passed){ this.message = test.error; return false; }
 
     test = this.rules.is.number(against);
     if(!test.passed){ this.message = test.error; return false; }
 
-    if(check < against){
+    if(check < against || check == against){
       this.message = `${this.message} ${check} is not greater than ${against}`;
+      return false;
+    }
+    return true;
+  }
+}
+
+RULES.is.lessThan = {
+  message: 'The value',
+  test: function(check,against){
+    this.message = 'The value';
+    
+    let test = this.rules.is.number(check);
+    if(!test.passed){ this.message = test.error; return false; }
+
+    test = this.rules.is.number(against);
+    if(!test.passed){ this.message = test.error; return false; }
+
+    if(check > against || check == against){
+      this.message = `${this.message} ${check} is not less than ${against}`;
       return false;
     }
     return true;
