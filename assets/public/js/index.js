@@ -10318,8 +10318,8 @@
     };
     Actions.open.form = function(){
       let btn = $(this);
-
-      Modal.actions.open({title: 'form.title', body: HTML.permision() });
+      let form = $(document.createElement('form'));
+      Modal.actions.open({title: 'form.title', body: form.append(HTML.permision()) });
       Permisions.actions.close();
       Modal.elements.button.close.on('click',()=>{
         Modal.actions.close();

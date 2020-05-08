@@ -1,6 +1,74 @@
 import { Rules, Test } from './errors.js';
 import { Observer } from './helpers.js';
 
+function Button(BUTTON){
+
+  const SUBJECT = new Observer();
+
+  const INSTANCE = this;
+
+  const EVENTS = {
+    state: {},
+    on: (type)=>{
+      if(!EVENTS.state[type]){
+        EVENTS.state[type] = true;
+        let update = (type)=>{
+          return function(){
+            INSTANCE.element.off(type);
+            SUBJECT.notify(type,arguments);
+            INSTANCE.element.on(type,update(type));
+          }
+        };
+        INSTANCE.element.on(type,update(type));
+      }
+    },
+    off: (type)=>{
+      EVENTS.state[type] = false;
+      INSTANCE.element.off(type);
+    }
+  };
+
+  const METHODS = {
+    'element': {
+      writable: false,
+      value: BUTTON
+    },
+    'on': {
+      configurable: true,
+      writable: false,
+      value: function(){
+        SUBJECT.event.get().forEach(EVENTS.on);
+      }
+    },
+    'off': {
+      configurable: true,
+      writable: false,
+      value: ()=>{
+        SUBJECT.event.get().forEach(EVENTS.off);
+      }
+    },
+    'events': {
+      configurable: true,
+      writable: false,
+      value: {
+        on: (type,fn)=>{
+          if(SUBJECT.event.get().indexOf(type) == -1){ SUBJECT.event.create(type); }
+          let index = SUBJECT.register(type,fn.bind(INSTANCE));
+          EVENTS.on(type);
+          return index;
+        },
+        off: EVENTS.off,
+        unregister: SUBJECT.unregister
+      }
+    },
+  };
+
+  ['click'].forEach(SUBJECT.event.create);
+
+  Object.defineProperties(this,METHODS);
+
+}
+
 function Input(INPUT){
 
   let jquery = INPUT instanceof window.$;
@@ -427,7 +495,8 @@ export {
   DateInput,
   SelectInput,
   TextAreaInput,
-  TextInput,  
+  TextInput,
   NumberInput,
-  Input
+  Input,
+  Button
 }

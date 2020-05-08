@@ -17,18 +17,16 @@ function success(res){
       setTimeout(()=>{ message.remove(); },1000);
     },1000);
   },100)
-}
+};
 
-function send(opt,fn){
-  $.ajax({
-    url: `${window.location.origin}/${opt.url}`,
-    async: (opt.aysnc ? opt.async : true),
-    method: 'post',
-    data: opt.data,
-    success: (fn == undefined ? success : fn)
-  });
 
-}
+const Permision = new Form({
+  name: 'permision',
+  title: 'Permiso',
+  html: HTML.permision,
+});
+
+
 
 const Forms = {};
 

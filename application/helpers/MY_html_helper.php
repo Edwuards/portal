@@ -95,4 +95,20 @@
 
   }
 
+  function Button($data){
+    $ci=& get_instance();
+    $overWrite = [
+      'text'=> isset($data['text']) ? $data['text'] : '',
+      'css'=> isset($data['css']) ? $data['css'] : 'py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden',
+      'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
+    ];
+
+    $overWrite['attrs']['data-type'] = 'button';
+
+    $button = '<button '.attrsToSting($overWrite['attrs']).'class="'.$overWrite['css'].'" type="button" >'.$overWrite['text'].'</button>';
+
+    return $button;
+
+  }
+
 ?>
