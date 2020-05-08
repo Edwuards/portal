@@ -77,6 +77,7 @@ function Input(INPUT){
       }
     },
     'off': {
+      configurable: true,
       writable: false,
       value: ()=>{
         SUBJECT.event.get().forEach(EVENTS.off);
@@ -190,10 +191,15 @@ function SelectInput(INPUT){
       el.text(option.text).val(option.value);
       this.element.append(el);
     },
+    select:(value)=>{
+      this.options.get().removeAttr('selected');
+      this.element.find(`[value="${value}"]`).attr('selected','selected');
+    },
     remove: (value)=>{
       this.element.find(`[value="${value}"]`).remove();
     },
-    get: ()=>{ return this.element.children(); }
+    get: ()=>{ return this.element.children(); },
+    find: (value)=>{ return this.element.find(`[value="${value}"]`); }
   }
 
   const METHODS = {
@@ -210,11 +216,12 @@ function SelectInput(INPUT){
 function DateInput(MONTH,DAY,YEAR){
   Input.call(this,$(document.createElement('input')));
 
-  const DATE = new Date();
-
   MONTH = new SelectInput(MONTH);
   DAY = new SelectInput(DAY);
   YEAR = new SelectInput(YEAR);
+
+  const GROUP = [MONTH,DAY,YEAR];
+  const DATE = new Date();
 
   const METHODS = {
     'month':{
@@ -229,7 +236,7 @@ function DateInput(MONTH,DAY,YEAR){
     'on': {
       writable: false,
       value: function(){
-        [MONTH,DAY,YEAR].forEach((input)=>{
+        GROUP.forEach((input)=>{
           input.on();
         });
       }
@@ -237,7 +244,7 @@ function DateInput(MONTH,DAY,YEAR){
     'off': {
       writable: false,
       value: function(){
-        [MONTH,DAY,YEAR].forEach((input)=>{
+        GROUP.forEach((input)=>{
           input.off();
         });
       }
@@ -246,17 +253,17 @@ function DateInput(MONTH,DAY,YEAR){
       writable: false,
       value: {
         on: (type,fn)=>{
-          [MONTH,DAY,YEAR].forEach((input)=>{
+          GROUP.forEach((input)=>{
             input.events.on(type,fn);
           });
         },
         off: (type)=>{
-          [MONTH,DAY,YEAR].forEach((input)=>{
+          GROUP.forEach((input)=>{
             input.events.off(type);
           });
         },
         unregister: (type,index)=>{
-          [MONTH,DAY,YEAR].forEach((input)=>{
+          GROUP.forEach((input)=>{
             input.events.unregister(type,index);
           });
         }
@@ -266,20 +273,161 @@ function DateInput(MONTH,DAY,YEAR){
       configurable: true,
       writable: true,
       value: function(on){
-        [MONTH,DAY,YEAR].forEach((input)=>{
+        GROUP.forEach((input)=>{
           input.disable(on);
         });
       }
     },
     'format':{
-      get: ()=>{}
-    }
+      get: ()=>{
+        return DATE.toJSON().slice(0, 19).replace('T', ' ');
+      }
+    },
     'value': {
       configurable: true,
       get: ()=>{ return DATE; }
     }
   };
 
+  Object.defineProperties(this,METHODS);
+
+  GROUP.forEach((input)=>{
+    let attr = input.element.attr('name');
+    let fn = (attr == 'month' ? 'setMonth' : (attr == 'day' ? 'setDate' : 'setFullYear'));
+    input.events.on('change',function(){
+      DATE[fn](Number(this.value));
+      console.log(DATE);
+    });
+  });
+
+  {
+    let date = new Date();
+    let year = Number(date.getFullYear());
+    let month = date.getMonth();
+    let days = new Date(year,(month+1),0).getDate();
+
+    for(let month = 0; month < 12; month++){
+      let text = new Intl.DateTimeFormat('es-MX',{month:'long'}).format(new Date(year,month));
+      MONTH.options.add({text,value:month});
+    }
+    MONTH.options.select(month);
+    MONTH.element.data('days',days);
+
+    for(var i = 1; i <= days; i++){ DAY.options.add({text:i,value:i}); }
+    DAY.options.select(date.getDate());
+
+    for(var i = 0; i <= 1; i++){ year = year+i; YEAR.options.add({text:year,value:year}); }
+
+    MONTH.events.on('change',function(){
+      let days = {}
+      days.current = Number(this.element.data('days'));
+      days.update = new Date();
+      days.update.setMonth(Number(this.value)+1);
+      days.update.setDate(0);
+      days.update = days.update.getDate();
+      let add = days.update > days.current;
+
+      if(add){
+        add = days.update - days.current;
+        while(add){
+          days.current++;
+          let exist = DAY.options.find(days.current);
+          if(exist){ exist.removeClass('hidden'); }
+          else{ DAY.options.add({text:days.current,value:days.current}); }
+          add--;
+        }
+      }
+      else{
+        DAY.options.get().each(function(i){
+          if((i+1) > days.update){ $(this).addClass('hidden'); }
+        });
+      }
+
+      DAY.options.select(1);
+      this.element.data('days',days.update);
+    });
+
+  }
+
 }
 
-export { SelectInput }
+function TimeInput(HOUR,MINUTES,TIME){
+  Input.call(this,$(document.createElement('input')));
+
+  HOUR = new NumberInput(HOUR);
+  MINUTES = new NumberInput(MINUTES);
+  TIME = new SelectInput(TIME);
+
+  const GROUP = [HOUR,MINUTES,TIME];
+
+  const METHODS = {
+    'hour':{
+      get: ()=>{ return HOUR }
+    },
+    'minute':{
+      get: ()=>{ return MINUTES }
+    },
+    'time':{
+      get: ()=>{ return TIME }
+    },
+    'on': {
+      writable: false,
+      value: function(){
+        GROUP.forEach((input)=>{ input.on(); });
+      }
+    },
+    'off': {
+      writable: false,
+      value: function(){
+        GROUP.forEach((input)=>{ input.off(); });
+      }
+    },
+    'events': {
+      writable: false,
+      value: {
+        on: (type,fn)=>{
+          GROUP.forEach((input)=>{ input.events.on(type,fn); });
+        },
+        off: (type)=>{
+          GROUP.forEach((input)=>{ input.events.off(type); });
+        },
+        unregister: (type,index)=>{
+          GROUP.forEach((input)=>{
+            input.events.unregister(type,index);
+          });
+        }
+      }
+    },
+    'disable':{
+      configurable: true,
+      writable: true,
+      value: function(on){
+        GROUP.forEach((input)=>{ input.disable(on); });
+      }
+    },
+    'value': {
+      configurable: true,
+      get: ()=>{
+        return {
+          hour: (TIME.value == 'pm' ? (HOUR.value + 12) : HOUR.value),
+          minutes: MINUTES.value
+        }
+      }
+    }
+  };
+
+  Object.defineProperties(this,METHODS);
+
+  ['am','pm'].forEach((val)=>{ TIME.options.add({value: val,text: val.toUpperCase() }); });
+
+}
+
+export {
+  TimeInput,
+  DateInput,
+  SelectInput,
+  TextAreaInput,
+  TextInput,  
+  NumberInput,
+  Input
+}

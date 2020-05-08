@@ -1,10 +1,11 @@
 <?php
 
 $html = [
-  'date_start' => $this->load->view('forms/inputs/date',['group'=>'date_start'],true),
-  'date_finish' => $this->load->view('forms/inputs/date',['group'=>'date_finish'],true)
+  'date_start' => DateInput(['group'=>'date_start']),
+  'date_finish' => DateInput(['group'=>'date_finish'])
 ];
- ?>
+
+?>
 
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha de salida</p>

@@ -1,34 +1,45 @@
 <?php
   $inputs = [
-    [
-      'type'=>'number',
+    'number'=>[
       'css'=>'w-1/3 mx-1',
       'label'=>'Hora',
-      'name'=>'hour',
-      'min'=>'1',
-      'max'=>'12'
+      'attrs'=>[
+        'name'=>'hour',
+        'min'=>'1',
+        'max'=>'12'
+      ]
     ],
-    [
-      'type'=>'number',
+    'number'=>[
       'css'=>'w-1/3 mx-1',
       'label'=>'Minutos',
-      'name'=>'minutes',
-      'min'=>'0',
-      'max'=>'59'
+      'attrs'=>[
+        'name'=>'minutes',
+        'min'=>'0',
+        'max'=>'59'
+      ]
     ],
-    [
-      'type'=>'select',
+    'select'=>[
       'css'=>'w-1/3 mx-1',
       'label'=>'<i class="far fa-clock"></i>',
-      'name'=>'amPm'
+      'attrs'=>[
+        'name'=>'amPm'
+      ]
     ]
   ];
 
   $html = '';
 
-  foreach ($inputs as $data) {
-    $data['group'] = $group;
-    $html .= $this->load->view('forms/inputs/'.$data['type'],$data,true);
+  foreach ($inputs as $key => $data) {
+    $data['attrs']['data-group'] = $group;
+    $data['attrs']['data-type'] = 'time';
+
+    if($key == 'number'){
+      $html .= NumberInput($data);
+    }
+    else{
+      $html .= SelectInput($data);
+    }
+
   }
 
 

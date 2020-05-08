@@ -1,58 +1,63 @@
 <?php
 
 $html = [
-  'image'=> $this->load->view('forms/inputs/image',[
-    'css'=>[
-      'cont'=>'flex-col-reverse items-center',
-      'img'=>'w-1/2 rounded-full overflow-hidden' ],
-    'group'=>'',
-    'name'=>'img',
-    'label'=>'Avatar'
-    ],true),
-  'name' => $this->load->view('forms/inputs/text',[
-    'css'=>['cont'=>'w-full mx-1','input'=>'w-full disabled'],
-    'group'=>'',
-    'name'=>'name',
-    'label'=>'Nombre'
-    ],true),
-  'work_position' => $this->load->view('forms/inputs/text',[
+  'image'=> ImageInput([
+    'css'=>['cont'=>'','img'=>'w-2/3' ],
+    'label'=>'Avatar',
+    'attrs'=>[
+      'input'=>[
+        'data-group'=>'avatar',
+        'name'=>'file'
+      ],
+      'button'=>[
+        'data-group'=>'avatar',
+        'name'=>'upload',
+      ],
+      'img'=>[
+        'data-group'=>'avatar',
+        'name'=>'preview',
+        'src'=>"https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png"
+      ]
+    ]
+  ]),
+  'name' => TextInput([
+    'css'=>['cont'=>'w-full mx-1','input'=>'w-full'],
+    'label'=>'Nombre',
+    'attrs'=>['name'=>'name'],
+  ]),
+  'work_position' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'work_position',
-    'label'=>'Puesto'
-    ],true),
-  'work_area' => $this->load->view('forms/inputs/text',[
+    'label'=>'Puesto',
+    'attrs'=>['name'=>'work_position'],
+  ]),
+  'work_area' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'work_area',
-    'label'=>'Área'
-    ],true),
-  'email' => $this->load->view('forms/inputs/text',[
+    'label'=>'Área',
+    'attrs'=>['name'=>'work_area'],
+  ]),
+  'email' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'email',
-    'label'=>'Correo'
-    ],true),
-  'birthday' => $this->load->view('forms/inputs/text',[
+    'label'=>'Coreo',
+    'attrs'=>['name'=>'email'],
+  ]),
+  'birthday' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'birthday',
-    'label'=>'Cumpleaños'
-    ],true),
-  'vacations' => $this->load->view('forms/inputs/text',[
+    'label'=>'Cumpleaños',
+    'attrs'=>['name'=>'birthday'],
+  ]),
+  'vacations' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'vacations',
-    'label'=>'Vacaciones'
-    ],true),
-  'work_start' => $this->load->view('forms/inputs/text',[
+    'label'=>'Vacaciones',
+    'attrs'=>['name'=>'vacations'],
+  ]),
+  'work_start' => TextInput([
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
-    'group'=>'',
-    'name'=>'work_start',
-    'label'=>'Fecha de ingreso'
-    ],true),
+    'label'=>'Fecha de ingreso',
+    'attrs'=>['name'=>'work_start'],
+  ])
 ];
 ?>
+
 <?php echo $html['image']; ?>
 <?php echo $html['name']; ?>
 <div class="flex">

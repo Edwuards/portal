@@ -3,25 +3,32 @@
     [
       'css'=>'w-1/3 mx-1',
       'label'=>'Mes',
-      'name'=>'month'
+      'attrs'=>[
+        'name'=>'month'
+      ]
     ],
     [
       'css'=>'w-1/3 mx-1',
       'label'=>'Día',
-      'name'=>'day'
+      'attrs'=>[
+        'name'=>'day'
+      ]
     ],
     [
       'css'=>'w-1/3 mx-1',
       'label'=>'Año',
-      'name'=>'year'
+      'attrs'=>[
+        'name'=>'year'
+      ]
     ]
   ];
 
   $html = '';
 
   foreach ($select as $data) {
-    $data['group'] = $group;
-    $html .= $this->load->view('forms/inputs/select',$data,true);
+    $data['attrs']['data-group'] = $group;
+    $data['attrs']['data-type'] = 'date';
+    $html .= SelectInput($data);
   }
 
 

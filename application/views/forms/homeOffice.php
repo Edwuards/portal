@@ -1,15 +1,12 @@
 <?php
 
 $html = [
-  'date' => $this->load->view('forms/inputs/date',['group'=>'date'],true),
-  'hour_start' => $this->load->view('forms/inputs/time',['group'=>'hour_start'],true),
-  'hour_finish' => $this->load->view('forms/inputs/time',['group'=>'hour_finish'],true),
-  'textarea' => $this->load->view('forms/inputs/textarea',[
+  'date' => DateInput(['group'=>'date']),
+  'textarea' => TextAreaInput([
     'label'=>'Descrpción',
-    'name'=>'description',
     'css'=>'w-full',
-    'group'=>''
-  ],true)
+    'attrs'=>[ 'name'=>'description',]
+  ]),
 ];
  ?>
 

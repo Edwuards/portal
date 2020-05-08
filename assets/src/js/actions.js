@@ -4,6 +4,7 @@ import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
 import { default as formsInit } from './forms/forms.js';
 import { default as tablesInit } from './dataTable.js';
+import { HTML } from './forms/templates.js';
 
 export default function(){
   const Calendar = calendarInit();
@@ -55,15 +56,12 @@ export default function(){
   }
   Actions.open.form = function(){
     let btn = $(this);
-    let form = Forms[btn.attr('name')];
-    form.setButtons(Modal.elements.button);
-    console.log(form);
-    form.open();
-    Modal.actions.open({title: form.title, body: form.form });
+
+    Modal.actions.open({title: 'form.title', body: HTML.permision() });
     Permisions.actions.close();
     Modal.elements.button.close.on('click',()=>{
       Modal.actions.close();
-      form.close();
+
       Modal.elements.button.close.off('click')
     })
   };

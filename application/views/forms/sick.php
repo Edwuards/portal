@@ -1,16 +1,30 @@
 <?php
 
 $html = [
-  'date_start' => $this->load->view('forms/inputs/date',['group'=>'date_start'],true),
-  'date_finish' => $this->load->view('forms/inputs/date',['group'=>'date_finish'],true),
-  'image'=> $this->load->view('forms/inputs/image',[
+  'date_start' => DateInput(['group'=>'date_start']),
+  'date_finish' => DateInput(['group'=>'date_finish']),
+  'image'=> ImageInput([
     'css'=>['cont'=>'','img'=>'w-2/3' ],
-    'group'=>'',
-    'name'=>'img',
-    'label'=>
-    'Receta Medica'
-    ],true)
+    'label'=>'Receta Medica',
+    'attrs'=>[
+      'input'=>[
+        'data-group'=>'medicalProof',
+        'name'=>'file'
+      ],
+      'button'=>[
+        'data-group'=>'medicalProof',
+        'name'=>'upload',
+      ],
+      'img'=>[
+        'data-group'=>'medicalProof',
+        'name'=>'preview',
+        'src'=>"https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png"
+      ]
+    ]
+  ])
 ];
+
+
 ?>
 
 <div class="w-full mb-2">

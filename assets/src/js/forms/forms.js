@@ -38,11 +38,7 @@ Forms.permision = {
   html: HTML.permision,
   buttons: ['send'],
   init: function(){
-    this.group.date = this.createDateInput(this.group.date);
-    this.group.hour_start = this.createTimeInput(this.group.hour_start);
-    this.group.hour_finish = this.createTimeInput(this.group.hour_finish);
-  },
-  open: function(){
+
     this.buttons.send.removeClass('hidden');
   },
   send: function(){
