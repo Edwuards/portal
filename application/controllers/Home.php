@@ -30,4 +30,6 @@ class Home extends CI_Controller {
 		->set_output($html);
 	}
 
+	
+
 }

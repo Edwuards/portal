@@ -1,7 +1,7 @@
-<div data-table="myAvisos" class="min-w-full h-full bg-gray-200 absolute p-10 hidden">
+<div data-table="userAvisos" class="min-w-full h-full bg-gray-200 absolute p-10 hidden">
   <div class="header flex items-center w-full h-12 px-4 border-b">
     <div class="w-10 mx-2">
-      <p class="font-bold">ID</p>
+
     </div>
     <div class="w-10 mx-2">
       <p class="font-bold">ID</p>
@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="body w-full">
-    <div class="flex w-full h-12 px-4 border-b">
+    <div class="flex items-center w-full h-12 px-4 border-b">
       <button class="w-10 h-10 mx-2" type="button" name="button">
         <i class="text-blue-500 fas fa-paper-plane"></i>
       </button>
