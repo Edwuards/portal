@@ -87,9 +87,9 @@
       ]
     ];
 
-    $overWrite['attrs']['img']['data-type'] = 'upload';
-    $overWrite['attrs']['button']['data-type'] = 'upload';
-    $overWrite['attrs']['input']['data-type'] = 'upload';
+    $overWrite['attrs']['img']['data-type'] = 'image';
+    $overWrite['attrs']['button']['data-type'] = 'image';
+    $overWrite['attrs']['input']['data-type'] = 'image';
 
     return $ci->load->view('forms/inputs/image',$overWrite,true);
 
@@ -99,7 +99,7 @@
     $ci=& get_instance();
     $overWrite = [
       'text'=> isset($data['text']) ? $data['text'] : '',
-      'css'=> isset($data['css']) ? $data['css'] : 'py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden',
+      'css'=> isset($data['css']) ? $data['css'] : 'py-2 px-4 mx-2 text-sm bg-blue-700 text-white',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
     ];
 
@@ -109,6 +109,16 @@
 
     return $button;
 
+  }
+
+  function FormFooter($buttons){
+    $html = '';
+    foreach ($buttons as $btn) { $html .= $btn.' '; };
+    return '<div class="w-full">
+              <div data="error" class="text-red-500 mx-2 w-full text-sm" >
+              </div>
+              <div class="flex"> '.$html.'</div>
+            </div>';
   }
 
 ?>

@@ -9973,15 +9973,14 @@
       Elements.body.html(data.body);
 
       Elements.container.removeClass('hidden')
-      .animate({'opacity': 1},1000,()=>{
-        Elements.modal.addClass('active');
-      });
+      .animate({'opacity': 1},1000);
+      Elements.modal.addClass('active').removeClass('close');
     };
 
     Actions.close = ()=>{
+      Elements.modal.addClass('close').removeClass('active');
       Elements.container.animate({'opacity': 0},1000,()=>{
         Elements.container.addClass('hidden');
-        Elements.modal.removeClass('active');
         Elements.title.html('');
         Elements.body.html('');
         Elements.allButtons.addClass('hidden');
@@ -10028,214 +10027,1087 @@
     }
   };
 
+  /*
+    All RULES must have a test and message property
+    All test must return true if passed or false if failed.
+    If test returns false the message will be available to log
+    All test function can not be anonymous
+    Rule = {
+      message: string
+      test: (value)=>{ return false || true }
+    }
+  */
+  const Rules = {};
+  const RULES = {};
+
+
+  RULES.is = {};
+  RULES.has = {};
+  RULES.validate = {};
+
+  // RULES FOR IS TYPE
+
+  RULES.is.object = {
+    message: 'The parameter is not an object type',
+    test: function(value){
+      if( Array.isArray(value) || typeof value !== 'object' ){ return false; }    return true;
+    }
+  };
+
+  RULES.is.notDuplicateProperty = {
+    message: 'The property already exist inside the object ',
+    test: function(property,object){
+      let test = this.rules.is.string(property);
+      if(!test.passed){this.message = test.error; return false; }
+
+      test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false; }
+
+
+      if(object[property] !== undefined ){
+        return false
+      }
+      return true
+    }
+  };
+
+  RULES.is.string = {
+    message: 'The parameter is not a string type',
+    test: function(value){
+      if(typeof value !== 'string'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.notEmpty = {
+    message: 'The parameter is empty',
+    test: function(value){
+      if(value == '' || value == undefined){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.number = {
+    message: 'The parameter is not a number type',
+    test: function(value){
+      if(typeof value !== 'number'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.array = {
+    message: 'The paramter is not an Array type',
+    test: function(value){ return Array.isArray(value); }
+  };
+
+  RULES.is.instanceOf = {
+    message: 'The object given is not an instance of',
+    test: function(compare,against){
+      let test = this.rules.is.object(compare);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.function(against);{
+      if(!test.passed){ this.message = test.error; return false; }}
+
+      if(!(compare instanceof against)){
+        this.message = `${this.message} ${against.name}`;
+        return false
+      }
+
+      return true
+    }
+  };
+
+  RULES.is.instanceOfAny = {
+    message: 'The object is not an instance of any of the following : ',
+    test: function(compare,against){
+      let test = undefined;
+      let names = '';
+      test = this.rules.is.array(against);{
+      if(!test.passed){ this.message = test.error; return false; }}
+
+      test = against.every(function(obj){
+        names += obj.constructor.name+' ';
+        return !this.rules.is.instanceOf(compare,obj).passed;
+      }.bind(this));
+
+      if(test){ this.message = `${this.message} ${names}`; }
+
+      return !test;
+
+    }
+  };
+
+  RULES.is.function = {
+    message: 'The property is not a function',
+    test: function(value){
+      if(typeof value !== 'function'){ return false; }
+      return true;
+    }
+  };
+
+  RULES.is.greaterThan = {
+    message: 'The value',
+    test: function(check,against){
+      this.message = 'The value';
+
+      let test = this.rules.is.number(check);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(against);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(check < against || check == against){
+        this.message = `${this.message} ${check} is not greater than ${against}`;
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.is.lessThan = {
+    message: 'The value',
+    test: function(check,against){
+      this.message = 'The value';
+      
+      let test = this.rules.is.number(check);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(against);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(check > against || check == against){
+        this.message = `${this.message} ${check} is not less than ${against}`;
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.is.htmlChildren = {
+    message: 'The followin object does not posses an array property with HTMLElement instances ',
+    test: function(children){
+      if(!Array.isArray(children)){ return false }    if(children.some((child)=>{ return !(child instanceof HTMLElement) })){ return false }
+      return true;
+    }
+  };
+
+  RULES.is.defined = {
+    message: 'The following property is not defined ',
+    test: function(property,object){
+      let test = this.rules.is.string(property);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(object[property] === undefined ){ this.message += 'property'; return false; }
+      return true;
+    }
+  };
+
+  RULES.is.notEmptyArray = {
+    message: 'The given array is empty',
+    test: function(array){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      return array.length != 0
+    }
+  };
+
+  // RULES FOR HAS TYPE
+
+  RULES.has.arrayLength = {
+    message:'The array must have a length of ',
+    test: function(array,length){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false}
+
+      test = this.rules.is.number(length);
+      if(!test.passed){ this.message = test.error; return false}
+
+      if(array.length !== length){ return false }
+      return true
+    }
+  };
+
+  RULES.has.properties = {
+    message: 'The object does not have all of the following properties ',
+    test: function(properties,object){
+      let test = this.rules.is.object(object);
+      if(!test.passed){ this.message = test.error; return false }
+
+      test = this.rules.is.array(properties);
+      if(!test.passed){ this.message = test.error; return false }
+
+      (function(properties){
+
+        properties.every(function(prop){
+          test = this.rules.is.string(prop);
+          return test.passed
+        }.bind(this));
+
+        return test;
+
+      }.bind(this))(properties);
+
+      if(!test.passed){ this.message = test.error; return false }
+
+
+      if(properties.some((property)=>{ return object[property] === undefined })){
+        properties.forEach(function(property){ this.message = this.message+property+' '; }.bind(this));
+        return false;
+      }
+      return true;
+    }
+  };
+
+  RULES.has.index = {
+    message: 'The index is undefined for the given array.',
+    test: function(array,index){
+      let test = this.rules.is.array(array);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      test = this.rules.is.number(index);
+      if(!test.passed){ this.message = test.error; return false; }
+
+      if(array[index] === undefined){ return false; }
+      return true;
+    }
+  };
+
+  for (let type in RULES) {
+    for(let name in RULES[type]){
+      let rule = RULES[type][name];
+      if(Rules[type] == undefined){ Rules[type] = {}; }
+      let context = { message: rule.message, rules: Rules };
+      Rules[type][name] = function(){ return new Rule(context,rule,arguments) };
+    }
+  }
+
+  function Rule(context,rule,args){
+    this.passed = rule.test.apply(context,args);
+    this.error = this.passed ? undefined : new Error(context.message);
+  }
+
+  function Test(tests){
+    let test = undefined, rule = undefined, args = undefined;
+    test = Rules.is.array(tests);
+    if(!test.passed){ return test }  tests.every((check,i)=>{
+
+      test = Rules.is.array(check);
+      if(!test.passed){ return false; }
+
+      test = Rules.has.arrayLength(check,2);
+      if(!test.passed){ return false; }
+
+      rule = check[0]; args = check[1];
+
+      test = Rules.is.array(args);
+      if(!test.passed){ return false; }
+
+      test = Rules.is.function(rule);
+      if(!test.passed){ return false; }
+
+      rule = rule.apply(null,args);
+
+      test = Rules.is.instanceOf(rule,Rule);
+      if(!test.passed){ return false; }
+
+      test = rule;
+
+      return test.passed
+
+
+    });
+
+    return test
+  }
+
+  function Observer(events){
+    const Events = {};
+
+    this.event = {
+      create: (event)=>{
+        let test = undefined;
+    	  [
+      		Rules.is.string(event),
+      		Rules.is.notDuplicateProperty(event,Events)
+    	  ].some((check)=>{ test = check ; return !test.passed; });
+
+        if(!test.passed){ throw test.error; }
+        Events[event] = [];
+      },
+      delete: (event)=>{
+        let test = undefined ;
+    	  [
+      		Rules.is.string(event),
+      		Rules.is.defined(event,Events)
+    	  ].some((check)=>{ test = check; return !test.passed });
+
+      	if(!test.passed){ throw test.error; }
+
+        delete Events[event];
+      },
+      get: ()=>{ return Object.keys(Events); }
+    };
+
+    this.notify = (event,update)=>{
+      let test = Rules.is.defined(event,Events);
+      if(!test.passed){ throw test.error; }
+      Events[event].forEach((notify)=>{ notify.apply(null,update); });
+    };
+
+    this.register = (event,subscriber)=>{
+    	let test = Test([
+        [Rules.is.defined,[event,Events]],
+        [Rules.is.function,[subscriber]]
+      ]);
+
+      if(!test.passed){ throw test.error; }
+
+      return Events[event].push(subscriber) - 1;
+    };
+
+    this.unregister = (event,index)=>{
+    	let test = undefined ;
+  	  [
+        Rules.is.defined(event,Events),
+        Rules.has.index(Events[event],index)
+      ].some((check)=>{ test = check ; return !test.passed; });
+
+  	  if(!test.passed){ throw test.error; }
+
+      Events[event]  = Events[event].reduce((a,c,i)=>{
+        if(i !== index){ a.push(c); }
+        return a;
+
+      },[]);
+    };
+
+    if(Rules.is.array(events).passed){
+  	  events.forEach(this.event.create);
+    }
+
+  }
+
+  function Button(BUTTON){
+
+    const SUBJECT = new Observer();
+
+    const INSTANCE = this;
+
+    const EVENTS = {
+      state: {},
+      on: (type)=>{
+        if(!EVENTS.state[type]){
+          EVENTS.state[type] = true;
+          let update = (type)=>{
+            return function(){
+              INSTANCE.element.off(type);
+              SUBJECT.notify(type,arguments);
+              INSTANCE.element.on(type,update(type));
+            }
+          };
+          INSTANCE.element.on(type,update(type));
+        }
+      },
+      off: (type)=>{
+        EVENTS.state[type] = false;
+        INSTANCE.element.off(type);
+      }
+    };
+
+    const METHODS = {
+      'element': {
+        writable: false,
+        value: BUTTON
+      },
+      'on': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          SUBJECT.event.get().forEach(EVENTS.on);
+        }
+      },
+      'off': {
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          SUBJECT.event.get().forEach(EVENTS.off);
+        }
+      },
+      'events': {
+        configurable: true,
+        writable: false,
+        value: {
+          on: (type,fn)=>{
+            if(SUBJECT.event.get().indexOf(type) == -1){ SUBJECT.event.create(type); }
+            let index = SUBJECT.register(type,fn.bind(INSTANCE));
+            EVENTS.on(type);
+            return index;
+          },
+          off: EVENTS.off,
+          unregister: SUBJECT.unregister
+        }
+      },
+    };
+
+    ['click'].forEach(SUBJECT.event.create);
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function Input(INPUT){
+
+    let jquery = INPUT instanceof window.$;
+    let test = Rules.is.instanceOfAny(
+      (jquery ? INPUT[0] : INPUT),
+      [HTMLInputElement,HTMLSelectElement,HTMLTextAreaElement]
+    );
+
+    if(!test.passed){ throw test.error; }
+
+    const TEST = {
+      rules: [],
+      map: {},
+      addRule: (rule)=>{
+        TEST.map[rule.name] = TEST.rules.push([rule.test,rule.args]) - 1;
+      },
+      removeRule: (name)=>{
+        let index = TEST.map[name];
+        if(index !== undefined){
+          TEST.rules  = TEST.rules.reduce((a,c,i)=>{
+            if(i !== index){ a.push(c); }
+            return a;
+          },[]);
+        }
+      },
+      run: ()=>{
+        let rules = TEST.rules.map((check)=>{
+          let copy = [check[0],[]];
+          if(Array.isArray(check[1])){ copy[1] = copy[1].concat(check[1]); }
+          copy[1].unshift(INSTANCE.value);
+          return copy;
+        });
+
+        return Test(rules);
+      }
+    };
+
+    const SUBJECT = new Observer();
+
+    const INSTANCE = this;
+
+    const EVENTS = {
+      state: {},
+      on: (type)=>{
+        if(!EVENTS.state[type]){
+          EVENTS.state[type] = true;
+          let update = (type)=>{
+            return function(){
+              INSTANCE.element.off(type);
+              SUBJECT.notify(type,arguments);
+              INSTANCE.element.on(type,update(type));
+            }
+          };
+          INSTANCE.element.on(type,update(type));
+        }
+      },
+      off: (type)=>{
+        EVENTS.state[type] = false;
+        INSTANCE.element.off(type);
+      }
+    };
+
+    const METHODS = {
+      'element': {
+        writable: false,
+        value: INPUT
+      },
+      'on': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          EVENTS.on('component.init');
+          this.element.trigger('component.init');
+        }
+      },
+      'off': {
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          SUBJECT.event.get().forEach(EVENTS.off);
+        }
+      },
+      'events': {
+        configurable: true,
+        writable: false,
+        value: {
+          on: (type,fn)=>{
+            if(SUBJECT.event.get().indexOf(type) == -1){ SUBJECT.event.create(type); }
+            let index = SUBJECT.register(type,fn.bind(INSTANCE));
+            EVENTS.on(type);
+            return index;
+          },
+          off: EVENTS.off,
+          unregister: SUBJECT.unregister
+        }
+      },
+      'disable':{
+        configurable: true,
+        writable: true,
+        value: function(on){
+          this.element[on ? 'attr' : 'removeAttr' ]('disabled','disabled');
+        }
+      },
+      'rules': {
+        writable: false,
+        value: {
+          add: TEST.addRule,
+          remove: TEST.removeRule,
+          test: TEST.run
+        }
+      },
+      'value': {
+        configurable: true,
+        get: ()=>{ return this.element.val().trim(); }
+      }
+    };
+
+    ['component.init','focus','input','blur'].forEach(SUBJECT.event.create);
+
+    SUBJECT.register('component.init',function(){
+      let types = SUBJECT.event.get().reduce((a,c)=>{
+        if(c != 'component.init'){ a.push(c); }
+        return a;
+      },[]);
+      types.forEach(EVENTS.on);
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function TextInput(INPUT){
+    Input.call(this,INPUT);
+    this.element.attr('type','text');
+
+    this.rules.add('not empty',Rules.is.notEmtpy);
+  }
+
+  function NumberInput(INPUT){
+    Input.call(this,INPUT);
+
+    const PROPS = {};
+
+    function maxMinSetter(max){
+      let name = `${max ? 'max' : 'min'} number`;
+      let test = max ? Rules.is.lessThan : Rules.is.greaterThan;
+      return function(value){
+        PROPS[max ? 'max' : 'min'] = value;
+        let args = max ? [(PROPS.max+1)] : [(PROPS.min-1)];
+        this.element.attr((max ? 'max' : 'min'),value);
+        this.rules.remove(name);
+        this.rules.add({ name, test, args });
+      }
+    }
+
+    const METHODS = {
+      'value':{
+        get:()=>{ return Number(this.element.val()); }
+      },
+      'max':{
+        get: ()=>{ return PROPS.max },
+        set: maxMinSetter(true)
+      },
+      'min':{
+        get: ()=>{ return PROPS.min },
+        set: maxMinSetter(false)
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    this.element.attr('type','number');
+    this.max = Number(this.element.attr('max'));
+    this.min = Number(this.element.attr('min'));
+  }
+
+  function TextAreaInput(INPUT){
+    Input.call(this,INPUT);
+    this.rules.add('not empty',Rules.is.notEmtpy);
+  }
+
+  function SelectInput(INPUT){
+    Input.call(this,INPUT);
+
+    const OPTIONS = {
+      add: (option)=>{
+        let el = $(document.createElement('option'));
+        el.text(option.text).val(option.value);
+        this.element.append(el);
+      },
+      select:(value)=>{
+        this.options.get().removeAttr('selected');
+        this.element.find(`[value="${value}"]`).attr('selected','selected');
+      },
+      remove: (value)=>{
+        this.element.find(`[value="${value}"]`).remove();
+      },
+      get: ()=>{ return this.element.children(); },
+      find: (value)=>{ return this.element.find(`[value="${value}"]`); }
+    };
+
+    const METHODS = {
+      'options':{
+        writable: false,
+        value: OPTIONS
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function DateInput(MONTH,DAY,YEAR){
+    Input.call(this,$(document.createElement('input')));
+
+    MONTH = new SelectInput(MONTH);
+    DAY = new SelectInput(DAY);
+    YEAR = new SelectInput(YEAR);
+
+    const GROUP = [MONTH,DAY,YEAR];
+    const DATE = new Date();
+
+    const METHODS = {
+      'month':{
+        get: ()=>{ return MONTH }
+      },
+      'day':{
+        get: ()=>{ return DAY }
+      },
+      'year':{
+        get: ()=>{ return YEAR }
+      },
+      'on': {
+        writable: false,
+        value: function(){
+          GROUP.forEach((input)=>{
+            input.on();
+          });
+        }
+      },
+      'off': {
+        writable: false,
+        value: function(){
+          GROUP.forEach((input)=>{
+            input.off();
+          });
+        }
+      },
+      'events': {
+        writable: false,
+        value: {
+          on: (type,fn)=>{
+            GROUP.forEach((input)=>{
+              input.events.on(type,fn);
+            });
+          },
+          off: (type)=>{
+            GROUP.forEach((input)=>{
+              input.events.off(type);
+            });
+          },
+          unregister: (type,index)=>{
+            GROUP.forEach((input)=>{
+              input.events.unregister(type,index);
+            });
+          }
+        }
+      },
+      'disable':{
+        configurable: true,
+        writable: true,
+        value: function(on){
+          GROUP.forEach((input)=>{
+            input.disable(on);
+          });
+        }
+      },
+      'format':{
+        get: ()=>{
+          return DATE.toJSON().slice(0, 19).replace('T', ' ');
+        }
+      },
+      'value': {
+        configurable: true,
+        get: ()=>{ return DATE; }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    GROUP.forEach((input)=>{
+      let attr = input.element.attr('name');
+      let fn = (attr == 'month' ? 'setMonth' : (attr == 'day' ? 'setDate' : 'setFullYear'));
+      input.events.on('change',function(){
+        DATE[fn](Number(this.value));
+        console.log(DATE);
+      });
+    });
+
+    {
+      let date = new Date();
+      let year = Number(date.getFullYear());
+      let month = date.getMonth();
+      let days = new Date(year,(month+1),0).getDate();
+
+      for(let month = 0; month < 12; month++){
+        let text = new Intl.DateTimeFormat('es-MX',{month:'long'}).format(new Date(year,month));
+        MONTH.options.add({text,value:month});
+      }
+      MONTH.options.select(month);
+      MONTH.element.data('days',days);
+
+      for(var i = 1; i <= days; i++){ DAY.options.add({text:i,value:i}); }
+      DAY.options.select(date.getDate());
+
+      for(var i = 0; i <= 1; i++){ year = year+i; YEAR.options.add({text:year,value:year}); }
+
+      MONTH.events.on('change',function(){
+        let days = {};
+        days.current = Number(this.element.data('days'));
+        days.update = new Date();
+        days.update.setMonth(Number(this.value)+1);
+        days.update.setDate(0);
+        days.update = days.update.getDate();
+        let add = days.update > days.current;
+
+        if(add){
+          add = days.update - days.current;
+          while(add){
+            days.current++;
+            let exist = DAY.options.find(days.current);
+            if(exist){ exist.removeClass('hidden'); }
+            else { DAY.options.add({text:days.current,value:days.current}); }
+            add--;
+          }
+        }
+        else {
+          DAY.options.get().each(function(i){
+            if((i+1) > days.update){ $(this).addClass('hidden'); }
+          });
+        }
+
+        DAY.options.select(1);
+        this.element.data('days',days.update);
+      });
+
+    }
+
+  }
+
+  function TimeInput(HOUR,MINUTES,TIME){
+    Input.call(this,$(document.createElement('input')));
+
+    HOUR = new NumberInput(HOUR);
+    MINUTES = new NumberInput(MINUTES);
+    TIME = new SelectInput(TIME);
+
+    const GROUP = [HOUR,MINUTES,TIME];
+
+    const METHODS = {
+      'hour':{
+        get: ()=>{ return HOUR }
+      },
+      'minute':{
+        get: ()=>{ return MINUTES }
+      },
+      'time':{
+        get: ()=>{ return TIME }
+      },
+      'on': {
+        writable: false,
+        value: function(){
+          GROUP.forEach((input)=>{ input.on(); });
+        }
+      },
+      'off': {
+        writable: false,
+        value: function(){
+          GROUP.forEach((input)=>{ input.off(); });
+        }
+      },
+      'events': {
+        writable: false,
+        value: {
+          on: (type,fn)=>{
+            GROUP.forEach((input)=>{ input.events.on(type,fn); });
+          },
+          off: (type)=>{
+            GROUP.forEach((input)=>{ input.events.off(type); });
+          },
+          unregister: (type,index)=>{
+            GROUP.forEach((input)=>{
+              input.events.unregister(type,index);
+            });
+          }
+        }
+      },
+      'disable':{
+        configurable: true,
+        writable: true,
+        value: function(on){
+          GROUP.forEach((input)=>{ input.disable(on); });
+        }
+      },
+      'value': {
+        configurable: true,
+        get: ()=>{
+          return {
+            hour: (TIME.value == 'pm' ? (HOUR.value + 12) : HOUR.value),
+            minutes: MINUTES.value
+          }
+        }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    ['am','pm'].forEach((val)=>{ TIME.options.add({value: val,text: val.toUpperCase() }); });
+
+  }
+
+  function ImageInput(INPUT,BUTTON,IMG){
+    Input.call(this,INPUT);
+    BUTTON = new Button(BUTTON);
+    const INSTANCE = this;
+    const PROPS = {
+      img: IMG,
+      reader: new FileReader(),
+      file: undefined,
+      data: undefined
+    };
+    const METHODS = {
+      'value': {
+        get:()=>{ return file }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    PROPS.reader.onload = (e)=>{
+      PROPS.img.attr('src',e.target.result);
+      PROPS.data = e.target.result;
+    };
+
+    BUTTON.events.on('click',function(){
+      INSTANCE.element.val('');
+      INSTANCE.element.trigger('click');
+    });
+
+    this.events.on('change',function(){
+      PROPS.file = this.element[0].files[0];
+      PROPS.reader.readAsDataURL(PROPS.file);
+    });
+
+  }
+
   function Form(data){
+
     const FORM = $(document.createElement('form'));
-    const TITLE = data.title;
-    FORM.html(data.html);
+    const INSTANCE = this;
+    const BUTTONS = {
+      all: [],
+      name: {}
+    };
+    const INPUTS = {
+      all: [],
+      type:{}
+    };
+    const SUBJECT = new Observer(['open','close','send']);
+    const PROPS = {
+      alive:false,
+      title:data.title,
+      name:data.name
+    };
+    const OPEN = ()=>{
+      INPUTS.all.forEach((input)=>{ input.on(); });
+      BUTTONS.all.forEach((btn)=>{ btn.on(); });
+      PROPS.alive = true;
+      return FORM
+    };
+    const CLOSE = ()=>{
+      INPUTS.all.forEach((input)=>{ input.off(); });
+      BUTTONS.all.forEach((btn)=>{ btn.off(); });
+      PROPS.alive = false;
+    };
+
+    FORM.html(typeof data.html == 'function' ? data.html() : data.html );
+
     FORM.attr('name',data.name);
 
-    FORM.find('input,select,button,textarea').each(function(){
-      let el = $(this);
+    FORM.find('[data-type]').each(function(){
+      let el = $(this),
+      type = el.attr('data-type'),
+      name = el.attr('name'),
+      group = el.attr('data-group');
+
+      if(type !== 'button'){
+        if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
+        if(group){
+          if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {}; }
+          INPUTS.type[type][group][name] = el;
+        }
+        else {
+          if(type == 'text'){
+            el = new TextInput(el);
+          }
+          else if(type == 'number'){
+            el = new NumberInput(el);
+          }
+          else if(type == 'select'){
+            el = new SelectInput(el);
+          }
+          else if(type == 'textarea'){
+            el = new TextAreaInput(el);
+          }
+
+          INPUTS.type[type][name] = el;
+        }
+      }
+      else {
+        el = new Button(el);
+        BUTTONS.name[name] = new Button(el);
+        BUTTONS.all.push(el);
+      }
     });
 
+    for(let type in INPUTS.type){
+      for (let input in INPUTS.type[type]) {
+        if(type == 'date'){
+          input = INPUTS.type.date[input];
+          INPUTS.type.date[input] = new DateInput(input.month,input.day,input.year);
+        }
+        if(type == 'time'){
+          input = INPUTS.type.time[input];
+          INPUTS.type.time[input] = new TimeInput(input.hour,input.minutes,input.time);
+        }
+        if(type == 'image'){
+          input = INPUTS.type.image[input];
+          INPUTS.type.image[input] = new ImageInput(input.file,input.upload,input.preview);
+        }
+        INPUTS.all.push(INPUTS.type[type][input]);
+      }
+    }
 
+    const METHODS = {
+      'element': {
+        get:()=>{ return FORM }
+      },
+      'name':{
+        get:()=>{ return PROPS.name; }
+      },
+      'alive':{
+        get:()=>{ return PROPS.alive; }
+      },
+      'title':{
+        set:(title)=>{ PROPS.title = title;},
+        get:()=>{ return PROPS.title; }
+      },
+      'open': {
+        configurable: true,
+        get:()=>{ return OPEN; },
+        set:(open)=>{
+          Object.defineProperty(INSTANCE,'open',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              let form = OPEN();
+              open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+              return form;
+            }
+          });
+        }
+      },
+      'close': {
+        configurable: true,
+        get:()=>{ return CLOSE; },
+        set:(close)=>{
+          Object.defineProperty(INSTANCE,'close',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              CLOSE();
+              close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+            }
+          });
+        }
+      },
+      'send': {
+        configurable: true,
+        set:(send)=>{
+          Object.defineProperty(INSTANCE,'send',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              INPUTS.all.forEach((input)=>{ input.off(); });
+              let value = send.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+              SUBJECT.notify('send',value);
+            }
+          });
+        }
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS.name,
+      },
+      'events':{
+        writable: false,
+        value: {
+          on: SUBJECT.register,
+          off: SUBJECT.unregister
+        }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
   }
 
-  function success(res){
-
-    let message = $(document.createElement('div'));
-    message.addClass('lateral-message flex text-md p-2 pt-2 z-20 bg-green-700 text-white').html(`
-    <i class="fas fa-paper-plane"></i>
-    <p class="mx-2">Solicitud enviada </p>
-  `);
-    $('body').append(message);
-    setTimeout(()=>{
-      message.addClass('active');
-      setTimeout(()=>{
-        message.css('opacity','0');
-        setTimeout(()=>{ message.remove(); },1000);
-      },1000);
-    },100);
-  }
-
-  function send(opt,fn){
-    $.ajax({
-      url: `${window.location.origin}/${opt.url}`,
-      async: (opt.aysnc ? opt.async : true),
-      method: 'post',
-      data: opt.data,
-      success: (fn == undefined ? success : fn)
-    });
-
-  }
-
-  const Forms = {};
-
-  Forms.permision = {
-    name:'permision',
+  const Permision = new Form({
+    name: 'permision',
     title: 'Permiso',
     html: HTML.permision,
-    buttons: ['send'],
-    init: function(){
+  });
 
-      this.buttons.send.removeClass('hidden');
-    },
-    send: function(){
-      let time = {};
-      let date = {};
-      let description = this.textarea.description.val().trim();
-      time.start = this.group.hour_start.time();
-      time.finish = this.group.hour_finish.time();
-      date.start = this.group.date.date();
-      date.finish = this.group.date.date();
-
-      date.start.setHours(time.start.hour,time.start.minutes);
-      date.finish.setHours(time.finish.hour,time.finish.minutes);
-
-      date.start = this.group.date.format(date.start);
-      date.finish = this.group.date.format(date.finish);
-
-      let data = {
-        notice: 1,
-        date_start: date.start,
-        date_finish: date.finish,
-        comments: description,
-      };
-
-      send({url:'permisions/create',data});
-
-    }
-  };
-
-  Forms.homeOffice = {
-    name:'homeOffice',
-    title:'Home Office',
-    html: HTML.homeOffice,
-    buttons: ['send'],
-    init: function(){
-      this.group.date = this.createDateInput(this.group.date);
-    },
-    open: function(){
-      this.buttons.send.removeClass('hidden');
-    },
-    send: function(){
-
-      let date = {};
-      let description = this.textarea.description.val().trim();
-      date.start = this.group.date.date();
-      date.finish = this.group.date.date();
-
-      date.start.setHours(10);
-      date.finish.setHours(19);
-
-      date.start = this.group.date.format(date.start);
-      date.finish = this.group.date.format(date.finish);
-
-      let data = {
-        notice: 2,
-        date_start: date.start,
-        date_finish: date.finish,
-        comments: description,
-      };
-
-      send({url:'permisions/create',data});
-    }
-  };
-
-  Forms.vacation = {
-    name:'vacation',
+  const Vacation = new Form({
+    name: 'vacation',
     title: 'Vacación',
     html: HTML.vacation,
-    buttons: ['send'],
-    init: function(){
-      this.group.date_start = this.createDateInput(this.group.date_start);
-      this.group.date_finish = this.createDateInput(this.group.date_finish);
-    },
-    open: function(){
-      this.buttons.send.removeClass('hidden');
-    },
-    send:function(){
-      let date = {};
-      date.start = this.group.date_start.date();
-      date.finish = this.group.date_finish.date();
+  });
 
-      date.start.setHours(10);
-      date.finish.setHours(10);
+  const HomeOffice = new Form({
+    name: 'homeOffice',
+    title: 'Trabajo desde casa',
+    html: HTML.homeOffice,
+  });
 
-      date.start = this.group.date_start.format(date.start);
-      date.finish = this.group.date_finish.format(date.finish);
-
-      let data = {
-        notice: 3,
-        date_start: date.start,
-        date_finish: date.finish,
-      };
-
-      send({url:'permisions/create',data});
-    }
-  };
-
-  Forms.sick = {
-    name:'sick',
-    title:'Enfermedad',
+  const Sick = new Form({
+    name: 'sick',
+    title: 'Enfermedad',
     html: HTML.sick,
-    buttons: ['send'],
-    init: function(){
-      this.group.date_start = this.createDateInput(this.group.date_start);
-      this.group.date_finish = this.createDateInput(this.group.date_finish);
-      this.previewImg(this.input.img,this.button.upload,this.button.upload.children('img'));
-    },
-    open: function(){
-      this.buttons.send.removeClass('hidden');
-    },
-    close: function(){
-      // remplazar el src por una ruta relativa de un img placeholder
-      let img = this.button.upload.children('img');
-      img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
-    },
-    send: function(){
-      let date = {};
-      date.start = this.group.date_start.date();
-      date.finish = this.group.date_finish.date();
+  });
 
-      date.start.setHours(10);
-      date.finish.setHours(19);
-
-      date.start = this.group.date_start.format(date.start);
-      date.finish = this.group.date_finish.format(date.finish);
-
-      let data = {
-        notice: 4,
-        date_start: date.start,
-        date_finish: date.finish,
-      };
-
-      send({url:'permisions/create',data});
-    }
-  };
-
-  Forms.profile = {
-    name:'profile',
-    title:'Mi Perfil',
-    html: HTML.profile,
-    buttons: ['edit'],
-    init: function(){
-      let input = this.input;
-      let img = this.button.upload.children('img');
-      this.button.upload.on('click',()=>{
-        input.img[0].value = '';
-        input.img.trigger('click');
-      });
-      this.input.img.on('input',function(){ previewImg(input.img,img); });
-    },
-    close: function(){
-      // remplazar el src por una ruta relativa de un img placeholder
-      let img = this.button.upload.children('img');
-      img.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
-    }
-  };
-
-  var formsInit = ()=>{ for (let name in Forms) { Forms[name] = new Form(Forms[name]); } return Forms };
+  var Forms = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    Permision: Permision,
+    Vacation: Vacation,
+    HomeOffice: HomeOffice,
+    Sick: Sick
+  });
 
   function tablesInit (){
     const Actions = {};
@@ -10272,7 +11144,6 @@
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
-    const Forms = formsInit();
     const Permisions = permisionsInit();
     const Tables = tablesInit();
     const Actions = {};
@@ -10318,14 +11189,22 @@
     };
     Actions.open.form = function(){
       let btn = $(this);
-      let form = $(document.createElement('form'));
-      Modal.actions.open({title: 'form.title', body: form.append(HTML.permision()) });
+      let form = btn.attr('name');
+      for (let name in Forms) {
+        if(Forms[name].name == form){ form = Forms[name]; }
+      }
       Permisions.actions.close();
+      let close = form.events.on('close',()=>{
+        Modal.element.button.close.trigger('click');
+      });
       Modal.elements.button.close.on('click',()=>{
+        if(form.alive){ form.close(); }
+        form.events.off('close',close);
         Modal.actions.close();
-
         Modal.elements.button.close.off('click');
       });
+
+      Modal.actions.open({title: form.title, body: form.open() });
     };
     Actions.open.table = function(){
       let name = $(this).attr('name');

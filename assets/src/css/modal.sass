@@ -5,13 +5,15 @@
   #modal
     height: 20px;
     width: 20px;
-    transition: height 1s ,width 1s 1s;
+    transition: height .5s ,width .75s .5s;
     .header
       .title
         width: calc(100% - 48px);
     .body
-      height: calc(100% - 128px);
+      height: calc(100% - 64px);
       overflow-y: scroll;
   #modal.active
     height: 100%;
     width: 100%;
+  #modal.close
+    transition: height .5s .5s, width .5s ;

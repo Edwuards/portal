@@ -21,7 +21,8 @@ $html = [
         'src'=>"https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png"
       ]
     ]
-  ])
+  ]),
+  'send'=> Button(['text'=>'Enviar','attrs'=>['name'=>'send']])
 ];
 
 
@@ -37,3 +38,4 @@ $html = [
 </div>
 
 <?php echo $html['image']; ?>
+<?php echo FormFooter([$html['send']]); ?>

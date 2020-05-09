@@ -13,11 +13,5 @@
     <div class="body p-4">
 
     </div>
-    <div class="footer flex w-full h-16 px-4 justify-start items-center ">
-      <button class="py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden" type="button" name="cancel">Cancelar</button>
-      <button class="py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden" type="button" name="edit">Editar</button>
-      <button class="py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden" type="button" name="accept">Aceptar</button>
-      <button class="py-2 px-4 mx-2 text-sm bg-blue-700 text-white hidden" type="button" name="send">Enviar</button>
-    </div>
   </div>
 </div>
