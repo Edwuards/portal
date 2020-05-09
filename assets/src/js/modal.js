@@ -23,15 +23,14 @@ export default function(){
     Elements.body.html(data.body);
 
     Elements.container.removeClass('hidden')
-    .animate({'opacity': 1},1000,()=>{
-      Elements.modal.addClass('active');
-    });
+    .animate({'opacity': 1},1000);
+    Elements.modal.addClass('active').removeClass('close');
   }
 
   Actions.close = ()=>{
+    Elements.modal.addClass('close').removeClass('active');
     Elements.container.animate({'opacity': 0},1000,()=>{
       Elements.container.addClass('hidden');
-      Elements.modal.removeClass('active');
       Elements.title.html('');
       Elements.body.html('');
       Elements.allButtons.addClass('hidden');

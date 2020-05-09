@@ -204,7 +204,7 @@ function TextInput(INPUT){
   Input.call(this,INPUT);
   this.element.attr('type','text');
 
-  this.rules.add(Rules.is.notEmtpy);
+  this.rules.add('not empty',Rules.is.notEmtpy);
 }
 
 function NumberInput(INPUT){
@@ -247,7 +247,7 @@ function NumberInput(INPUT){
 
 function TextAreaInput(INPUT){
   Input.call(this,INPUT);
-  this.rules.add(Rules.is.notEmtpy);
+  this.rules.add('not empty',Rules.is.notEmtpy);
 }
 
 function SelectInput(INPUT){
@@ -490,6 +490,41 @@ function TimeInput(HOUR,MINUTES,TIME){
 
 }
 
+function ImageInput(INPUT,BUTTON,IMG){
+  Input.call(this,INPUT);
+  BUTTON = new Button(BUTTON);
+  const INSTANCE = this;
+  const PROPS = {
+    img: IMG,
+    reader: new FileReader(),
+    file: undefined,
+    data: undefined
+  };
+  const METHODS = {
+    'value': {
+      get:()=>{ return file }
+    }
+  }
+
+  Object.defineProperties(this,METHODS);
+
+  PROPS.reader.onload = (e)=>{
+    PROPS.img.attr('src',e.target.result);
+    PROPS.data = e.target.result;
+  }
+
+  BUTTON.events.on('click',function(){
+    INSTANCE.element.val('');
+    INSTANCE.element.trigger('click');
+  });
+
+  this.events.on('change',function(){
+    PROPS.file = this.element[0].files[0];
+    PROPS.reader.readAsDataURL(PROPS.file);
+  })
+
+}
+
 export {
   TimeInput,
   DateInput,
@@ -497,6 +532,7 @@ export {
   TextAreaInput,
   TextInput,
   NumberInput,
+  ImageInput,
   Input,
   Button
 }

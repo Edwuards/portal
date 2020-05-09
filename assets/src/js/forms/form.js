@@ -1,10 +1,10 @@
-import { Observer } from './helpers.js';
+import { Observer } from '../helpers.js';
 import * as Inputs from '../inputs.js';
 
 function Form(data){
+
   const FORM = $(document.createElement('form'));
   const INSTANCE = this;
-  const TITLE = data.title;
   const BUTTONS = {
     all: [],
     name: {}
@@ -14,8 +14,25 @@ function Form(data){
     type:{}
   };
   const SUBJECT = new Observer(['open','close','send']);
+  const PROPS = {
+    alive:false,
+    title:data.title,
+    name:data.name
+  };
+  const OPEN = ()=>{
+    INPUTS.all.forEach((input)=>{ input.on(); });
+    BUTTONS.all.forEach((btn)=>{ btn.on(); });
+    PROPS.alive = true;
+    return FORM
+  };
+  const CLOSE = ()=>{
+    INPUTS.all.forEach((input)=>{ input.off(); });
+    BUTTONS.all.forEach((btn)=>{ btn.off(); });
+    PROPS.alive = false;
+  };
 
   FORM.html(typeof data.html == 'function' ? data.html() : data.html );
+
   FORM.attr('name',data.name);
 
   FORM.find('[data-type]').each(function(){
@@ -27,8 +44,8 @@ function Form(data){
     if(type !== 'button'){
       if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
       if(group){
-        if(!INPUTS.type[type][group]){ INPUT.type[type][group] = {} }
-        INPUT.type[type][group][name] = el;
+        if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {} }
+        INPUTS.type[type][group][name] = el;
       }
       else{
         if(type == 'text'){
@@ -44,7 +61,7 @@ function Form(data){
           el = new Inputs.TextAreaInput(el);
         }
 
-        INPUT.type[type][name] = el;
+        INPUTS.type[type][name] = el;
       }
     }
     else{
@@ -62,7 +79,11 @@ function Form(data){
       }
       if(type == 'time'){
         input = INPUTS.type.time[input];
-        INPUTS.type.time[input] = new Inputs.DateInput(input.hour,input.minutes,input.time);
+        INPUTS.type.time[input] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
+      }
+      if(type == 'image'){
+        input = INPUTS.type.image[input];
+        INPUTS.type.image[input] = new Inputs.ImageInput(input.file,input.upload,input.preview);
       }
       INPUTS.all.push(INPUTS.type[type][input]);
     }
@@ -72,44 +93,40 @@ function Form(data){
     'element': {
       get:()=>{ return FORM }
     },
+    'name':{
+      get:()=>{ return PROPS.name; }
+    },
+    'alive':{
+      get:()=>{ return PROPS.alive; }
+    },
+    'title':{
+      set:(title)=>{ PROPS.title = title;},
+      get:()=>{ return PROPS.title; }
+    },
     'open': {
       configurable: true,
-      get:()=>{
-        return ()=>{
-          INPUTS.all.forEach((input)=>{ input.on(); });
-          BUTTONS.all.forEach((btn)=>{ btn.on(); });
-          return FORM
-        };
-      },
+      get:()=>{ return OPEN; },
       set:(open)=>{
         Object.defineProperty(INSTANCE,'open',{
           configurable: false,
           writable: false,
           value:()=>{
-            return ()=>{
-            BUTTONS.all.forEach((btn)=>{ btn.on(); });
-            INPUTS.all.forEach((input)=>{ input.on(); });
+            let form = OPEN();
             open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
-            return FORM;
+            return form;
           }
         });
       }
     },
     'close': {
       configurable: true,
-      get:()=>{
-        return ()=>{
-          INPUTS.all.forEach((input)=>{ input.off(); })
-          BUTTONS.all.forEach((btn)=>{ btn.off(); })
-        };
-      },
+      get:()=>{ return CLOSE; },
       set:(close)=>{
         Object.defineProperty(INSTANCE,'close',{
           configurable: false,
           writable: false,
           value:()=>{
-            INPUTS.all.forEach((input)=>{ input.off(); });
-            BUTTONS.all.forEach((btn)=>{ btn.off(); })
+            CLOSE();
             close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
           }
         });
@@ -132,7 +149,7 @@ function Form(data){
     'buttons':{
       writable: false,
       value: BUTTONS.name,
-    }
+    },
     'events':{
       writable: false,
       value: {
@@ -142,7 +159,7 @@ function Form(data){
     }
   }
 
-
+  Object.defineProperties(this,METHODS);
 }
 
 export { Form }
