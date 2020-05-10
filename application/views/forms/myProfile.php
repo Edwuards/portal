@@ -2,7 +2,7 @@
 
 $html = [
   'image'=> ImageInput([
-    'css'=>['cont'=>'','img'=>'w-2/3' ],
+    'css'=>['cont'=>'items-center','img'=>'w-32 h-32 rounded-full overflow-hidden' ],
     'label'=>'Avatar',
     'attrs'=>[
       'input'=>[

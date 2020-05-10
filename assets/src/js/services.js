@@ -1,6 +1,7 @@
 function base_url(url){
-return `${window.location.origin}/index.php/${url}`;
+  return `${window.location.origin}/${url}`;
 };
+
 const Services = {};
 Services.get = {};
 Services.get.form = (name)=>{
@@ -15,6 +16,19 @@ Services.get.form = (name)=>{
   $.ajax(settings);
 
   return html;
+}
+
+Services.get.table = (name)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`tables/get/${name}`),
+    async: false,
+    success:(data)=>{ obj = data }
+  };
+
+  $.ajax(settings);
+  
+  return obj;
 }
 
 export { Services }

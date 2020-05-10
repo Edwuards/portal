@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="w-full mt-6" >
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="profile">
+      <button class="flex w-full mb-2 p-2 items-center" type="button" name="myProfile">
         <i class="w-10 text-xl far fa-user-circle"></i>
         <p class="ml-2">Perfil</p>
       </button>

@@ -26,10 +26,24 @@ const Sick = new Form({
   html: HTML.sick,
 });
 
+const myProfile = new Form({
+  title: 'Mi Perfil',
+  name: 'myProfile',
+  html: HTML.myProfile,
+});
+
+const userProfile = new Form({
+  title: 'Perfil de usuario',
+  name: 'userProfile',
+  html: HTML.userProfile,
+});
+
 
 export {
   Permision,
   Vacation,
   HomeOffice,
+  myProfile,
+  userProfile,
   Sick
 }

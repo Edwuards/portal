@@ -176,7 +176,7 @@
       }
     }
 
-    public function obtener($selecionar = false, $donde = [],$ordenar = [],$limite = [])
+    public function get($selecionar = false, $donde = [],$ordenar = [],$limite = [])
     {
       if($selecionar == false || gettype($selecionar) != 'string' || $selecionar == '')
       {
@@ -203,14 +203,14 @@
 
     }
 
-    public function insertar($datos = [])
+    public function insert($datos = [])
     {
       $this->db->insert($this->tabla,$datos);
       $this->resultado['datos'] = ['id'=>$this->db->insert_id()];
       return $this->resultado;
     }
 
-    public function actualizar($datos = [],$donde = [])
+    public function update($datos = [],$donde = [])
     {
 
       if(gettype($datos) != 'array' || count($datos) == 0)
@@ -241,7 +241,8 @@
 
     }
 
-    public function borrar($donde = []){
+    public function delete($donde = [])
+    {
 
       $consulta = $this->db;
       if($donde != [])
@@ -259,9 +260,17 @@
         }
       }
 
-
       return $this->resultado;
     }
 
+    public function json($data)
+    {
+      $this->output
+  		->set_content_type('application/json')
+  		->set_output(json_encode($data));
+    }
+
+
   }
+
 ?>

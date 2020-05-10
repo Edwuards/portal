@@ -17,9 +17,7 @@ class Home extends CI_Controller {
 			'js'=>['jquery','datepicker','index'],
 			'css'=>['base','index']
 		];
-		$views = [
-			'dashboard/content'=>''
-		];
+		$views = ['content'=>''];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
@@ -30,6 +28,5 @@ class Home extends CI_Controller {
 		->set_output($html);
 	}
 
-	
 
 }

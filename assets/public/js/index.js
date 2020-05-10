@@ -9913,19 +9913,18 @@
     Elements.openContainer = Elements.button.open.parent();
 
     Actions.hide = ()=>{
-      Elements.openContainer.addClass('hide');
+      Elements.container.addClass('hide');
     };
 
     Actions.show = ()=>{
-      Elements.openContainer.removeClass('hide');
+      Elements.container.removeClass('hide');
     };
 
     Actions.open = ()=>{
       State.open = true;
       Elements.container.addClass('active');
       Elements.btnContainer
-      .addClass('active')
-      .removeClass('w-0');
+      .addClass('active');
       Elements.button.open.children('i')
       .removeClass('fa-plus')
       .addClass('fa-times');
@@ -9936,8 +9935,7 @@
       State.open = false;
       Elements.container.removeClass('active');
       Elements.btnContainer
-      .removeClass('active')
-      .addClass('w-0');
+      .removeClass('active');
       Elements.actions.removeClass('active').children('p').removeClass('active');
       Elements.button.open.children('i')
       .removeClass('fa-times')
@@ -9992,8 +9990,9 @@
   }
 
   function base_url(url){
-  return `${window.location.origin}/index.php/${url}`;
-  }const Services = {};
+    return `${window.location.origin}/${url}`;
+  }
+  const Services = {};
   Services.get = {};
   Services.get.form = (name)=>{
     let html = '';
@@ -10009,22 +10008,29 @@
     return html;
   };
 
+  Services.get.table = (name)=>{
+    let obj = '';
+    let settings = {
+      url: base_url(`tables/get/${name}`),
+      async: false,
+      success:(data)=>{ obj = data; }
+    };
+
+    $.ajax(settings);
+    
+    return obj;
+  };
+
   const HTML = {
-    permision: ()=>{
-      return Services.get.form('permision');
+    userAvisos: ()=>{
+      return Services.get.table('userAvisos');
     },
-    homeOffice:  ()=>{
-      return Services.get.form('homeOffice');
+    users: ()=>{
+      return Services.get.table('users');
     },
-    vacation:()=>{
-      return Services.get.form('vacation');
+    myAvisos:()=>{
+      return Services.get.table('myAvisos');
     },
-    sick: ()=>{
-      return Services.get.form('sick');
-    },
-    profile: ()=>{
-      return Services.get.form('profile');
-    }
   };
 
   /*
@@ -10775,8 +10781,8 @@
       for(var i = 1; i <= days; i++){ DAY.options.add({text:i,value:i}); }
       DAY.options.select(date.getDate());
 
-      for(var i = 0; i <= 1; i++){ year = year+i; YEAR.options.add({text:year,value:year}); }
-
+      for(var i = 1900; i <= 2021; i++){ YEAR.options.add({text:i,value:i}); }
+      YEAR.options.select('2020');
       MONTH.events.on('change',function(){
         let days = {};
         days.current = Number(this.element.data('days'));
@@ -10885,6 +10891,8 @@
     Input.call(this,INPUT);
     BUTTON = new Button(BUTTON);
     const INSTANCE = this;
+    const ON = INSTANCE.on;
+    const OFF = INSTANCE.off;
     const PROPS = {
       img: IMG,
       reader: new FileReader(),
@@ -10894,6 +10902,23 @@
     const METHODS = {
       'value': {
         get:()=>{ return file }
+      },
+      'on': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          ON.call(this);
+          BUTTON.on();
+        }
+      },
+      'off': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          OFF.call(this);
+          BUTTON.off();
+          IMG.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+        }
       }
     };
 
@@ -10915,6 +10940,408 @@
     });
 
   }
+
+  function StatusInput(INPUT,STATUS){
+
+    SelectInput.call(this,INPUT);
+
+    this.events.on('change',function(){
+      let value = Number(this.value);
+      STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
+      if(value == 1){ STATUS.addClass('bg-yellow-500'); }
+      if(value == 2){ STATUS.addClass('bg-green-500'); }
+      if(value == 0){ STATUS.addClass('bg-red-500'); }
+    });
+
+  }
+
+  function Row(data){
+
+    const ROW = $(document.createElement('div'));
+    const INSTANCE = this;
+    const BUTTONS = {
+      all: [],
+      name: {}
+    };
+    const INPUTS = {
+      all: [],
+      type:{}
+    };
+    const SUBJECT = new Observer(['open','close','send']);
+    const PROPS = {
+      alive:false,
+      id: data.id
+    };
+    const OPEN = ()=>{
+      INPUTS.all.forEach((input)=>{ input.on(); });
+      BUTTONS.all.forEach((btn)=>{ btn.on(); });
+      PROPS.alive = true;
+      return ROW
+    };
+    const CLOSE = ()=>{
+      INPUTS.all.forEach((input)=>{ input.off(); });
+      BUTTONS.all.forEach((btn)=>{ btn.off(); });
+      PROPS.alive = false;
+    };
+
+    ROW.html(typeof data.html == 'function' ? data.html() : data.html )
+    .addClass('flex w-full h-12 px-4 border-b')
+    .attr('data','row');
+
+    ROW.find('[data-type]').each(function(){
+      let el = $(this),
+      type = el.attr('data-type'),
+      name = el.attr('name'),
+      group = el.attr('data-group');
+
+      if(type !== 'button'){
+        if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
+        if(group){
+          if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {}; }
+          INPUTS.type[type][group][name] = el;
+        }
+        else {
+          if(type == 'text'){
+            el = new TextInput(el);
+          }
+          else if(type == 'number'){
+            el = new NumberInput(el);
+          }
+          else if(type == 'select'){
+            el = new SelectInput(el);
+          }
+          else if(type == 'textarea'){
+            el = new TextAreaInput(el);
+          }
+
+          INPUTS.type[type][name] = el;
+        }
+      }
+      else {
+        el = new Button(el);
+        BUTTONS.name[name] = new Button(el);
+        BUTTONS.all.push(el);
+      }
+    });
+
+    for(let type in INPUTS.type){
+      for (let input in INPUTS.type[type]) {
+        let name = input;
+        if(type == 'date'){
+          input = INPUTS.type.date[input];
+          INPUTS.type.date[name] = new DateInput(input.month,input.day,input.year);
+        }
+        if(type == 'time'){
+          input = INPUTS.type.time[input];
+          INPUTS.type.time[name] = new TimeInput(input.hour,input.minutes,input.time);
+        }
+        if(type == 'image'){
+          input = INPUTS.type.image[input];
+          INPUTS.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
+        }
+        if(type == 'status'){
+          input = INPUTS.type.status[input];
+          INPUTS.type.status[name] = new StatusInput(input.status,input.indicator);
+        }
+        INPUTS.all.push(INPUTS.type[type][name]);
+      }
+    }
+
+    const METHODS = {
+      'element': {
+        get:()=>{ return ROW }
+      },
+      'alive':{
+        get:()=>{ return PROPS.alive; }
+      },
+      'id':{
+        get:()=>{ return PROPS.id; }
+      },
+      'on': {
+        configurable: true,
+        get:()=>{ return OPEN; },
+        set:(open)=>{
+          Object.defineProperty(INSTANCE,'open',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              let form = OPEN();
+              open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+              return form;
+            }
+          });
+        }
+      },
+      'off': {
+        configurable: true,
+        get:()=>{ return CLOSE; },
+        set:(close)=>{
+          Object.defineProperty(INSTANCE,'close',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              CLOSE();
+              close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+            }
+          });
+        }
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS.name,
+      },
+      'events':{
+        writable: false,
+        value: {
+          on: SUBJECT.register,
+          off: SUBJECT.unregister
+        }
+      },
+      'disable':{
+        writable: false,
+        value: (toggle)=>{
+          INPUTS.all.forEach((input)=>{ input.disable(toggle); });
+        }
+      },
+      'inputs':{
+        writable: false,
+        value: INPUTS.type
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+  }
+
+  function Table(data){
+    data.html = typeof data.html == 'function' ? data.html() : data.html;
+    const TABLE = $(document.createElement('div'));
+    const HTML = {
+      row: data.html.row,
+      table: data.html.table
+    };
+    const INSTANCE = this;
+    const BUTTONS = {
+      all: [],
+      name: {}
+    };
+    const ROWS = {
+      id: 0,
+      all: [],
+      add: ()=>{
+        let row = ROWS.all[ROWS.all.push(new Row({id:ROWS.id++,html:HTML.row})) - 1];
+        row.disable(true);
+        SUBJECT.notify('addRow',row);
+        return row;
+      },
+      remove: ()=>{
+
+      }
+    };
+    const SUBJECT = new Observer(['open','close','send','addRow','removeRow']);
+    const PROPS = {
+      alive:false,
+      name:data.name,
+      body: undefined
+    };
+    const OPEN = ()=>{
+      TABLE.removeClass('hidden');
+      ROWS.all.forEach((row)=>{ row.on(); });
+      BUTTONS.all.forEach((btn)=>{ btn.on(); });
+      PROPS.alive = true;
+      return TABLE
+    };
+    const CLOSE = ()=>{
+      TABLE.addClass('hidden');
+      ROWS.all.forEach((row)=>{ row.off(); });
+      BUTTONS.all.forEach((btn)=>{ btn.off(); });
+      PROPS.alive = false;
+    };
+
+    TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden').attr('data-table',data.name);
+    PROPS.body = TABLE.find('.body');
+    TABLE.find('[data-type="button"]').each(function(){
+      let el = $(this),
+      name = el.attr('name');
+      BUTTONS.name[name] = new Button(el);
+      BUTTONS.all.push(BUTTONS.name[name]);
+    });
+
+    const METHODS = {
+      'element': {
+        get:()=>{ return TABLE }
+      },
+      'name':{
+        get:()=>{ return PROPS.name; }
+      },
+      'alive':{
+        get:()=>{ return PROPS.alive; }
+      },
+      'open': {
+        configurable: true,
+        get:()=>{ return OPEN; },
+        set:(open)=>{
+          Object.defineProperty(INSTANCE,'open',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              let form = OPEN();
+              open.call({ inputs: ROWS, buttons: BUTTONS.name });
+              return form;
+            }
+          });
+        }
+      },
+      'close': {
+        configurable: true,
+        get:()=>{ return CLOSE; },
+        set:(close)=>{
+          Object.defineProperty(INSTANCE,'close',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              CLOSE();
+              close.call({ inputs: ROWS, buttons: BUTTONS.name });
+            }
+          });
+        }
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS.name,
+      },
+      'events':{
+        writable: false,
+        value: {
+          on: SUBJECT.register,
+          off: SUBJECT.unregister
+        }
+      },
+      'rows':{
+        writable: false,
+        value: (()=>{
+          const OBJ = {};
+
+          const METHODS = {
+            'add': {
+              configurable: true,
+              set: (fn)=>{
+                Object.defineProperty(OBJ,'add',{
+                  configurable: false,
+                  value: (data)=>{
+                    let row = ROWS.add();
+                    fn.call({row},data);
+                    PROPS.body.append(row.element);
+                  }
+                });
+              }
+            }
+          };
+
+          Object.defineProperties(OBJ,METHODS);
+
+          return OBJ;
+        })()
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function tablesInit(Modal,Forms){
+    const Container = $('#dataTable');
+    const State = {
+      open: false
+    };
+    const Tables = [
+      new Table({
+        name: 'users',
+        html: HTML.users
+      }),
+      new Table({
+        name: 'userAvisos',
+        html: HTML.userAvisos
+      }),
+      new Table({
+        name: 'myAvisos',
+        html: HTML.myAvisos
+      })
+    ];
+
+    const Users = Tables[0];
+    const UserAvisos = Tables[1];
+
+    UserAvisos.rows.add = function(data){
+
+    };
+
+    Users.rows.add = function(data){
+      this.inputs.text.id = data.id;
+      this.inputs.text.name = data.name;
+    };
+
+
+    Users.buttons.addUser.events.on('click',function(){
+      let form = Forms.userProfile;
+      let close = form.events.on('close',()=>{
+        Modal.element.button.close.trigger('click');
+      });
+      Modal.elements.button.close.on('click',()=>{
+        if(form.alive){ form.close(); }
+        form.events.off('close',close);
+        Modal.actions.close();
+        Modal.elements.button.close.off('click');
+      });
+
+      Modal.actions.open({title: form.title, body: form.open() });
+    });
+
+
+
+
+
+
+
+    Tables.forEach((t)=>{ Container.append(t.element); });
+
+    return {
+      open: (name)=>{
+        if(State.open){ State.open.close(); }      let table = Tables.find((t)=>{ return t.name == name; });
+        table.open();
+        State.open = table;
+        if(!Container.hasClass('active')){ Container.addClass('active'); }
+      },
+      close:()=>{
+        if(State.open){
+          State.open.close();
+          State.open = false;
+        }
+        Container.removeClass('active');
+      },
+    }
+
+  }
+
+  const HTML$1 = {
+    permision: ()=>{
+      return Services.get.form('permision');
+    },
+    homeOffice:  ()=>{
+      return Services.get.form('homeOffice');
+    },
+    vacation:()=>{
+      return Services.get.form('vacation');
+    },
+    sick: ()=>{
+      return Services.get.form('sick');
+    },
+    myProfile: ()=>{
+      return Services.get.form('myProfile');
+    },
+    userProfile: ()=>{
+      return Services.get.form('userProfile');
+    }
+  };
 
   function Form(data){
 
@@ -10941,6 +11368,7 @@
       return FORM
     };
     const CLOSE = ()=>{
+      FORM[0].reset();
       INPUTS.all.forEach((input)=>{ input.off(); });
       BUTTONS.all.forEach((btn)=>{ btn.off(); });
       PROPS.alive = false;
@@ -10980,27 +11408,31 @@
         }
       }
       else {
-        el = new Button(el);
         BUTTONS.name[name] = new Button(el);
-        BUTTONS.all.push(el);
+        BUTTONS.all.push(BUTTONS.name[name]);
       }
     });
 
     for(let type in INPUTS.type){
       for (let input in INPUTS.type[type]) {
+        let name = input;
         if(type == 'date'){
           input = INPUTS.type.date[input];
-          INPUTS.type.date[input] = new DateInput(input.month,input.day,input.year);
+          INPUTS.type.date[name] = new DateInput(input.month,input.day,input.year);
         }
         if(type == 'time'){
           input = INPUTS.type.time[input];
-          INPUTS.type.time[input] = new TimeInput(input.hour,input.minutes,input.time);
+          INPUTS.type.time[name] = new TimeInput(input.hour,input.minutes,input.time);
         }
         if(type == 'image'){
           input = INPUTS.type.image[input];
-          INPUTS.type.image[input] = new ImageInput(input.file,input.upload,input.preview);
+          INPUTS.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
         }
-        INPUTS.all.push(INPUTS.type[type][input]);
+        if(type == 'status'){
+          input = INPUTS.type.status[input];
+          INPUTS.type.status[name] = new StatusInput(input.status,input.indicator);
+        }
+        INPUTS.all.push(INPUTS.type[type][name]);
       }
     }
 
@@ -11080,25 +11512,37 @@
   const Permision = new Form({
     name: 'permision',
     title: 'Permiso',
-    html: HTML.permision,
+    html: HTML$1.permision,
   });
 
   const Vacation = new Form({
     name: 'vacation',
     title: 'Vacación',
-    html: HTML.vacation,
+    html: HTML$1.vacation,
   });
 
   const HomeOffice = new Form({
     name: 'homeOffice',
     title: 'Trabajo desde casa',
-    html: HTML.homeOffice,
+    html: HTML$1.homeOffice,
   });
 
   const Sick = new Form({
     name: 'sick',
     title: 'Enfermedad',
-    html: HTML.sick,
+    html: HTML$1.sick,
+  });
+
+  const myProfile = new Form({
+    title: 'Mi Perfil',
+    name: 'myProfile',
+    html: HTML$1.myProfile,
+  });
+
+  const userProfile = new Form({
+    title: 'Perfil de usuario',
+    name: 'userProfile',
+    html: HTML$1.userProfile,
   });
 
   var Forms = /*#__PURE__*/Object.freeze({
@@ -11106,46 +11550,18 @@
     Permision: Permision,
     Vacation: Vacation,
     HomeOffice: HomeOffice,
+    myProfile: myProfile,
+    userProfile: userProfile,
     Sick: Sick
   });
-
-  function tablesInit (){
-    const Actions = {};
-    const Elements = {};
-    const State = {};
-
-    Elements.container = $('#dataTable');
-    Elements.tables = {};
-    Elements.container.find('[data-table]').each(function(){
-      let el = $(this);
-      Elements.tables[el.attr('data-table')] = el;
-    });
-
-    Actions.changeTable = (table)=>{
-      for (let name in Elements.tables) {
-        console.log(table == name);
-        Elements.tables[name][table == name ? 'removeClass' : 'addClass' ]('hidden');
-      }
-    };
-    Actions.open = (table)=>{
-      Elements.container.addClass('active');
-      Actions.changeTable(table);
-    };
-    Actions.close = ()=>{
-      Elements.container.removeClass('active');
-      Actions.changeTable(false);
-    };
-
-    return {actions: Actions, elements: Elements, state: State}
-
-  }
 
   function actionsInit(){
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
     const Permisions = permisionsInit();
-    const Tables = tablesInit();
+    const Tables = tablesInit(Modal,Forms);
+
     const Actions = {};
     const Elements = {};
     Actions.open = {};
@@ -11193,6 +11609,7 @@
       for (let name in Forms) {
         if(Forms[name].name == form){ form = Forms[name]; }
       }
+      if(form.name === 'myProfile'){ Nav.elements.button.menu.trigger('click'); }
       Permisions.actions.close();
       let close = form.events.on('close',()=>{
         Modal.element.button.close.trigger('click');
@@ -11208,18 +11625,17 @@
     };
     Actions.open.table = function(){
       let name = $(this).attr('name');
+      Tables.open(name);
       Nav.elements.button.menu.trigger('click');
       Nav.actions.updateMenu(name);
       Nav.actions.changeNavBar(name);
-      Tables.actions.open(name);
-
     };
     Actions.open.calendar = function(){
+      Tables.close();
       Nav.elements.button.menu.trigger('click');
       Nav.actions.updateMenu('calendar');
       Nav.actions.changeNavBar('calendar');
       Nav.actions.closeMenu();
-      Tables.actions.close();
     };
 
     [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
@@ -11239,6 +11655,7 @@
     elements.nav.menu.button.myAvisos.on('click',actions.open.table);
     elements.nav.menu.button.userAvisos.on('click',actions.open.table);
     elements.nav.menu.button.calendar.on('click',actions.open.calendar);
+    elements.nav.menu.button.myProfile.on('click',actions.open.form);
     elements.permisions.button.open.on('click',actions.open.permisions);
     elements.permisions.button.homeOffice.on('click',actions.open.form);
     elements.permisions.button.sick.on('click',actions.open.form);

@@ -13,6 +13,7 @@ function Events(){
   elements.nav.menu.button.myAvisos.on('click',actions.open.table);
   elements.nav.menu.button.userAvisos.on('click',actions.open.table);
   elements.nav.menu.button.calendar.on('click',actions.open.calendar);
+  elements.nav.menu.button.myProfile.on('click',actions.open.form);
   elements.permisions.button.open.on('click',actions.open.permisions);
   elements.permisions.button.homeOffice.on('click',actions.open.form);
   elements.permisions.button.sick.on('click',actions.open.form);

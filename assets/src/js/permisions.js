@@ -13,19 +13,18 @@ export default function(){
   Elements.openContainer = Elements.button.open.parent();
 
   Actions.hide = ()=>{
-    Elements.openContainer.addClass('hide');
+    Elements.container.addClass('hide');
   }
 
   Actions.show = ()=>{
-    Elements.openContainer.removeClass('hide');
+    Elements.container.removeClass('hide');
   }
 
   Actions.open = ()=>{
     State.open = true;
     Elements.container.addClass('active');
     Elements.btnContainer
-    .addClass('active')
-    .removeClass('w-0');
+    .addClass('active');
     Elements.button.open.children('i')
     .removeClass('fa-plus')
     .addClass('fa-times');
@@ -36,8 +35,7 @@ export default function(){
     State.open = false;
     Elements.container.removeClass('active');
     Elements.btnContainer
-    .removeClass('active')
-    .addClass('w-0');
+    .removeClass('active');
     Elements.actions.removeClass('active').children('p').removeClass('active');
     Elements.button.open.children('i')
     .removeClass('fa-times')

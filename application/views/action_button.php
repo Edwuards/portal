@@ -26,7 +26,7 @@ foreach ($buttons['elements'] as $button) {
 
 
 <div id="permisions" class="absolute flex flex-col justify-end items-end right-0 bottom-0 p-6 z-10">
-  <div class="relative w-48 mb-2 flex flex-col items-end right-0 bottom-0 overflow-hidden">
+  <div class="relative mb-2 flex flex-col items-end right-0 bottom-0 overflow-hidden w-48">
     <?php echo $html ?>
   </div>
   <div class="relative open flex justify-end ">

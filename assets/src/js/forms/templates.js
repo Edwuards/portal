@@ -13,8 +13,11 @@ const HTML = {
   sick: ()=>{
     return Services.get.form('sick');
   },
-  profile: ()=>{
-    return Services.get.form('profile');
+  myProfile: ()=>{
+    return Services.get.form('myProfile');
+  },
+  userProfile: ()=>{
+    return Services.get.form('userProfile');
   }
 }
 

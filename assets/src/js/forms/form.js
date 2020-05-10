@@ -26,6 +26,7 @@ function Form(data){
     return FORM
   };
   const CLOSE = ()=>{
+    FORM[0].reset();
     INPUTS.all.forEach((input)=>{ input.off(); });
     BUTTONS.all.forEach((btn)=>{ btn.off(); });
     PROPS.alive = false;
@@ -65,27 +66,31 @@ function Form(data){
       }
     }
     else{
-      el = new Inputs.Button(el);
       BUTTONS.name[name] = new Inputs.Button(el);
-      BUTTONS.all.push(el);
+      BUTTONS.all.push(BUTTONS.name[name]);
     }
   });
 
   for(let type in INPUTS.type){
     for (let input in INPUTS.type[type]) {
+      let name = input;
       if(type == 'date'){
         input = INPUTS.type.date[input];
-        INPUTS.type.date[input] = new Inputs.DateInput(input.month,input.day,input.year);
+        INPUTS.type.date[name] = new Inputs.DateInput(input.month,input.day,input.year);
       }
       if(type == 'time'){
         input = INPUTS.type.time[input];
-        INPUTS.type.time[input] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
+        INPUTS.type.time[name] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
       }
       if(type == 'image'){
         input = INPUTS.type.image[input];
-        INPUTS.type.image[input] = new Inputs.ImageInput(input.file,input.upload,input.preview);
+        INPUTS.type.image[name] = new Inputs.ImageInput(input.file,input.upload,input.preview);
       }
-      INPUTS.all.push(INPUTS.type[type][input]);
+      if(type == 'status'){
+        input = INPUTS.type.status[input];
+        INPUTS.type.status[name] = new Inputs.StatusInput(input.status,input.indicator);
+      }
+      INPUTS.all.push(INPUTS.type[type][name]);
     }
   }
 

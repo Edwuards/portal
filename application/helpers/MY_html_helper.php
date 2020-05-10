@@ -76,6 +76,7 @@
   function ImageInput($data){
     $ci=& get_instance();
     $overWrite = [
+      'label'=> isset($data['label']) ? $data['label'] : '',
       'css'=>[
         'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
         'img'=> isset($data['css']['img']) ? $data['css']['img'] : ''
@@ -134,14 +135,13 @@
 
   function RowTextCell($data){
     $overWrite = [
-      'text'=> isset($data['text']) ? $data['text'] : '',
       'css'=> isset($data['css']) ? $data['css'] : '',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
     ];
     $overWrite['attrs']['data-type'] = 'text';
 
-    return '<div '.attrsToSting($overWrite['attrs']).' class="'.$overWrite['css'].' mx-2">
-      <p>'.$overWrite['text'].'</p>
+    return '<div  class="'.$overWrite['css'].' mx-2">
+      <input '.attrsToSting($overWrite['attrs']).' class="h-full w-full text-sm bg-white" type="text" >
     </div>';
   }
 
@@ -162,11 +162,11 @@
     </div>';
   }
 
-  function Table($table,$html){
+  function Table($html){
     $ci=& get_instance();
 
     $row = '';
-    $data = ['buttons' = '','header' => '','table'=>$table];
+    $data = ['buttons' => '','header' => ''];
     foreach ($html['buttons'] as $button ) {
       $data['buttons'] .= $button;
     }
@@ -177,7 +177,7 @@
 
     return [
       'table'=> $ci->load->view('table',$data,true),
-      'row' => RowCont($row)
+      'row' => $row
     ];
 
   }

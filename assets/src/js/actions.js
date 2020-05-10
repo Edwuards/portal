@@ -2,15 +2,16 @@ import { default as calendarInit } from './calendar.js';
 import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
+import {default as tablesInit} from './tables/tables.js';
 import * as Forms  from './forms/forms.js';
-import { default as tablesInit } from './dataTable.js';
 
 export default function(){
   const Calendar = calendarInit();
   const Nav = navInit();
   const Modal = modalInit();
   const Permisions = permisionsInit();
-  const Tables = tablesInit();
+  const Tables = tablesInit(Modal,Forms);
+
   const Actions = {};
   const Elements = {};
   Actions.open = {};
@@ -58,6 +59,7 @@ export default function(){
     for (let name in Forms) {
       if(Forms[name].name == form){ form = Forms[name]; }
     }
+    if(form.name === 'myProfile'){ Nav.elements.button.menu.trigger('click'); }
     Permisions.actions.close();
     let close = form.events.on('close',()=>{
       Modal.element.button.close.trigger('click');
@@ -73,18 +75,17 @@ export default function(){
   };
   Actions.open.table = function(){
     let name = $(this).attr('name');
+    Tables.open(name);
     Nav.elements.button.menu.trigger('click');
     Nav.actions.updateMenu(name);
     Nav.actions.changeNavBar(name);
-    Tables.actions.open(name);
-
   };
   Actions.open.calendar = function(){
+    Tables.close();
     Nav.elements.button.menu.trigger('click');
     Nav.actions.updateMenu('calendar');
     Nav.actions.changeNavBar('calendar');
     Nav.actions.closeMenu();
-    Tables.actions.close();
   };
 
   [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })

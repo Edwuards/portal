@@ -384,8 +384,8 @@ function DateInput(MONTH,DAY,YEAR){
     for(var i = 1; i <= days; i++){ DAY.options.add({text:i,value:i}); }
     DAY.options.select(date.getDate());
 
-    for(var i = 0; i <= 1; i++){ year = year+i; YEAR.options.add({text:year,value:year}); }
-
+    for(var i = 1900; i <= 2021; i++){ i; YEAR.options.add({text:i,value:i}); }
+    YEAR.options.select('2020');
     MONTH.events.on('change',function(){
       let days = {}
       days.current = Number(this.element.data('days'));
@@ -494,6 +494,8 @@ function ImageInput(INPUT,BUTTON,IMG){
   Input.call(this,INPUT);
   BUTTON = new Button(BUTTON);
   const INSTANCE = this;
+  const ON = INSTANCE.on;
+  const OFF = INSTANCE.off;
   const PROPS = {
     img: IMG,
     reader: new FileReader(),
@@ -503,6 +505,23 @@ function ImageInput(INPUT,BUTTON,IMG){
   const METHODS = {
     'value': {
       get:()=>{ return file }
+    },
+    'on': {
+      configurable: true,
+      writable: false,
+      value: function(){
+        ON.call(this);
+        BUTTON.on();
+      }
+    },
+    'off': {
+      configurable: true,
+      writable: false,
+      value: function(){
+        OFF.call(this);
+        BUTTON.off();
+        IMG.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+      }
     }
   }
 
@@ -525,6 +544,20 @@ function ImageInput(INPUT,BUTTON,IMG){
 
 }
 
+function StatusInput(INPUT,STATUS){
+
+  SelectInput.call(this,INPUT);
+
+  this.events.on('change',function(){
+    let value = Number(this.value);
+    STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
+    if(value == 1){ STATUS.addClass('bg-yellow-500'); }
+    if(value == 2){ STATUS.addClass('bg-green-500'); }
+    if(value == 0){ STATUS.addClass('bg-red-500'); }
+  });
+
+}
+
 export {
   TimeInput,
   DateInput,
@@ -533,6 +566,7 @@ export {
   TextInput,
   NumberInput,
   ImageInput,
+  StatusInput,
   Input,
   Button
 }

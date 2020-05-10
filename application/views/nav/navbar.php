@@ -4,5 +4,7 @@
   </button>
   <?php $this->load->view('nav/calendar'); ?>
   <?php $this->load->view('nav/users'); ?>
+  <?php $this->load->view('nav/myAvisos'); ?>
+  <?php $this->load->view('nav/userAvisos'); ?>
 
 </nav>
