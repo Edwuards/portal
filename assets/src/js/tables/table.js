@@ -99,6 +99,10 @@ function Row(data){
     'alive':{
       get:()=>{ return PROPS.alive; }
     },
+    'die':{
+      writable: false,
+      value:()=>{ INSTANCE.off(); INSTANCE.element.remove(); }
+    },
     'id':{
       get:()=>{ return PROPS.id; }
     },

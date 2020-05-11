@@ -9970,19 +9970,16 @@
       Elements.title.html(data.title);
       Elements.body.html(data.body);
 
-      Elements.container.removeClass('hidden')
-      .animate({'opacity': 1},1000);
+      Elements.container.addClass('active').removeClass('close');
       Elements.modal.addClass('active').removeClass('close');
     };
 
     Actions.close = ()=>{
+      Elements.container.addClass('close').removeClass('active');
       Elements.modal.addClass('close').removeClass('active');
-      Elements.container.animate({'opacity': 0},1000,()=>{
-        Elements.container.addClass('hidden');
-        Elements.title.html('');
-        Elements.body.html('');
-        Elements.allButtons.addClass('hidden');
-      });
+      Elements.title.html('');
+      Elements.body.html('');
+      Elements.allButtons.addClass('hidden');
     };
 
     return { elements: Elements, actions: Actions}
@@ -11085,6 +11082,10 @@
       'alive':{
         get:()=>{ return PROPS.alive; }
       },
+      'die':{
+        writable: false,
+        value:()=>{ INSTANCE.off(); INSTANCE.element.remove(); }
+      },
       'id':{
         get:()=>{ return PROPS.id; }
       },
@@ -11374,11 +11375,11 @@
         this.user = user;
         let row = this;
         this.buttons.edit.events.on('click',openForm(forms.edit,()=>{ return row.user; }));
-        // this.buttons.delete.events.on('click',openForm(forms.delete));
+        this.buttons.delete.events.on('click',openForm(forms.delete,()=>{ return row.user; }));
 
       };
 
-      Users.buttons.addUser.events.on('click',openForm(forms.create));
+      Users.buttons.addUser.events.on('click',openForm(forms.create,()=>{ return true }));
 
       forms.create.events.on('response',function(response){
         if(!response.error){
@@ -11395,6 +11396,14 @@
           forms.edit.close();
         }
 
+      });
+
+      forms.delete.events.on('response',function(response){
+        if(!response.error){
+          let user = response.data;
+          let row = Users.rows.find((r)=>{ return r.user.id == user; });
+          row.die();
+        }
       });
 
       Services.get.user({},(response)=>{
@@ -11492,8 +11501,7 @@
     };
 
     FORM.html(typeof data.html == 'function' ? data.html() : data.html );
-
-    FORM.attr('name',data.name);
+    FORM.attr('name',data.name).addClass('h-full');
 
     FORM.find('[data-type]').each(function(){
       let el = $(this),
@@ -11591,7 +11599,7 @@
             writable: false,
             value:()=>{
               CLOSE();
-              close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+              close.call(INSTANCE);
             }
           });
         }
@@ -11712,10 +11720,11 @@
         name: 'myProfile',
         html: HTML$1.myProfile,
       }),
-      delte: new Form({
+      delete: new Form({
         title: 'Eliminar Usuario',
         name: 'deleteUser',
-        html: HTML$1.myProfile,
+        html: HTML$1.user.delete,
+        url: 'users/delete'
       })
     };
 
@@ -11765,13 +11774,26 @@
       User.edit.buttons.edit.element.addClass('hidden');
     });
 
-    User.edit.buttons.cancel.events.on('click',function(){
-      User.edit.close();
-    });
+    User.edit.buttons.cancel.events.on('click',User.edit.close);
 
     User.edit.buttons.send.events.on('click',User.edit.send);
 
+    User.delete.open = function(user){
+      this.user = user;
+      this.element.find('[data="message"]').text(`
+      Estás seguro de elimiar el usuario : ${user.name}
+      con el id: ${user.id}
+    `);
+    };
 
+    User.delete.send = function(){
+      this.close();
+      return { error: false, data:{id:this.user.id} }
+    };
+
+    User.delete.buttons.send.events.on('click',User.delete.send);
+
+    User.delete.buttons.cancel.events.on('click',User.delete.close);
 
     [Permisions,User].forEach(Helper.exportForm);
 

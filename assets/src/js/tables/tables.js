@@ -60,11 +60,11 @@ export default function(Modal,Forms){
       this.user = user;
       let row = this;
       this.buttons.edit.events.on('click',openForm(forms.edit,()=>{ return row.user; }));
-      // this.buttons.delete.events.on('click',openForm(forms.delete));
+      this.buttons.delete.events.on('click',openForm(forms.delete,()=>{ return row.user; }));
 
     }
 
-    Users.buttons.addUser.events.on('click',openForm(forms.create));
+    Users.buttons.addUser.events.on('click',openForm(forms.create,()=>{ return true }));
 
     forms.create.events.on('response',function(response){
       if(!response.error){
@@ -82,6 +82,14 @@ export default function(Modal,Forms){
       }
 
     });
+
+    forms.delete.events.on('response',function(response){
+      if(!response.error){
+        let user = response.data;
+        let row = Users.rows.find((r)=>{ return r.user.id == user; });
+        row.die();
+      }
+    })
 
     Services.get.user({},(response)=>{
       if(!response.error){

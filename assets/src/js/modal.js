@@ -22,19 +22,16 @@ export default function(){
     Elements.title.html(data.title);
     Elements.body.html(data.body);
 
-    Elements.container.removeClass('hidden')
-    .animate({'opacity': 1},1000);
+    Elements.container.addClass('active').removeClass('close');
     Elements.modal.addClass('active').removeClass('close');
   }
 
   Actions.close = ()=>{
+    Elements.container.addClass('close').removeClass('active');
     Elements.modal.addClass('close').removeClass('active');
-    Elements.container.animate({'opacity': 0},1000,()=>{
-      Elements.container.addClass('hidden');
-      Elements.title.html('');
-      Elements.body.html('');
-      Elements.allButtons.addClass('hidden');
-    });
+    Elements.title.html('');
+    Elements.body.html('');
+    Elements.allButtons.addClass('hidden');
   }
 
   return { elements: Elements, actions: Actions}

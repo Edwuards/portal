@@ -79,10 +79,11 @@ export default function(){
       name: 'myProfile',
       html: HTML.myProfile,
     }),
-    delte: new Form({
+    delete: new Form({
       title: 'Eliminar Usuario',
       name: 'deleteUser',
-      html: HTML.myProfile,
+      html: HTML.user.delete,
+      url: 'users/delete'
     })
   }
 
@@ -132,13 +133,26 @@ export default function(){
     User.edit.buttons.edit.element.addClass('hidden');
   });
 
-  User.edit.buttons.cancel.events.on('click',function(){
-    User.edit.close();
-  });
+  User.edit.buttons.cancel.events.on('click',User.edit.close);
 
   User.edit.buttons.send.events.on('click',User.edit.send);
 
+  User.delete.open = function(user){
+    this.user = user;
+    this.element.find('[data="message"]').text(`
+      Estás seguro de elimiar el usuario : ${user.name}
+      con el id: ${user.id}
+    `);
+  }
 
+  User.delete.send = function(){
+    this.close();
+    return { error: false, data:{id:this.user.id} }
+  }
+
+  User.delete.buttons.send.events.on('click',User.delete.send);
+
+  User.delete.buttons.cancel.events.on('click',User.delete.close);
 
   [Permisions,User].forEach(Helper.exportForm);
 

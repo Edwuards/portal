@@ -53,8 +53,7 @@ function Form(data){
   }
 
   FORM.html(typeof data.html == 'function' ? data.html() : data.html );
-
-  FORM.attr('name',data.name);
+  FORM.attr('name',data.name).addClass('h-full');
 
   FORM.find('[data-type]').each(function(){
     let el = $(this),
@@ -152,7 +151,7 @@ function Form(data){
           writable: false,
           value:()=>{
             CLOSE();
-            close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+            close.call(INSTANCE);
           }
         });
       }

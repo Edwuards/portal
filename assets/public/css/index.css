@@ -286,7 +286,9 @@ form .select.disabled {
 #modal-cont {
   opacity: 0;
   overflow: hidden;
-  background-color: #949494ad; }
+  background-color: #949494ad;
+  left: -100%;
+  transition: opacity .5s; }
   #modal-cont #modal {
     height: 20px;
     width: 20px;
@@ -298,9 +300,17 @@ form .select.disabled {
       overflow-y: scroll; }
   #modal-cont #modal.active {
     height: 100%;
-    width: 100%; }
+    width: 100%;
+    opacity: 1; }
   #modal-cont #modal.close {
     transition: height .5s .5s, width .5s; }
+
+#modal-cont.active {
+  opacity: 1;
+  left: 0px; }
+
+#modal-cont.close {
+  transition: opacity 1s, left .5s 1s; }
 
 #dataTable {
   top: 100%;

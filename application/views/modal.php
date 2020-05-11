@@ -1,4 +1,4 @@
-<div id="modal-cont" class="hidden flex w-screen h-full justify-center items-center absolute top-0 z-50 sm:py-12">
+<div id="modal-cont" class=" flex w-screen h-full justify-center items-center absolute top-0 z-50 sm:py-12">
   <div id="modal" class="bg-white sm:max-w-md overflow-hidden">
     <div class="header flex w-full h-16 justify-start items-center shadow-lg bg-blue-700 text-white">
       <div class="title pl-6">

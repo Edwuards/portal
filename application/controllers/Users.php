@@ -38,7 +38,7 @@ class Users extends CI_Controller {
 			$this->response = $this->Users->create($user);
 			if(!$this->response['error']){
 				$id = $this->response['data']['id'];
-				$this->response = $this->get([['id','=',$id]]);
+				$this->response = $this->Users->get([['id','=',$id]]);
 			}
 		}
 
@@ -46,7 +46,8 @@ class Users extends CI_Controller {
 
 	}
 
-	public function get(){
+	public function get()
+	{
 		$this->resetResponse();
 
 		$method = $this->input->method();
@@ -64,7 +65,8 @@ class Users extends CI_Controller {
 
 	}
 
-	public function edit(){
+	public function edit()
+	{
 		$this->resetResponse();
 
 		$method = $this->input->method();
@@ -87,7 +89,30 @@ class Users extends CI_Controller {
 		}
 
 		if(!$this->response['error']){
-			$this->response['data'] = $this->Users->find($where)['data'][0]; 
+			$this->response['data'] = $this->Users->find($where)['data'][0];
+		}
+
+		$this->json($this->response);
+
+	}
+
+	public function delete()
+	{
+		$this->resetResponse();
+
+		$method = $this->input->method();
+		if($method != 'post'){
+			$this->response['error'] = true;
+			$this->response['data'] = 'Solo por metódo POST';
+		}
+
+		if(!$this->response['error']){
+			$id = $this->input->post('id');
+			$this->response = $this->Users->delete([['id','=',$id]]);
+		}
+
+		if(!$this->response['error']){
+			$this->response['data'] = $id;
 		}
 
 		$this->json($this->response);
