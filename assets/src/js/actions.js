@@ -2,10 +2,11 @@ import { default as calendarInit } from './calendar.js';
 import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
-import {default as tablesInit} from './tables/tables.js';
-import * as Forms  from './forms/forms.js';
+import { default as tablesInit } from './tables/tables.js';
+import { default as formsInit } from './forms/forms.js';
 
 export default function(){
+  const Forms = formsInit();
   const Calendar = calendarInit();
   const Nav = navInit();
   const Modal = modalInit();
@@ -53,14 +54,23 @@ export default function(){
   Actions.open.permisions = ()=>{
     Permisions.actions[Permisions.state.open ? 'close' : 'open']();
   }
-  Actions.open.form = function(){
-    let btn = $(this);
-    let form = btn.attr('name');
-    for (let name in Forms) {
-      if(Forms[name].name == form){ form = Forms[name]; }
-    }
-    if(form.name === 'myProfile'){ Nav.elements.button.menu.trigger('click'); }
+  Actions.open.permision = function(){
+    let form = Forms.get($(this).attr('name'));
     Permisions.actions.close();
+    let close = form.events.on('close',()=>{
+      Modal.element.button.close.trigger('click');
+    });
+    Modal.elements.button.close.on('click',()=>{
+      if(form.alive){ form.close() }
+      form.events.off('close',close);
+      Modal.actions.close();
+      Modal.elements.button.close.off('click')
+    });
+
+    Modal.actions.open({title: form.title, body: form.open() });
+  };
+  Actions.open.profile = function(){
+    let form = Forms.get('profile');
     let close = form.events.on('close',()=>{
       Modal.element.button.close.trigger('click');
     });

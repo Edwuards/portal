@@ -1,23 +1,17 @@
 import { Services } from '../services.js';
 
 const HTML = {
-  permision: ()=>{
-    return Services.get.form('permision');
+  permisions:{
+    permision: ()=>{ return Services.get.form('permisions/permision'); },
+    homeOffice:  ()=>{ return Services.get.form('permisions/homeOffice'); },
+    vacation:()=>{ return Services.get.form('permisions/vacation'); },
+    sick: ()=>{ return Services.get.form('permisions/sick'); },
   },
-  homeOffice:  ()=>{
-    return Services.get.form('homeOffice');
-  },
-  vacation:()=>{
-    return Services.get.form('vacation');
-  },
-  sick: ()=>{
-    return Services.get.form('sick');
-  },
-  myProfile: ()=>{
-    return Services.get.form('myProfile');
-  },
-  userProfile: ()=>{
-    return Services.get.form('userProfile');
+  user: {
+    create: ()=>{ return Services.get.form('user/create'); },
+    edit: ()=>{ return Services.get.form('user/edit'); },
+    profile: ()=>{ return Services.get.form('user/profile'); },
+    delete: ()=>{ return Services.get.form('user/delete'); }
   }
 }
 

@@ -2,7 +2,7 @@ import { Rules, Test } from './errors.js';
 
 function Observer(events){
   const Events = {};
-
+  let ID = 0;
   this.event = {
     create: (event)=>{
       let test = undefined;
@@ -31,7 +31,7 @@ function Observer(events){
   this.notify = (event,update)=>{
     let test = Rules.is.defined(event,Events);
     if(!test.passed){ throw test.error; }
-    Events[event].forEach((notify)=>{ notify.apply(null,update); });
+    Events[event].forEach((sub)=>{ sub.notify.apply(null,update); });
   }
 
   this.register = (event,subscriber)=>{
@@ -42,20 +42,20 @@ function Observer(events){
 
     if(!test.passed){ throw test.error; }
 
-    return Events[event].push(subscriber) - 1;
+    Events[event].push({id: ID++, notify: subscriber});
+    return ID;
   }
 
-  this.unregister = (event,index)=>{
+  this.unregister = (event,id)=>{
   	let test = undefined ;
 	  [
       Rules.is.defined(event,Events),
-      Rules.has.index(Events[event],index)
     ].some((check)=>{ test = check ; return !test.passed; });
 
 	  if(!test.passed){ throw test.error; }
 
-    Events[event]  = Events[event].reduce((a,c,i)=>{
-      if(i !== index){ a.push(c); }
+    Events[event]  = Events[event].reduce((a,c)=>{
+      if(c.id !== id){ a.push(c); }
       return a;
 
     },[]);

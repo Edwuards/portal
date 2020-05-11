@@ -52,10 +52,9 @@ $html = [
     'label'=>'Vacaciones',
     'attrs'=> ['name'=>'vacations','min'=>'6','max'=>'14'],
   ]),
-  'cancel'=> Button(['text'=>'Cancelar','attrs'=>['name'=>'cancel']]),
-  'edit'=> Button(['text'=>'Editar','attrs'=>['name'=>'edit']]),
-  'save'=> Button(['text'=>'Guardar','attrs'=>['name'=>'save']])
+  'send'=> Button(['text'=>'Enviar','attrs'=>['name'=>'send']])
 ];
+
 ?>
 
 <?php echo $html['image']; ?>
@@ -80,4 +79,4 @@ $html = [
 </div>
 
 
-<?php echo FormFooter([$html['cancel'],$html['edit'],$html['save']]); ?>
+<?php echo FormFooter([$html['send']]); ?>

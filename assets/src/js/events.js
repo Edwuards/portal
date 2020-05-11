@@ -13,12 +13,12 @@ function Events(){
   elements.nav.menu.button.myAvisos.on('click',actions.open.table);
   elements.nav.menu.button.userAvisos.on('click',actions.open.table);
   elements.nav.menu.button.calendar.on('click',actions.open.calendar);
-  elements.nav.menu.button.myProfile.on('click',actions.open.form);
+  elements.nav.menu.button.myProfile.on('click',actions.open.profile);
   elements.permisions.button.open.on('click',actions.open.permisions);
-  elements.permisions.button.homeOffice.on('click',actions.open.form);
-  elements.permisions.button.sick.on('click',actions.open.form);
-  elements.permisions.button.vacation.on('click',actions.open.form);
-  elements.permisions.button.permision.on('click',actions.open.form);
+  elements.permisions.button.homeOffice.on('click',actions.open.permision);
+  elements.permisions.button.sick.on('click',actions.open.permision);
+  elements.permisions.button.vacation.on('click',actions.open.permision);
+  elements.permisions.button.permision.on('click',actions.open.permision);
   elements.modal.errors.on('modalError',actions.modalError);
 
 

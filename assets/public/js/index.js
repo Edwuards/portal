@@ -9997,8 +9997,9 @@
   Services.get.form = (name)=>{
     let html = '';
     let settings = {
-      url: base_url(`home/forms/${name}`),
-      method: 'GET',
+      url: base_url(`home/forms`),
+      method: 'post',
+      data:{ name },
       async: false,
       success:(data)=>{ html = data; }
     };
@@ -10007,7 +10008,6 @@
 
     return html;
   };
-
   Services.get.table = (name)=>{
     let obj = '';
     let settings = {
@@ -10017,8 +10017,19 @@
     };
 
     $.ajax(settings);
-    
+
     return obj;
+  };
+  Services.get.user = (data,fn)=>{
+    let settings = {
+      url: base_url(`users/get`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
   };
 
   const HTML = {
@@ -10333,7 +10344,7 @@
 
   function Observer(events){
     const Events = {};
-
+    let ID = 0;
     this.event = {
       create: (event)=>{
         let test = undefined;
@@ -10362,7 +10373,7 @@
     this.notify = (event,update)=>{
       let test = Rules.is.defined(event,Events);
       if(!test.passed){ throw test.error; }
-      Events[event].forEach((notify)=>{ notify.apply(null,update); });
+      Events[event].forEach((sub)=>{ sub.notify.apply(null,update); });
     };
 
     this.register = (event,subscriber)=>{
@@ -10373,20 +10384,20 @@
 
       if(!test.passed){ throw test.error; }
 
-      return Events[event].push(subscriber) - 1;
+      Events[event].push({id: ID++, notify: subscriber});
+      return ID;
     };
 
-    this.unregister = (event,index)=>{
+    this.unregister = (event,id)=>{
     	let test = undefined ;
   	  [
         Rules.is.defined(event,Events),
-        Rules.has.index(Events[event],index)
       ].some((check)=>{ test = check ; return !test.passed; });
 
   	  if(!test.passed){ throw test.error; }
 
-      Events[event]  = Events[event].reduce((a,c,i)=>{
-        if(i !== index){ a.push(c); }
+      Events[event]  = Events[event].reduce((a,c)=>{
+        if(c.id !== id){ a.push(c); }
         return a;
 
       },[]);
@@ -10528,17 +10539,24 @@
       }
     };
 
+    const PROPS = {};
+
     const METHODS = {
       'element': {
         writable: false,
         value: INPUT
       },
+      'parent':{
+        get: ()=>{
+          if(!PROPS.parent){ PROPS.parent = INPUT.parent(); }
+          return PROPS.parent;
+        }
+      },
       'on': {
         configurable: true,
         writable: false,
         value: function(){
-          EVENTS.on('component.init');
-          this.element.trigger('component.init');
+          SUBJECT.event.get().forEach(EVENTS.on);
         }
       },
       'off': {
@@ -10579,19 +10597,15 @@
       },
       'value': {
         configurable: true,
-        get: ()=>{ return this.element.val().trim(); }
+        get: ()=>{ return this.element.val().trim(); },
+        set: (value)=>{
+          this.element.val(value);
+          this.element.trigger('input');
+        }
       }
     };
 
-    ['component.init','focus','input','blur'].forEach(SUBJECT.event.create);
-
-    SUBJECT.register('component.init',function(){
-      let types = SUBJECT.event.get().reduce((a,c)=>{
-        if(c != 'component.init'){ a.push(c); }
-        return a;
-      },[]);
-      types.forEach(EVENTS.on);
-    });
+    ['focus','input','blur'].forEach(SUBJECT.event.create);
 
     Object.defineProperties(this,METHODS);
 
@@ -10623,7 +10637,14 @@
 
     const METHODS = {
       'value':{
-        get:()=>{ return Number(this.element.val()); }
+        get:()=>{ return Number(this.element.val()); },
+        set: (value)=>{
+          value = Number(value);
+          if(!isNaN(value)){
+            this.element.val(value);
+            this.element.trigger('input');
+          }
+        }
       },
       'max':{
         get: ()=>{ return PROPS.max },
@@ -10750,6 +10771,18 @@
       },
       'value': {
         configurable: true,
+        set: (unixTimeStamp)=>{
+          let test = Rules.is.number(unixTimeStamp);
+          if(!test.passed){ throw test.error; }
+          DATE.setTime(unixTimeStamp * 1000);
+
+          GROUP.forEach((input)=>{
+            let attr = input.element.attr('name');
+            let fn = (attr == 'month' ? 'getMonth' : (attr == 'day' ? 'getDate' : 'getFullYear'));
+            input.value = DATE[fn]();
+          });
+
+        },
         get: ()=>{ return DATE; }
       }
     };
@@ -10761,7 +10794,6 @@
       let fn = (attr == 'month' ? 'setMonth' : (attr == 'day' ? 'setDate' : 'setFullYear'));
       input.events.on('change',function(){
         DATE[fn](Number(this.value));
-        console.log(DATE);
       });
     });
 
@@ -10901,7 +10933,7 @@
     };
     const METHODS = {
       'value': {
-        get:()=>{ return file }
+        get:()=>{ return PROPS.file }
       },
       'on': {
         configurable: true,
@@ -10967,7 +10999,7 @@
       all: [],
       type:{}
     };
-    const SUBJECT = new Observer(['open','close','send']);
+    const SUBJECT = new Observer(['alive']);
     const PROPS = {
       alive:false,
       id: data.id
@@ -11018,9 +11050,8 @@
         }
       }
       else {
-        el = new Button(el);
         BUTTONS.name[name] = new Button(el);
-        BUTTONS.all.push(el);
+        BUTTONS.all.push(BUTTONS.name[name]);
       }
     });
 
@@ -11106,6 +11137,16 @@
       'inputs':{
         writable: false,
         value: INPUTS.type
+      },
+      'update': {
+        configurable: true,
+        set: (fn)=>{
+          Object.defineProperty(INSTANCE,'update',{
+            configurable: false,
+            writable: false,
+            value: fn
+          });
+        }
       }
     };
 
@@ -11130,14 +11171,16 @@
       add: ()=>{
         let row = ROWS.all[ROWS.all.push(new Row({id:ROWS.id++,html:HTML.row})) - 1];
         row.disable(true);
-        SUBJECT.notify('addRow',row);
+        SUBJECT.notify('addRow',[row]);
         return row;
       },
       remove: ()=>{
 
-      }
+      },
+      get: ()=>{ return ROWS.all },
+      find: (find)=>{ return ROWS.all.find(find); }
     };
-    const SUBJECT = new Observer(['open','close','send','addRow','removeRow']);
+    const SUBJECT = new Observer(['open','close','addRow','removeRow','rowUpdate']);
     const PROPS = {
       alive:false,
       name:data.name,
@@ -11157,7 +11200,7 @@
       PROPS.alive = false;
     };
 
-    TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden').attr('data-table',data.name);
+    TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden overflow-scroll').attr('data-table',data.name);
     PROPS.body = TABLE.find('.body');
     TABLE.find('[data-type="button"]').each(function(){
       let el = $(this),
@@ -11229,11 +11272,38 @@
                   configurable: false,
                   value: (data)=>{
                     let row = ROWS.add();
-                    fn.call({row},data);
+                    fn.call(row,data);
                     PROPS.body.append(row.element);
+                    return row;
                   }
                 });
               }
+            },
+            'update': {
+              configurable: true,
+              set: (fn)=>{
+                let update = (row)=>{
+                  return function(){
+                    fn.apply(row,arguments);
+                    SUBJECT.notify('rowUpdate',[row]);
+                  }
+                };
+                ROWS.all.forEach((r)=>{ r.update = update(r); });
+                SUBJECT.register('addRow',function(row){ row.update = update(row); });
+                Object.defineProperty(OBJ,'update',{
+                  configurable: false,
+                  enumerable: false,
+                  value: true
+                });
+              }
+            },
+            'get': {
+              writable: false,
+              value: ROWS.get
+            },
+            'find': {
+              writable: false,
+              value: ROWS.find
             }
           };
 
@@ -11269,38 +11339,71 @@
     ];
 
     const Users = Tables[0];
-    const UserAvisos = Tables[1];
 
-    UserAvisos.rows.add = function(data){
+    {
 
-    };
+      let forms = {
+        'create':Forms.get('createUser'),
+        'edit':Forms.get('editUser'),
+        'delete':Forms.get('deleteUser')
+      };
 
-    Users.rows.add = function(data){
-      this.inputs.text.id = data.id;
-      this.inputs.text.name = data.name;
-    };
+      let openForm = (form,data)=>{
+        return function(){
+          let close = form.events.on('close',()=>{
+            Modal.elements.button.close.trigger('click');
+          });
+          Modal.elements.button.close.on('click',()=>{
+            if(form.alive){ form.close(); }
+            form.events.off('close',close);
+            Modal.actions.close();
+            Modal.elements.button.close.off('click');
+          });
+          Modal.actions.open({title: form.title, body: form.open(data()) });
+        }
+      };
 
+      Users.rows.update = function(user){
+        this.user = user;
+        this.inputs.text.id.value = user.id;
+        this.inputs.text.name.value = user.name;
+      };
 
-    Users.buttons.addUser.events.on('click',function(){
-      let form = Forms.userProfile;
-      let close = form.events.on('close',()=>{
-        Modal.element.button.close.trigger('click');
+      Users.rows.add = function(user){
+        this.update(user);
+        this.user = user;
+        let row = this;
+        this.buttons.edit.events.on('click',openForm(forms.edit,()=>{ return row.user; }));
+        // this.buttons.delete.events.on('click',openForm(forms.delete));
+
+      };
+
+      Users.buttons.addUser.events.on('click',openForm(forms.create));
+
+      forms.create.events.on('response',function(response){
+        if(!response.error){
+          Users.rows.add(response.data);
+          Modal.elements.button.close.trigger('click');
+        }
       });
-      Modal.elements.button.close.on('click',()=>{
-        if(form.alive){ form.close(); }
-        form.events.off('close',close);
-        Modal.actions.close();
-        Modal.elements.button.close.off('click');
+
+      forms.edit.events.on('response',function(response){
+        if(!response.error){
+          let user = response.data;
+          let row = Users.rows.find((r)=>{ return r.user.id == user.id; });
+          row.update(user);
+          forms.edit.close();
+        }
+
       });
 
-      Modal.actions.open({title: form.title, body: form.open() });
-    });
-
-
-
-
-
-
+      Services.get.user({},(response)=>{
+        if(!response.error){
+          console.log(response);
+          response.data.forEach(Users.rows.add);
+        }
+      });
+    }
 
     Tables.forEach((t)=>{ Container.append(t.element); });
 
@@ -11323,23 +11426,17 @@
   }
 
   const HTML$1 = {
-    permision: ()=>{
-      return Services.get.form('permision');
+    permisions:{
+      permision: ()=>{ return Services.get.form('permisions/permision'); },
+      homeOffice:  ()=>{ return Services.get.form('permisions/homeOffice'); },
+      vacation:()=>{ return Services.get.form('permisions/vacation'); },
+      sick: ()=>{ return Services.get.form('permisions/sick'); },
     },
-    homeOffice:  ()=>{
-      return Services.get.form('homeOffice');
-    },
-    vacation:()=>{
-      return Services.get.form('vacation');
-    },
-    sick: ()=>{
-      return Services.get.form('sick');
-    },
-    myProfile: ()=>{
-      return Services.get.form('myProfile');
-    },
-    userProfile: ()=>{
-      return Services.get.form('userProfile');
+    user: {
+      create: ()=>{ return Services.get.form('user/create'); },
+      edit: ()=>{ return Services.get.form('user/edit'); },
+      profile: ()=>{ return Services.get.form('user/profile'); },
+      delete: ()=>{ return Services.get.form('user/delete'); }
     }
   };
 
@@ -11355,16 +11452,21 @@
       all: [],
       type:{}
     };
-    const SUBJECT = new Observer(['open','close','send']);
+    const SUBJECT = new Observer(['open','close','send','response','error']);
     const PROPS = {
       alive:false,
       title:data.title,
-      name:data.name
+      name:data.name,
+      url: data.url,
+      async: data.async ? data.async : true,
+      method: data.method ? data.method : 'POST',
+      json: data.json ? data.json : false
     };
     const OPEN = ()=>{
       INPUTS.all.forEach((input)=>{ input.on(); });
       BUTTONS.all.forEach((btn)=>{ btn.on(); });
       PROPS.alive = true;
+      SUBJECT.notify('open',[true]);
       return FORM
     };
     const CLOSE = ()=>{
@@ -11372,6 +11474,21 @@
       INPUTS.all.forEach((input)=>{ input.off(); });
       BUTTONS.all.forEach((btn)=>{ btn.off(); });
       PROPS.alive = false;
+      SUBJECT.notify('close',[true]);
+
+    };
+    const SEND = (message)=>{
+      SUBJECT.notify('send',[message]);
+      if(!message.error){
+        $.ajax({
+          url: `${window.location.origin}/${PROPS.url}`,
+          method: PROPS.method,
+          data: PROPS.json ? JSON.stringify(message.data) : message.data,
+          async: PROPS.async,
+          success: (response)=>{ SUBJECT.notify('response',[response]); },
+          error: (response)=>{ SUBJECT.notify('error',[response]); }
+        });
+      }
     };
 
     FORM.html(typeof data.html == 'function' ? data.html() : data.html );
@@ -11457,9 +11574,9 @@
           Object.defineProperty(INSTANCE,'open',{
             configurable: false,
             writable: false,
-            value:()=>{
+            value:function(){
               let form = OPEN();
-              open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+              open.apply(INSTANCE,arguments);
               return form;
             }
           });
@@ -11485,10 +11602,8 @@
           Object.defineProperty(INSTANCE,'send',{
             configurable: false,
             writable: false,
-            value:()=>{
-              INPUTS.all.forEach((input)=>{ input.off(); });
-              let value = send.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
-              SUBJECT.notify('send',value);
+            value:function(){
+              SEND(send.apply(INSTANCE,arguments));
             }
           });
         }
@@ -11497,11 +11612,21 @@
         writable: false,
         value: BUTTONS.name,
       },
+      'inputs':{
+        writable: false,
+        value: INPUTS.type,
+      },
       'events':{
         writable: false,
         value: {
           on: SUBJECT.register,
           off: SUBJECT.unregister
+        }
+      },
+      'disable': {
+        writable: false,
+        value: (toggle)=>{
+          INPUTS.all.forEach((input)=>{ input.disable(toggle); });
         }
       }
     };
@@ -11509,53 +11634,155 @@
     Object.defineProperties(this,METHODS);
   }
 
-  const Permision = new Form({
-    name: 'permision',
-    title: 'Permiso',
-    html: HTML$1.permision,
-  });
+  function formsInit(){
+    const Forms = [];
 
-  const Vacation = new Form({
-    name: 'vacation',
-    title: 'Vacación',
-    html: HTML$1.vacation,
-  });
+    const Helper = {
+      notEmptyText: (inputs)=>{
+        for(let input in inputs){
+          input = inputs[input];
+          input.events.on('input',function(){
+            let value = this.value;
+            this.parent[value != '' ? 'addClass' : 'removeClass']('active');
+          });
+        }
+      },
+      notEmptyNumber: (inputs)=>{
+        for(let input in inputs){
+          input = inputs[input];
+          input.events.on('input',function(){
+            let value = this.value;
+            if(!this.parent.hasClass('active')){ this.parent.addClass('active'); }
+            this.value = (value > this.max ? this.max : ( value < this.min ? this.min : value ) );
+          });
+        }
+      },
+      collectValues: (inputs)=>{
+        const MAP = {};
+        for (let type in inputs) {
+          for(let name in inputs[type]){
+            MAP[name] = inputs[type][name][type == 'date' ? 'format': 'value'];
+          }
+        }
+        return MAP;
+      },
+      exportForm:(form)=>{
+        for(let name in form){ Forms.push(form[name]); }
+      }
+    };
 
-  const HomeOffice = new Form({
-    name: 'homeOffice',
-    title: 'Trabajo desde casa',
-    html: HTML$1.homeOffice,
-  });
+    const Permisions = {
+      permision: new Form({
+        name: 'permision',
+        title: 'Permiso',
+        html: HTML$1.permisions.permision,
+      }),
+      vacation: new Form({
+        name: 'vacation',
+        title: 'Vacación',
+        html: HTML$1.permisions.vacation,
+      }),
+      homeOffice: new Form({
+        name: 'homeOffice',
+        title: 'Trabajo desde casa',
+        html: HTML$1.permisions.homeOffice,
+      }),
+      sick: new Form({
+        name: 'sick',
+        title: 'Enfermedad',
+        html: HTML$1.permisions.sick,
+      })
+    };
 
-  const Sick = new Form({
-    name: 'sick',
-    title: 'Enfermedad',
-    html: HTML$1.sick,
-  });
+    const User = {
+      create:  new Form({
+        title: 'Nuevo usuario',
+        name: 'createUser',
+        html: HTML$1.user.create,
+        url: 'users/create',
+      }),
+      edit:  new Form({
+        title: 'Editar usuario',
+        name: 'editUser',
+        html: HTML$1.user.edit,
+        url: 'users/edit',
+      }),
+      profile: new Form({
+        title: 'Mi Perfil',
+        name: 'myProfile',
+        html: HTML$1.myProfile,
+      }),
+      delte: new Form({
+        title: 'Eliminar Usuario',
+        name: 'deleteUser',
+        html: HTML$1.myProfile,
+      })
+    };
 
-  const myProfile = new Form({
-    title: 'Mi Perfil',
-    name: 'myProfile',
-    html: HTML$1.myProfile,
-  });
+    User.create.open = function(){
+      Helper.notEmptyText(this.inputs.text);
+      Helper.notEmptyNumber(this.inputs.number);
+    };
 
-  const userProfile = new Form({
-    title: 'Perfil de usuario',
-    name: 'userProfile',
-    html: HTML$1.userProfile,
-  });
+    User.create.send = function(){
+      return {error: false, data: Helper.collectValues(this.inputs) };
+    };
 
-  var Forms = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    Permision: Permision,
-    Vacation: Vacation,
-    HomeOffice: HomeOffice,
-    myProfile: myProfile,
-    userProfile: userProfile,
-    Sick: Sick
-  });
+    User.create.buttons.send.events.on('click',User.create.send);
+
+    User.edit.open = function(user){
+      this.user = user.id;
+      this.disable(true);
+      this.buttons.send.element.addClass('hidden');
+      this.buttons.cancel.element.addClass('hidden');
+      this.buttons.edit.element.removeClass('hidden');
+
+      Helper.notEmptyText(this.inputs.text);
+      Helper.notEmptyNumber(this.inputs.number);
+
+      this.inputs.text.name.value = user.name;
+      this.inputs.text.lastname.value = user.lastname;
+      this.inputs.text.email.value = user.email;
+      this.inputs.number.vacations.value = user.vacations;
+      this.inputs.date.birthday.value = Number(user.birthday);
+      this.inputs.date.work_start.value = Number(user.work_start);
+    };
+
+    User.edit.send = function(){
+      return {
+        error: false,
+        data: {
+          user: Helper.collectValues(this.inputs),
+          where:[['id','=',this.user]]
+        }
+      }
+    };
+
+    User.edit.buttons.edit.events.on('click',function(){
+      User.edit.disable(false);
+      User.edit.buttons.cancel.element.removeClass('hidden');
+      User.edit.buttons.send.element.removeClass('hidden');
+      User.edit.buttons.edit.element.addClass('hidden');
+    });
+
+    User.edit.buttons.cancel.events.on('click',function(){
+      User.edit.close();
+    });
+
+    User.edit.buttons.send.events.on('click',User.edit.send);
+
+
+
+    [Permisions,User].forEach(Helper.exportForm);
+
+    return {
+      get:(name)=>{ return Forms.find((f)=>{ return f.name == name; }); }
+    }
+
+  }
 
   function actionsInit(){
+    const Forms = formsInit();
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
@@ -11603,14 +11830,23 @@
     Actions.open.permisions = ()=>{
       Permisions.actions[Permisions.state.open ? 'close' : 'open']();
     };
-    Actions.open.form = function(){
-      let btn = $(this);
-      let form = btn.attr('name');
-      for (let name in Forms) {
-        if(Forms[name].name == form){ form = Forms[name]; }
-      }
-      if(form.name === 'myProfile'){ Nav.elements.button.menu.trigger('click'); }
+    Actions.open.permision = function(){
+      let form = Forms.get($(this).attr('name'));
       Permisions.actions.close();
+      let close = form.events.on('close',()=>{
+        Modal.element.button.close.trigger('click');
+      });
+      Modal.elements.button.close.on('click',()=>{
+        if(form.alive){ form.close(); }
+        form.events.off('close',close);
+        Modal.actions.close();
+        Modal.elements.button.close.off('click');
+      });
+
+      Modal.actions.open({title: form.title, body: form.open() });
+    };
+    Actions.open.profile = function(){
+      let form = Forms.get('profile');
       let close = form.events.on('close',()=>{
         Modal.element.button.close.trigger('click');
       });
@@ -11655,12 +11891,12 @@
     elements.nav.menu.button.myAvisos.on('click',actions.open.table);
     elements.nav.menu.button.userAvisos.on('click',actions.open.table);
     elements.nav.menu.button.calendar.on('click',actions.open.calendar);
-    elements.nav.menu.button.myProfile.on('click',actions.open.form);
+    elements.nav.menu.button.myProfile.on('click',actions.open.profile);
     elements.permisions.button.open.on('click',actions.open.permisions);
-    elements.permisions.button.homeOffice.on('click',actions.open.form);
-    elements.permisions.button.sick.on('click',actions.open.form);
-    elements.permisions.button.vacation.on('click',actions.open.form);
-    elements.permisions.button.permision.on('click',actions.open.form);
+    elements.permisions.button.homeOffice.on('click',actions.open.permision);
+    elements.permisions.button.sick.on('click',actions.open.permision);
+    elements.permisions.button.vacation.on('click',actions.open.permision);
+    elements.permisions.button.permision.on('click',actions.open.permision);
     elements.modal.errors.on('modalError',actions.modalError);
 
 

@@ -54,7 +54,10 @@ $html = [
     'css'=>['cont'=>'w-1/2 mx-1','input'=>'w-full'],
     'label'=>'Fecha de ingreso',
     'attrs'=>['name'=>'work_start'],
-  ])
+  ]),
+  'send'=> Button(['text'=>'Guardar','attrs'=>['name'=>'send']]),
+  'edit'=> Button(['text'=>'Editar','attrs'=>['name'=>'edit']]),
+  'cancel'=> Button(['text'=>'Cancelar','attrs'=>['name'=>'cancel']])
 ];
 ?>
 
@@ -72,3 +75,5 @@ $html = [
   <?php echo $html['work_start']; ?>
   <?php echo $html['vacations']; ?>
 </div>
+
+<?php echo FormFooter([$html['send'],$html['edit'],$['cancel']]); ?>

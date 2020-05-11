@@ -13,7 +13,7 @@ function Row(data){
     all: [],
     type:{}
   };
-  const SUBJECT = new Observer(['open','close','send']);
+  const SUBJECT = new Observer(['alive']);
   const PROPS = {
     alive:false,
     id: data.id
@@ -64,9 +64,8 @@ function Row(data){
       }
     }
     else{
-      el = new Inputs.Button(el);
       BUTTONS.name[name] = new Inputs.Button(el);
-      BUTTONS.all.push(el);
+      BUTTONS.all.push(BUTTONS.name[name]);
     }
   });
 
@@ -152,6 +151,16 @@ function Row(data){
     'inputs':{
       writable: false,
       value: INPUTS.type
+    },
+    'update': {
+      configurable: true,
+      set: (fn)=>{
+        Object.defineProperty(INSTANCE,'update',{
+          configurable: false,
+          writable: false,
+          value: fn
+        })
+      }
     }
   }
 
@@ -176,14 +185,16 @@ function Table(data){
     add: ()=>{
       let row = ROWS.all[ROWS.all.push(new Row({id:ROWS.id++,html:HTML.row})) - 1];
       row.disable(true);
-      SUBJECT.notify('addRow',row);
+      SUBJECT.notify('addRow',[row]);
       return row;
     },
     remove: ()=>{
 
-    }
+    },
+    get: ()=>{ return ROWS.all },
+    find: (find)=>{ return ROWS.all.find(find); }
   };
-  const SUBJECT = new Observer(['open','close','send','addRow','removeRow']);
+  const SUBJECT = new Observer(['open','close','addRow','removeRow','rowUpdate']);
   const PROPS = {
     alive:false,
     name:data.name,
@@ -203,7 +214,7 @@ function Table(data){
     PROPS.alive = false;
   };
 
-  TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden').attr('data-table',data.name);
+  TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden overflow-scroll').attr('data-table',data.name);
   PROPS.body = TABLE.find('.body');
   TABLE.find('[data-type="button"]').each(function(){
     let el = $(this),
@@ -275,11 +286,38 @@ function Table(data){
                 configurable: false,
                 value: (data)=>{
                   let row = ROWS.add();
-                  fn.call({row},data);
+                  fn.call(row,data);
                   PROPS.body.append(row.element);
+                  return row;
                 }
               });
             }
+          },
+          'update': {
+            configurable: true,
+            set: (fn)=>{
+              let update = (row)=>{
+                return function(){
+                  fn.apply(row,arguments);
+                  SUBJECT.notify('rowUpdate',[row]);
+                }
+              };
+              ROWS.all.forEach((r)=>{ r.update = update(r) });
+              SUBJECT.register('addRow',function(row){ row.update = update(row) })
+              Object.defineProperty(OBJ,'update',{
+                configurable: false,
+                enumerable: false,
+                value: true
+              });
+            }
+          },
+          'get': {
+            writable: false,
+            value: ROWS.get
+          },
+          'find': {
+            writable: false,
+            value: ROWS.find
           }
         }
 

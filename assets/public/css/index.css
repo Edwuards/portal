@@ -270,7 +270,7 @@ form .textarea.active {
   form .input.active label,
   form .select.active label,
   form .textarea.active label {
-    z-index: 10; }
+    z-index: 20; }
 
 form .input.disabled,
 form .textarea.disabled,

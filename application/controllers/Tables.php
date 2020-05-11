@@ -97,7 +97,6 @@ class Tables extends CI_Controller {
 		];
 	}
 
-
 	private function users()
 	{
 		return [
@@ -114,7 +113,7 @@ class Tables extends CI_Controller {
 					'row'=>Button([
 						'css'=>'w-10 h-10 mx-2',
 						'text'=>'<i class="text-blue-500 fas fa-eye"></i>',
-						'attrs'=>['name'=>'profile']
+						'attrs'=>['name'=>'edit']
 					])
 				],
 				[
@@ -122,7 +121,7 @@ class Tables extends CI_Controller {
 					'row'=>Button([
 						'css'=>'w-10 h-10 mx-2',
 						'text'=>'<i class="text-red-500 fas fa-trash-alt"></i>',
-						'attrs'=>['name'=>'deleteUser']
+						'attrs'=>['name'=>'delete']
 					])
 				],
 				[

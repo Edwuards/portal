@@ -131,17 +131,24 @@ function Input(INPUT){
     }
   };
 
+  const PROPS = {};
+
   const METHODS = {
     'element': {
       writable: false,
       value: INPUT
     },
+    'parent':{
+      get: ()=>{
+        if(!PROPS.parent){ PROPS.parent = INPUT.parent(); }
+        return PROPS.parent;
+      }
+    },
     'on': {
       configurable: true,
       writable: false,
       value: function(){
-        EVENTS.on('component.init');
-        this.element.trigger('component.init');
+        SUBJECT.event.get().forEach(EVENTS.on);
       }
     },
     'off': {
@@ -182,19 +189,15 @@ function Input(INPUT){
     },
     'value': {
       configurable: true,
-      get: ()=>{ return this.element.val().trim(); }
+      get: ()=>{ return this.element.val().trim(); },
+      set: (value)=>{
+        this.element.val(value);
+        this.element.trigger('input');
+      }
     }
   };
 
-  ['component.init','focus','input','blur'].forEach(SUBJECT.event.create);
-
-  SUBJECT.register('component.init',function(){
-    let types = SUBJECT.event.get().reduce((a,c)=>{
-      if(c != 'component.init'){ a.push(c); }
-      return a;
-    },[]);
-    types.forEach(EVENTS.on);
-  })
+  ['focus','input','blur'].forEach(SUBJECT.event.create);
 
   Object.defineProperties(this,METHODS);
 
@@ -226,7 +229,14 @@ function NumberInput(INPUT){
 
   const METHODS = {
     'value':{
-      get:()=>{ return Number(this.element.val()); }
+      get:()=>{ return Number(this.element.val()); },
+      set: (value)=>{
+        value = Number(value);
+        if(!isNaN(value)){
+          this.element.val(value);
+          this.element.trigger('input');
+        }
+      }
     },
     'max':{
       get: ()=>{ return PROPS.max },
@@ -353,6 +363,18 @@ function DateInput(MONTH,DAY,YEAR){
     },
     'value': {
       configurable: true,
+      set: (unixTimeStamp)=>{
+        let test = Rules.is.number(unixTimeStamp);
+        if(!test.passed){ throw test.error; }
+        DATE.setTime(unixTimeStamp * 1000);
+
+        GROUP.forEach((input)=>{
+          let attr = input.element.attr('name');
+          let fn = (attr == 'month' ? 'getMonth' : (attr == 'day' ? 'getDate' : 'getFullYear'));
+          input.value = DATE[fn]();
+        });
+
+      },
       get: ()=>{ return DATE; }
     }
   };
@@ -364,7 +386,6 @@ function DateInput(MONTH,DAY,YEAR){
     let fn = (attr == 'month' ? 'setMonth' : (attr == 'day' ? 'setDate' : 'setFullYear'));
     input.events.on('change',function(){
       DATE[fn](Number(this.value));
-      console.log(DATE);
     });
   });
 
@@ -504,7 +525,7 @@ function ImageInput(INPUT,BUTTON,IMG){
   };
   const METHODS = {
     'value': {
-      get:()=>{ return file }
+      get:()=>{ return PROPS.file }
     },
     'on': {
       configurable: true,

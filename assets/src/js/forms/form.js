@@ -13,16 +13,21 @@ function Form(data){
     all: [],
     type:{}
   };
-  const SUBJECT = new Observer(['open','close','send']);
+  const SUBJECT = new Observer(['open','close','send','response','error']);
   const PROPS = {
     alive:false,
     title:data.title,
-    name:data.name
+    name:data.name,
+    url: data.url,
+    async: data.async ? data.async : true,
+    method: data.method ? data.method : 'POST',
+    json: data.json ? data.json : false
   };
   const OPEN = ()=>{
     INPUTS.all.forEach((input)=>{ input.on(); });
     BUTTONS.all.forEach((btn)=>{ btn.on(); });
     PROPS.alive = true;
+    SUBJECT.notify('open',[true]);
     return FORM
   };
   const CLOSE = ()=>{
@@ -30,7 +35,22 @@ function Form(data){
     INPUTS.all.forEach((input)=>{ input.off(); });
     BUTTONS.all.forEach((btn)=>{ btn.off(); });
     PROPS.alive = false;
+    SUBJECT.notify('close',[true]);
+
   };
+  const SEND = (message)=>{
+    SUBJECT.notify('send',[message]);
+    if(!message.error){
+      $.ajax({
+        url: `${window.location.origin}/${PROPS.url}`,
+        method: PROPS.method,
+        data: PROPS.json ? JSON.stringify(message.data) : message.data,
+        async: PROPS.async,
+        success: (response)=>{ SUBJECT.notify('response',[response]); },
+        error: (response)=>{ SUBJECT.notify('error',[response]); }
+      });
+    }
+  }
 
   FORM.html(typeof data.html == 'function' ? data.html() : data.html );
 
@@ -115,9 +135,9 @@ function Form(data){
         Object.defineProperty(INSTANCE,'open',{
           configurable: false,
           writable: false,
-          value:()=>{
+          value:function(){
             let form = OPEN();
-            open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
+            open.apply(INSTANCE,arguments);
             return form;
           }
         });
@@ -143,10 +163,8 @@ function Form(data){
         Object.defineProperty(INSTANCE,'send',{
           configurable: false,
           writable: false,
-          value:()=>{
-            INPUTS.all.forEach((input)=>{ input.off(); });
-            let value = send.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
-            SUBJECT.notify('send',value);
+          value:function(){
+            SEND(send.apply(INSTANCE,arguments));
           }
         });
       }
@@ -155,11 +173,21 @@ function Form(data){
       writable: false,
       value: BUTTONS.name,
     },
+    'inputs':{
+      writable: false,
+      value: INPUTS.type,
+    },
     'events':{
       writable: false,
       value: {
         on: SUBJECT.register,
         off: SUBJECT.unregister
+      }
+    },
+    'disable': {
+      writable: false,
+      value: (toggle)=>{
+        INPUTS.all.forEach((input)=>{ input.disable(toggle); });
       }
     }
   }
