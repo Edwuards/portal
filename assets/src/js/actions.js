@@ -58,7 +58,7 @@ export default function(){
     let form = Forms.get($(this).attr('name'));
     Permisions.actions.close();
     let close = form.events.on('close',()=>{
-      Modal.element.button.close.trigger('click');
+      Modal.elements.button.close.trigger('click');
     });
     Modal.elements.button.close.on('click',()=>{
       if(form.alive){ form.close() }
@@ -72,7 +72,7 @@ export default function(){
   Actions.open.profile = function(){
     let form = Forms.get('profile');
     let close = form.events.on('close',()=>{
-      Modal.element.button.close.trigger('click');
+      Modal.elements.button.close.trigger('click');
     });
     Modal.elements.button.close.on('click',()=>{
       if(form.alive){ form.close() }

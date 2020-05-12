@@ -1,9 +1,10 @@
 <?php
 
 $html = [
-  'date' => DateInput(['group'=>'date']),
-  'hour_start' => TimeInput(['group'=>'hour_start']),
-  'hour_finish' => TimeInput(['group'=>'hour_finish']),
+  'date_start' => DateInput(['group'=>'start']),
+  'date_finish' => DateInput(['group'=>'finish']),
+  'hour_start' => TimeInput(['group'=>'start']),
+  'hour_finish' => TimeInput(['group'=>'finish']),
   'textarea' => TextAreaInput([
     'label'=>'Descrpción',
     'css'=>'w-full',
@@ -16,7 +17,10 @@ $html = [
 
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha</p>
-  <?php echo $html['date']; ?>
+  <?php echo $html['date_start']; ?>
+</div>
+<div class="hidden">
+  <?php echo $html['date_finish']; ?>
 </div>
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Horario de salida</p>

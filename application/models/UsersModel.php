@@ -23,11 +23,16 @@
       return count($this->result['data']) > 0 ? $this->result['data'][0]['id'] : false;
     }
 
-    public function create($user){
+    public function create($user)
+    {
       $this->response = [ 'error'=>false, 'data'=>false ];
-
       $exist = $this->exist($user['email']);
-      if(!$exist){
+
+      if($exist){
+        $this->response['error'] = true; $this->response['data'] = 'usuario con el correo '.$user['email'].' ya existe';
+      }
+
+      if(!$this->response['error']){
         $random = rand(10,20);
         $multi = rand(2,6);
         for ($i=0; $i < 5; $i++) { $random *= $multi; }
@@ -38,21 +43,23 @@
 
         $this->response = $this->insert($user);
       }
-      else{
-        $this->response['error'] = true; $this->response['data'] = 'usuario con el correo '.$user['email'].' ya existe';
+
+      if(!$this->response['error']){
+        $id = (string)$this->response['data']['id'];
+        $this->response['data'] = $this->find([['id','=',$id]])['data'][0];
       }
 
       return $this->response;
     }
 
-    public function find($where = [],$order = [],$limit = []){
+    public function find($where = [],$order = [],$limit = [])
+    {
       $select = 'id,name,lastname,email,vacations,';
       foreach (['work_start','birthday'] as $date) {
         $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
       }
       return  $this->get($select,$where,$order,$limit);
     }
-
 
   }
 

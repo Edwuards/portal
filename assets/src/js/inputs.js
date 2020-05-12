@@ -15,7 +15,7 @@ function Button(BUTTON){
         let update = (type)=>{
           return function(){
             INSTANCE.element.off(type);
-            SUBJECT.notify(type,arguments);
+            SUBJECT.notify(type,[arguments]);
             INSTANCE.element.on(type,update(type));
           }
         };
@@ -118,7 +118,7 @@ function Input(INPUT){
         let update = (type)=>{
           return function(){
             INSTANCE.element.off(type);
-            SUBJECT.notify(type,arguments);
+            SUBJECT.notify(type,[arguments]);
             INSTANCE.element.on(type,update(type));
           }
         };

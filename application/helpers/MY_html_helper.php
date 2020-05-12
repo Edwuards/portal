@@ -185,7 +185,7 @@
   function FormFooter($buttons){
     $html = '';
     foreach ($buttons as $btn) { $html .= $btn.' '; };
-    return '<div class="w-full">
+    return '<div class="w-full my-8">
               <div data="error" class="text-red-500 mx-2 w-full text-sm" >
               </div>
               <div class="flex"> '.$html.'</div>

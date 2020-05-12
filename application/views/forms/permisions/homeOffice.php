@@ -1,7 +1,8 @@
 <?php
 
 $html = [
-  'date' => DateInput(['group'=>'date']),
+  'date_start' => DateInput(['group'=>'start']),
+  'date_finish' => DateInput(['group'=>'finish']),
   'textarea' => TextAreaInput([
     'label'=>'Descrpción',
     'css'=>'w-full',
@@ -13,7 +14,11 @@ $html = [
 
 <div class="w-full mb-2">
   <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha</p>
-  <?php echo $html['date']; ?>
+  <?php echo $html['date_start']; ?>
+</div>
+
+<div class="hidden">
+  <?php echo $html['date_finish']; ?>
 </div>
 
 <div class="w-full mb-2">

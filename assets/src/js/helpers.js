@@ -41,10 +41,12 @@ function Observer(events){
     ]);
 
     if(!test.passed){ throw test.error; }
-
-    Events[event].push({id: ID++, notify: subscriber});
+    ID++;
+    Events[event].push({id: ID, notify: subscriber});
     return ID;
   }
+
+  this.log = ()=>{ console.log(Events); }
 
   this.unregister = (event,id)=>{
   	let test = undefined ;

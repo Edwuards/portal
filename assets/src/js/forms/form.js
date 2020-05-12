@@ -178,10 +178,14 @@ function Form(data){
     },
     'events':{
       writable: false,
-      value: {
-        on: SUBJECT.register,
-        off: SUBJECT.unregister
-      }
+      value: (()=>{
+        const OBJ = {};
+        Object.defineProperties(OBJ,{
+          'on':{ get: ()=>{ return SUBJECT.register } },
+          'off':{ get: ()=>{ return SUBJECT.unregister } },
+        })
+        return OBJ
+      })()
     },
     'disable': {
       writable: false,

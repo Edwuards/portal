@@ -92,93 +92,117 @@ export default function(){
     })
   }
 
-  Permisions.permision.open = function(){
-    this.inputs.date.finish.disable(true);
-    Helper.notEmptyNumber(this.inputs.time);
-    Helper.notEmptyText(this.inputs.textarea);
-  }
-
-  Permisions.permision.send = function(){
-    this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
-    let data = {
-      notice: 1,
-      comments:this.inputs.textarea.description.value,
-      date_start: this.inputs.date.start.value,
-      date_finish: this.inputs.date.finish.value,
-    };
-
-    let time = {
-      start: this.inputs.time.start.value,
-      finish: this.inputs.time.finish.value
+  {
+    let close = undefined;
+    Permisions.permision.open = function(){
+      this.inputs.date.finish.disable(true);
+      Helper.notEmptyNumber(this.inputs.time);
+      Helper.notEmptyText(this.inputs.textarea);
+      close = Permisions.permision.buttons.send.events.on('click',Permisions.permision.send);
     }
 
-    data.date_start.setHours(time.start.hour);
-    data.date_start.setMinutes(time.start.minutes);
-    data.date_finish.setHours(time.finish.hour);
-    data.date_finish.setMinutes(time.finish.minutes);
-    data.date_start = this.inputs.date.start.format;
-    data.date_finish = this.inputs.date.finish.format;
+    Permisions.permision.send = function(){
+      this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
+      let data = {
+        notice: 1,
+        comments:this.inputs.textarea.description.value,
+        date_start: this.inputs.date.start.value,
+        date_finish: this.inputs.date.finish.value,
+      };
 
-    this.close();
+      let time = {
+        start: this.inputs.time.start.value,
+        finish: this.inputs.time.finish.value
+      }
 
-    return { error: false, data }
+      data.date_start.setHours(time.start.hour);
+      data.date_start.setMinutes(time.start.minutes);
+      data.date_finish.setHours(time.finish.hour);
+      data.date_finish.setMinutes(time.finish.minutes);
+      data.date_start = this.inputs.date.start.format;
+      data.date_finish = this.inputs.date.finish.format;
+
+      this.close();
+
+      return { error: false, data }
+
+    }
+
+    Permisions.permision.events.on('send',()=>{
+      Permisions.permision.buttons.send.events.unregister('click',close);
+    });
 
   }
 
-  Permisions.permision.buttons.send.events.on('click',Permisions.permision.send);
-
-  Permisions.vacation.send = function(){
+  {
+    let close = undefined;
+    Permisions.vacation.send = function(){
     let data = {
       notice: 2,
       date_start: this.inputs.date.start.format,
       date_finish: this.inputs.date.finish.format,
     };
 
+    Permisions.vacation.buttons.send.events.unregister('click',close);
     this.close();
 
     return { error: false, data }
 
   }
+    Permisions.vacation.open = function(){
+      close = Permisions.vacation.buttons.send.events.on('click',Permisions.vacation.send);
 
-  Permisions.vacation.buttons.send.events.on('click',Permisions.vacation.send);
-
-  Permisions.sick.send = function(){
-    let data = {
-      notice: 3,
-      date_start: this.inputs.date.start.format,
-      date_finish: this.inputs.date.finish.format,
-    };
-
-    this.close();
-
-    return { error: false, data }
+    }
 
   }
 
-  Permisions.sick.buttons.send.events.on('click',Permisions.sick.send);
+  {
+    let close = undefined;
+    Permisions.sick.open = function(){
+      close = Permisions.sick.buttons.send.events.on('click',Permisions.sick.send);
 
-  Permisions.homeOffice.send = function(){
-    this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
+    }
+    Permisions.sick.send = function(){
+      let data = {
+        notice: 3,
+        date_start: this.inputs.date.start.format,
+        date_finish: this.inputs.date.finish.format,
+      };
+      Permisions.sick.buttons.send.events.unregister('click',close);
+      this.close();
 
-    let data = {
-      notice: 4,
-      comments: this.inputs.textarea.description.value,
-      date_start: this.inputs.date.start.format,
-      date_finish: this.inputs.date.finish.format,
-    };
+      return { error: false, data }
 
-    this.close();
+    }
 
-
-    return { error: false, data }
 
   }
 
-  Permisions.homeOffice.events.on('send',(data)=>{
-    console.log(data);
-  })
+  {
+    let close = undefined;
+    Permisions.homeOffice.open = function(){
+      close = Permisions.homeOffice.buttons.send.events.on('click',Permisions.homeOffice.send);
 
-  Permisions.homeOffice.buttons.send.events.on('click',()=>{ Permisions.homeOffice.send(); });
+    }
+    Permisions.homeOffice.send = function(){
+      this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
+
+      let data = {
+        notice: 4,
+        comments: this.inputs.textarea.description.value,
+        date_start: this.inputs.date.start.format,
+        date_finish: this.inputs.date.finish.format,
+      };
+
+      this.close();
+      Permisions.homeOffice.buttons.send.events.unregister('click',close);
+
+      return { error: false, data }
+
+    }
+
+
+  }
 
   User.create.open = function(){
     Helper.notEmptyText(this.inputs.text);

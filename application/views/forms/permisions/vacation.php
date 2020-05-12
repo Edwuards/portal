@@ -1,8 +1,8 @@
 <?php
 
 $html = [
-  'date_start' => DateInput(['group'=>'date_start']),
-  'date_finish' => DateInput(['group'=>'date_finish']),
+  'date_start' => DateInput(['group'=>'start']),
+  'date_finish' => DateInput(['group'=>'finish']),
   'send'=> Button(['text'=>'Enviar','attrs'=>['name'=>'send']])
 ];
 
