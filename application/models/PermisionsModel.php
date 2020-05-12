@@ -34,7 +34,7 @@
 
     public function find($where = [],$order = [],$limit = [])
     {
-      $select = 'id,notice,user,status,';
+      $select = 'id,notice as type,user,status,';
       foreach (['date_start','date_finish'] as $date) {
         $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
       }

@@ -40,7 +40,8 @@ class Permisions extends CI_Controller {
 			$this->response = $this->Permisions->create($permision);
 		}
 
-		$this->json($permision);
+
+		$this->json($this->response);
 
 	}
 
@@ -63,7 +64,7 @@ class Permisions extends CI_Controller {
 
 	}
 
-	public function edit()
+	public function update()
 	{
 		$this->resetResponse();
 
@@ -82,8 +83,8 @@ class Permisions extends CI_Controller {
 		}
 
 		if(!$this->response['error']){
-			$user = $this->input->post('user');
-			$this->response = $this->Permisions->update($user,$where);
+			$aviso = $this->input->post('aviso');
+			$this->response = $this->Permisions->update($aviso,$where);
 		}
 
 		if(!$this->response['error']){

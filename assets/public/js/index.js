@@ -10028,6 +10028,30 @@
 
     $.ajax(settings);
   };
+  Services.get.aviso = (data,fn)=>{
+    let settings = {
+      url: base_url(`permisions/get`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+
+  Services.update = {};
+  Services.update.aviso = (data,fn)=>{
+    let settings = {
+      url: base_url(`permisions/update`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
 
   const HTML = {
     userAvisos: ()=>{
@@ -10417,7 +10441,6 @@
     const EVENTS = {
       state: {},
       on: (type)=>{
-        SUBJECT.log();
         if(!EVENTS.state[type]){
           EVENTS.state[type] = true;
           let update = (type)=>{
@@ -10975,15 +10998,33 @@
 
   function StatusInput(INPUT,STATUS){
 
+
     SelectInput.call(this,INPUT);
 
-    this.events.on('change',function(){
-      let value = Number(this.value);
-      STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
-      if(value == 1){ STATUS.addClass('bg-yellow-500'); }
-      if(value == 2){ STATUS.addClass('bg-green-500'); }
-      if(value == 0){ STATUS.addClass('bg-red-500'); }
-    });
+    let METHODS = {
+      'update': {
+        writable: false,
+        value: function(){
+          let value = Number(this.value);
+          this.options.select(this.value);
+          STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
+          if(value == 1){ STATUS.addClass('bg-green-500'); }
+          if(value == 2){ STATUS.addClass('bg-yellow-500'); }
+          if(value == 0){ STATUS.addClass('bg-red-500'); }
+        }
+      },
+      'value':{
+        get: ()=>{ return this.element.val(); },
+        set: (value)=>{
+          this.element.val(value);
+          this.update();
+        }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    this.events.on('change',this.update);
 
   }
 
@@ -11072,7 +11113,7 @@
         }
         if(type == 'status'){
           input = INPUTS.type.status[input];
-          INPUTS.type.status[name] = new StatusInput(input.status,input.indicator);
+          INPUTS.type.status[name] = new StatusInput(input.aviso,input.status);
         }
         INPUTS.all.push(INPUTS.type[type][name]);
       }
@@ -11343,6 +11384,8 @@
     ];
 
     const Users = Tables[0];
+    const UserAvisos = Tables[1];
+    const myAvisos = Tables[2];
 
     {
 
@@ -11416,6 +11459,68 @@
         }
       });
     }
+
+    {
+      myAvisos.rows.add = function(aviso){
+        this.aviso = aviso;
+        this.inputs.text.id.value = aviso.id;
+        this.inputs.text.type.value = aviso.type;
+        this.inputs.status.aviso.value = aviso.status;
+      };
+
+      let forms = {};
+      ['permision','sick','vacation','homeOffice'].forEach((name)=>{
+        forms[name] = Forms.get(name);
+      });
+
+      for(let form in forms){
+        form = forms[form];
+        form.events.on('response',function(response){
+          if(!response.error){
+            let data = response.data;
+            myAvisos.rows.add(response.data);
+          }
+        });
+      }
+
+      Services.get.aviso({where: [['user','=','1']]},function(response){
+        if(!response.error){  response.data.forEach(myAvisos.rows.add); }
+      });
+    }
+
+    {
+      UserAvisos.rows.add = function(aviso){
+        this.inputs.status.aviso.disable(false);
+
+        this.aviso = aviso;
+        this.inputs.text.id.value = aviso.id;
+        this.inputs.text.type.value = aviso.type;
+        this.inputs.status.aviso.value = aviso.status;
+
+        aviso = this.aviso;
+
+        this.inputs.status.aviso.events.on('change',function(){
+          let value = this.value;
+          aviso.status = value;
+          let update = {
+            where: [['id','=',aviso.id]],
+            aviso: {status: value}
+          };
+          Services.update.aviso(update,()=>{});
+        });
+
+      };
+
+      Services.get.aviso({},function(response){
+          if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
+      });
+
+      Services.get.aviso({},function(response){
+        if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
+      });
+
+    }
+
 
     Tables.forEach((t)=>{ Container.append(t.element); });
 
@@ -11747,7 +11852,6 @@
         Helper.notEmptyText(this.inputs.textarea);
         close = Permisions.permision.buttons.send.events.on('click',Permisions.permision.send);
       };
-
       Permisions.permision.send = function(){
         this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
         let data = {
@@ -11774,33 +11878,30 @@
         return { error: false, data }
 
       };
-
       Permisions.permision.events.on('send',()=>{
         Permisions.permision.buttons.send.events.unregister('click',close);
       });
-
     }
 
     {
       let close = undefined;
       Permisions.vacation.send = function(){
-      let data = {
-        notice: 2,
-        date_start: this.inputs.date.start.format,
-        date_finish: this.inputs.date.finish.format,
+        let data = {
+          notice: 2,
+          date_start: this.inputs.date.start.format,
+          date_finish: this.inputs.date.finish.format,
+        };
+
+        Permisions.vacation.buttons.send.events.unregister('click',close);
+        this.close();
+
+        return { error: false, data }
+
       };
-
-      Permisions.vacation.buttons.send.events.unregister('click',close);
-      this.close();
-
-      return { error: false, data }
-
-    };
       Permisions.vacation.open = function(){
         close = Permisions.vacation.buttons.send.events.on('click',Permisions.vacation.send);
 
       };
-
     }
 
     {
@@ -11821,8 +11922,6 @@
         return { error: false, data }
 
       };
-
-
     }
 
     {
@@ -11847,8 +11946,6 @@
         return { error: false, data }
 
       };
-
-
     }
 
     User.create.open = function(){
@@ -11917,8 +12014,6 @@
     User.delete.buttons.send.events.on('click',User.delete.send);
 
     User.delete.buttons.cancel.events.on('click',User.delete.close);
-
-
 
     [Permisions,User].forEach(Helper.exportForm);
 

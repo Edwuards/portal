@@ -358,7 +358,7 @@ function DateInput(MONTH,DAY,YEAR){
     },
     'format':{
       get: ()=>{
-        return DATE.toJSON().slice(0, 19).replace('T', ' ');
+        return `${DATE.toISOString().slice(0,01)} ${DATE.toString().slice(16, 19)}
       }
     },
     'value': {
@@ -567,15 +567,33 @@ function ImageInput(INPUT,BUTTON,IMG){
 
 function StatusInput(INPUT,STATUS){
 
+
   SelectInput.call(this,INPUT);
 
-  this.events.on('change',function(){
-    let value = Number(this.value);
-    STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
-    if(value == 1){ STATUS.addClass('bg-yellow-500'); }
-    if(value == 2){ STATUS.addClass('bg-green-500'); }
-    if(value == 0){ STATUS.addClass('bg-red-500'); }
-  });
+  let METHODS = {
+    'update': {
+      writable: false,
+      value: function(){
+        let value = Number(this.value);
+        this.options.select(this.value);
+        STATUS.removeClass('bg-yellow-500 bg-green-500 bg-red-500');
+        if(value == 1){ STATUS.addClass('bg-green-500'); }
+        if(value == 2){ STATUS.addClass('bg-yellow-500'); }
+        if(value == 0){ STATUS.addClass('bg-red-500'); }
+      }
+    },
+    'value':{
+      get: ()=>{ return this.element.val(); },
+      set: (value)=>{
+        this.element.val(value);
+        this.update();
+      }
+    }
+  };
+
+  Object.defineProperties(this,METHODS);
+
+  this.events.on('change',this.update);
 
 }
 

@@ -100,7 +100,6 @@ export default function(){
       Helper.notEmptyText(this.inputs.textarea);
       close = Permisions.permision.buttons.send.events.on('click',Permisions.permision.send);
     }
-
     Permisions.permision.send = function(){
       this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
       let data = {
@@ -127,33 +126,30 @@ export default function(){
       return { error: false, data }
 
     }
-
     Permisions.permision.events.on('send',()=>{
       Permisions.permision.buttons.send.events.unregister('click',close);
     });
-
   }
 
   {
     let close = undefined;
     Permisions.vacation.send = function(){
-    let data = {
-      notice: 2,
-      date_start: this.inputs.date.start.format,
-      date_finish: this.inputs.date.finish.format,
-    };
+      let data = {
+        notice: 2,
+        date_start: this.inputs.date.start.format,
+        date_finish: this.inputs.date.finish.format,
+      };
 
-    Permisions.vacation.buttons.send.events.unregister('click',close);
-    this.close();
+      Permisions.vacation.buttons.send.events.unregister('click',close);
+      this.close();
 
-    return { error: false, data }
+      return { error: false, data }
 
-  }
+    }
     Permisions.vacation.open = function(){
       close = Permisions.vacation.buttons.send.events.on('click',Permisions.vacation.send);
 
     }
-
   }
 
   {
@@ -174,8 +170,6 @@ export default function(){
       return { error: false, data }
 
     }
-
-
   }
 
   {
@@ -200,8 +194,6 @@ export default function(){
       return { error: false, data }
 
     }
-
-
   }
 
   User.create.open = function(){
@@ -270,8 +262,6 @@ export default function(){
   User.delete.buttons.send.events.on('click',User.delete.send);
 
   User.delete.buttons.cancel.events.on('click',User.delete.close);
-
-
 
   [Permisions,User].forEach(Helper.exportForm);
 

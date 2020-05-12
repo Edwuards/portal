@@ -99,6 +99,68 @@ export default function(Modal,Forms){
     });
   }
 
+  {
+    myAvisos.rows.add = function(aviso){
+      this.aviso = aviso;
+      this.inputs.text.id.value = aviso.id;
+      this.inputs.text.type.value = aviso.type;
+      this.inputs.status.aviso.value = aviso.status;
+    }
+
+    let forms = {};
+    ['permision','sick','vacation','homeOffice'].forEach((name)=>{
+      forms[name] = Forms.get(name);
+    });
+
+    for(let form in forms){
+      form = forms[form];
+      form.events.on('response',function(response){
+        if(!response.error){
+          let data = response.data;
+          myAvisos.rows.add(response.data);
+        }
+      });
+    }
+
+    Services.get.aviso({where: [['user','=','1']]},function(response){
+      if(!response.error){  response.data.forEach(myAvisos.rows.add); }
+    });
+  }
+
+  {
+    UserAvisos.rows.add = function(aviso){
+      this.inputs.status.aviso.disable(false);
+
+      this.aviso = aviso;
+      this.inputs.text.id.value = aviso.id;
+      this.inputs.text.type.value = aviso.type;
+      this.inputs.status.aviso.value = aviso.status;
+
+      aviso = this.aviso;
+
+      this.inputs.status.aviso.events.on('change',function(){
+        let value = this.value;
+        aviso.status = value
+        let update = {
+          where: [['id','=',aviso.id]],
+          aviso: {status: value}
+        }
+        Services.update.aviso(update,()=>{})
+      });
+
+    }
+
+    Services.get.aviso({},function(response){
+        if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
+    })
+
+    Services.get.aviso({},function(response){
+      if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
+    });
+
+  }
+
+
   Tables.forEach((t)=>{ Container.append(t.element); })
 
   return {

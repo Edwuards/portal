@@ -86,7 +86,7 @@ function Row(data){
       }
       if(type == 'status'){
         input = INPUTS.type.status[input];
-        INPUTS.type.status[name] = new Inputs.StatusInput(input.status,input.indicator);
+        INPUTS.type.status[name] = new Inputs.StatusInput(input.aviso,input.status);
       }
       INPUTS.all.push(INPUTS.type[type][name]);
     }

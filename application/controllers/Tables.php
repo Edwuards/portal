@@ -50,24 +50,21 @@ class Tables extends CI_Controller {
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'Tipo','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'request' ] ])
+					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'type' ] ])
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'Estado','css'=>'w-40']),
 					'row'=>StatusInput([
 						'css'=>'w-40',
-						'select'=>[ 'name'=>'status', 'data-group'=>'status' ],
-						'indicator'=>[ 'name'=>'indicator', 'data-group'=>'status']
+						'select'=>[ 'name'=>'aviso', 'data-group'=>'aviso' ],
+						'indicator'=>[ 'name'=>'status', 'data-group'=>'aviso']
 					])
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'User ID','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'userId' ] ])
+					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'user' ] ])
 				],
-				[
-					'header'=>RowHeaderCell(['text'=>'Nombre','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'name' ] ])
-				]
+
 			]
 		];
 	}
@@ -83,14 +80,14 @@ class Tables extends CI_Controller {
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'Tipo','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'request' ] ])
+					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'type' ] ])
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'Estado','css'=>'w-40']),
 					'row'=>StatusInput([
 						'css'=>'w-40',
-						'select'=>[ 'name'=>'status', 'data-group'=>'status' ],
-						'indicator'=>[ 'name'=>'indicator', 'data-group'=>'status']
+						'select'=>[ 'name'=>'aviso', 'data-group'=>'aviso' ],
+						'indicator'=>[ 'name'=>'status', 'data-group'=>'aviso']
 					])
 				],
 			]

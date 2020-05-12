@@ -42,5 +42,31 @@ Services.get.user = (data,fn)=>{
 
   $.ajax(settings);
 }
+Services.get.aviso = (data,fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`permisions/get`),
+    data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
+
+Services.update = {};
+Services.update.aviso = (data,fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`permisions/update`),
+    data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
 
 export { Services }
