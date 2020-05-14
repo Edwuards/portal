@@ -196,7 +196,7 @@ function Table(data){
 
     },
     get: ()=>{ return ROWS.all },
-    find: (find)=>{ return ROWS.all.find(find); }
+    find: (find)=>{  return ROWS.all.find(find); }
   };
   const SUBJECT = new Observer(['open','close','addRow','removeRow','rowUpdate']);
   const PROPS = {
@@ -291,7 +291,7 @@ function Table(data){
                 value: (data)=>{
                   let row = ROWS.add();
                   fn.call(row,data);
-                  PROPS.body.append(row.element);
+                  PROPS.body.prepend(row.element);
                   return row;
                 }
               });

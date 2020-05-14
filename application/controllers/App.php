@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require(APPPATH.'/objects/View.php');
 
-class Home extends CI_Controller {
+class App extends CI_Controller {
 
 	private $View;
 	public function __construct(){
@@ -10,6 +10,15 @@ class Home extends CI_Controller {
 		$this->load->helper('url');
 		$this->load->helper('html');
 		$this->View = new View($this);
+	}
+
+	public function login(){
+		$scripts = [
+			'js'=>['login'],
+			'css'=>['base','login']
+		];
+		$views = ['login'=>''];
+		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Login']);
 	}
 
 	public function dashboard(){

@@ -7,7 +7,7 @@ Services.get = {};
 Services.get.form = (name)=>{
   let html = '';
   let settings = {
-    url: base_url(`home/forms`),
+    url: base_url(`app/forms`),
     method: 'post',
     data:{ name },
     async: false,

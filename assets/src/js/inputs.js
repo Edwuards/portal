@@ -358,7 +358,8 @@ function DateInput(MONTH,DAY,YEAR){
     },
     'format':{
       get: ()=>{
-        return `${DATE.toISOString().slice(0,01)} ${DATE.toString().slice(16, 19)}
+        let date = DATE.toLocaleDateString('es-MX').split('/').reduce((a,c)=>{ if(c.length == 1){ c = '0'+c; } return a = c+'-'+a; });
+        return `${date} ${DATE.toString().slice(16,24)}`;
       }
     },
     'value': {

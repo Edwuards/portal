@@ -26,7 +26,7 @@
 
       if(!$this->response['error']){
         $id = (string)$this->response['data']['id'];
-        $this->response['data'] = $this->find([['id','=',$id]])['data'][0];
+        $this->response['data'] = $this->find([['request.id','=',$id]])['data'][0];
       }
 
       return $this->response;
@@ -34,11 +34,26 @@
 
     public function find($where = [],$order = [],$limit = [])
     {
-      $select = 'id,notice as type,user,status,';
+      $select = '
+        request.id,
+        notice.title as type,
+        concat(users.name," ",users.lastname) as user,
+        request.status,
+      ';
+
       foreach (['date_start','date_finish'] as $date) {
-        $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
+        $select .= 'UNIX_TIMESTAMP(request.'.$date.') as '.$date.',';
       }
-      return  $this->get($select,$where,$order,$limit);
+
+      if(!count($order)){ $order = [['request.status','desc']]; }
+
+      $join = [
+        ['users','request.user = users.id'],
+        ['notice','request.notice = notice.id']
+      ];
+
+      return $this->join($select,$join,$where,$order);
+
     }
 
   }

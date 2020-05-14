@@ -2,18 +2,18 @@
 
   class Crud extends CI_Model
   {
-    private $tabla;
-    private $resultado = [ 'error'=>0, 'data'=>false ];
+    private $table;
+    private $response = [ 'error'=>0, 'data'=>false ];
 
-    public function __construct($tabla)
+    public function __construct($table)
     {
       parent::__construct();
       $this->load->database();
-      $this->tabla = $tabla;
+      $this->table = $table;
     }
 
-    private function resultReset(){
-      $this->resultado = [ 'error'=>0, 'data'=>false ];
+    private function resetResponse(){
+      $this->response = [ 'error'=>0, 'data'=>false ];
     }
 
     private function revisarParametroDonde($donde)
@@ -21,26 +21,26 @@
       $llaves = ['=','!=','>','<','>=','<='];
       if(gettype($donde) != 'array')
       {
-        $this->resultado['error'] = 1;
-        $this->resultado['data'] = 'el parametro "donde" no es un arreglo';
+        $this->response['error'] = 1;
+        $this->response['data'] = 'el parametro "donde" no es un arreglo';
       }
 
-      if(!$this->resultado['error'])
+      if(!$this->response['error'])
       {
         foreach($donde as $clausura)
         {
           if(!is_array($clausura))
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = ['toda clasura deben ser un arreglo '];
+            $this->response['error'] = 1;
+            $this->response['data'] = ['toda clasura deben ser un arreglo '];
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
           if(count($clausura) != 3)
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = 'Toda clausura del parametro donde llevara esta estructura --> [columna,operador,valor]';
+            $this->response['error'] = 1;
+            $this->response['data'] = 'Toda clausura del parametro donde llevara esta estructura --> [columna,operador,valor]';
             break;
           }
 
@@ -48,21 +48,21 @@
           {
             if(gettype($valor) != 'string')
             {
-              $this->resultado['error'] = 1;
-              $this->resultado['data'] = 'Los valores del arreglo del parametro donde deberan ser cadenas';
+              $this->response['error'] = 1;
+              $this->response['data'] = 'Los valores del arreglo del parametro donde deberan ser cadenas';
               break;
             }
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
           if(!in_array($clausura[1], $llaves))
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = 'el operador de una clausura solo puede un de los siguientes valores: = != > < >= <= ';
+            $this->response['error'] = 1;
+            $this->response['data'] = 'el operador de una clausura solo puede un de los siguientes valores: = != > < >= <= ';
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
         }
       }
@@ -75,26 +75,26 @@
 
       if(gettype($ordenar) != 'array')
       {
-        $this->resultado['error'] = 1;
-        $this->resultado['data'] = 'el parametro "ordenar" no es un arreglo de arreglos';
+        $this->response['error'] = 1;
+        $this->response['data'] = 'el parametro "ordenar" no es un arreglo de arreglos';
       }
 
-      if(!$this->resultado['error'])
+      if(!$this->response['error'])
       {
         foreach($ordenar as $clausura)
         {
           if(!is_array($clausura))
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = ['toda clasura deben ser un arreglo '];
+            $this->response['error'] = 1;
+            $this->response['data'] = ['toda clasura deben ser un arreglo '];
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
           if(count($clausura) != 2)
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = 'Toda clausura del parametro ordenar llevara esta estructura --> [columna,operador]';
+            $this->response['error'] = 1;
+            $this->response['data'] = 'Toda clausura del parametro ordenar llevara esta estructura --> [columna,operador]';
             break;
           }
 
@@ -102,21 +102,21 @@
           {
             if(gettype($valor) != 'string')
             {
-              $this->resultado['error'] = 1;
-              $this->resultado['data'] = 'Los valores del arreglo del parametro ordenar deberan ser cadenas';
+              $this->response['error'] = 1;
+              $this->response['data'] = 'Los valores del arreglo del parametro ordenar deberan ser cadenas';
               break;
             }
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
           if(!in_array($clausura[1], $llaves))
           {
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = 'el operador de una clausura solo puede un de los siguientes valores: ASC, DESC';
+            $this->response['error'] = 1;
+            $this->response['data'] = 'el operador de una clausura solo puede un de los siguientes valores: ASC, DESC';
           }
 
-          if($this->resultado['error']){ break; }
+          if($this->response['error']){ break; }
 
         }
       }
@@ -127,27 +127,27 @@
 
       if(gettype($limite) != 'array')
       {
-        $this->resultado['error'] = 1;
-        $this->resultado['data'] = 'el parametro "limite" no es un arreglo';
+        $this->response['error'] = 1;
+        $this->response['data'] = 'el parametro "limite" no es un arreglo';
       }
 
-      if(!$this->resultado['error'])
+      if(!$this->response['error'])
       {
         if(count($limite) > 2){
-          $this->resultado['error'] = 1;
-          $this->resultado['data'] = 'El arreglo solo debe contener de uno a dos valores';
+          $this->response['error'] = 1;
+          $this->response['data'] = 'El arreglo solo debe contener de uno a dos valores';
         }
 
       }
 
-      if(!$this->resultado['error'])
+      if(!$this->response['error'])
       {
 
         foreach ($limite as $valor)
         {
           if(gettype($valor) != 'integer'){
-            $this->resultado['error'] = 1;
-            $this->resultado['data'] = 'Todos los valores deben ser numeros';
+            $this->response['error'] = 1;
+            $this->response['data'] = 'Todos los valores deben ser numeros';
             break;
           }
         }
@@ -176,93 +176,99 @@
       }
     }
 
-    public function get($selecionar, $donde = [],$ordenar = [],$limite = [])
+    public function get($selecionar, $donde = [],$ordenar = [],$limite = [],$join = [])
     {
-      $this->resultReset();
+      $this->resetResponse();
       if($selecionar == false || gettype($selecionar) != 'string' || $selecionar == '')
       {
         $selecionar = '*';
       }
 
-      $consulta = $this->db->select($selecionar)->from($this->tabla);
+      $consulta = $this->db->select($selecionar)->from($this->table);
 
       if($donde != []){ $this->revisarParametroDonde($donde); }
 
-      if(!$this->resultado['error'] && count($donde)){ $this->donde($consulta,$donde); }
+      if(count($join)){ foreach ($join as $clause) { $consulta->join($clause[0],$clause[1]); } }
+
+      if(!$this->response['error'] && count($donde)){ $this->donde($consulta,$donde); }
 
       if($ordenar != []){ $this->revisarParametroOrdenar($ordenar); }
 
-      if(!$this->resultado['error'] && count($ordenar)){ $this->ordenar($consulta,$ordenar); }
+      if(!$this->response['error'] && count($ordenar)){ $this->ordenar($consulta,$ordenar); }
 
       if($limite != []){ $this->revisarParametroLimite($limite); }
 
-      if(!$this->resultado['error'] && count($limite)){ $this->limite($consulta,$limite); }
+      if(!$this->response['error'] && count($limite)){ $this->limite($consulta,$limite); }
 
-      if(!$this->resultado['error']){ $this->resultado['data'] = $consulta->get()->result_array(); }
+      if(!$this->response['error']){ $this->response['data'] = $consulta->get()->result_array(); }
 
-      return $this->resultado;
+      return $this->response;
 
     }
 
     public function insert($data = [])
     {
-      $this->resultReset();
-      $this->db->insert($this->tabla,$data);
-      $this->resultado['data'] = ['id'=>$this->db->insert_id()];
-      return $this->resultado;
+      $this->resetResponse();
+      $this->db->insert($this->table,$data);
+      $this->response['data'] = ['id'=>$this->db->insert_id()];
+      return $this->response;
     }
 
     public function update($data = [],$donde = [])
     {
-      $this->resultReset();
+      $this->resetResponse();
       if(gettype($data) != 'array' || count($data) == 0)
       {
-        $this->resultado['error'] = 1;
-        $this->resultado['data'] = 'el primer parametro debe ser un arreglo asociativo';
+        $this->response['error'] = 1;
+        $this->response['data'] = 'el primer parametro debe ser un arreglo asociativo';
       }
 
-      if(!$this->resultado['error']){ $consulta = $this->db->set($data); }
+      if(!$this->response['error']){ $consulta = $this->db->set($data); }
 
-      if(!$this->resultado['error'] && ($donde != []) )
+      if(!$this->response['error'] && ($donde != []) )
       {
         $this->revisarParametroDonde($donde);
-        if(!$this->resultado['error']){ $this->donde($consulta,$donde); }
+        if(!$this->response['error']){ $this->donde($consulta,$donde); }
       }
 
-      if(!$this->resultado['error']){
-        $consulta->update($this->tabla);
+      if(!$this->response['error']){
+        $consulta->update($this->table);
         if($this->db->affected_rows() == 0)
         {
-          $this->resultado['error'] = 1;
-          $this->resultado['data'] = 'No se realizo ninguna actualizacion con los parametros proporcionados';
+          $this->response['error'] = 1;
+          $this->response['data'] = 'No se realizo ninguna actualizacion con los parametros proporcionados';
         }
 
       }
 
-      return $this->resultado;
+      return $this->response;
 
     }
 
     public function delete($donde = [])
     {
-      $this->resultReset();
+      $this->resetResponse();
       $consulta = $this->db;
       if($donde != [])
       {
        $this->revisarParametroDonde($donde);
-       if(!$this->resultado['error']){ $this->donde($consulta,$donde); }
+       if(!$this->response['error']){ $this->donde($consulta,$donde); }
       }
 
-      if(!$this->resultado['error']){
-        $consulta->delete($this->tabla);
+      if(!$this->response['error']){
+        $consulta->delete($this->table);
         if($this->db->affected_rows() == 0)
         {
-          $this->resultado['error'] = 1;
-          $this->resultado['data'] = 'No se borro ningun dato con los parametros proporcionados';
+          $this->response['error'] = 1;
+          $this->response['data'] = 'No se borro ningun dato con los parametros proporcionados';
         }
       }
 
-      return $this->resultado;
+      return $this->response;
+    }
+
+    public function join($select,$join = [],$where = [],$order=[],$limit=[]){
+      return $this->get($select,$where,$order,$limit,$join);
     }
 
     public function json($data)
@@ -271,6 +277,7 @@
   		->set_content_type('application/json')
   		->set_output(json_encode($data));
     }
+
 
   }
 

@@ -49,8 +49,8 @@ class Tables extends CI_Controller {
 					'row'=>RowTextCell(['css'=>'w-10','attrs'=>[ 'name'=>'id' ] ])
 				],
 				[
-					'header'=>RowHeaderCell(['text'=>'Tipo','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'type' ] ])
+					'header'=>RowHeaderCell(['text'=>'Tipo','css'=>'w-32']),
+					'row'=>RowTextCell(['css'=>'w-32','attrs'=>[ 'name'=>'type' ] ])
 				],
 				[
 					'header'=>RowHeaderCell(['text'=>'Estado','css'=>'w-40']),
@@ -61,8 +61,8 @@ class Tables extends CI_Controller {
 					])
 				],
 				[
-					'header'=>RowHeaderCell(['text'=>'User ID','css'=>'w-20']),
-					'row'=>RowTextCell(['css'=>'w-20','attrs'=>[ 'name'=>'user' ] ])
+					'header'=>RowHeaderCell(['text'=>'Usuario','css'=>'w-40']),
+					'row'=>RowTextCell(['css'=>'w-40','attrs'=>[ 'name'=>'user' ] ])
 				],
 
 			]

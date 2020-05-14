@@ -14,7 +14,7 @@
         <i class="w-10 text-xl far fa-user-circle"></i>
         <p class="ml-2">Perfil</p>
       </button>
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="calendar">
+      <button class="flex w-full mb-2 p-2 items-center hidden" type="button" name="calendar">
         <i class="w-10 text-xl far fa-calendar"></i>
         <p class="ml-2">Calendario</p>
       </button>

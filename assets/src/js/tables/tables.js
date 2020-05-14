@@ -100,6 +100,36 @@ export default function(Modal,Forms){
   }
 
   {
+    let getUpdates = ()=>{
+      let date = new Date();
+      let format = ()=>{
+        let dateFormat = date.toLocaleDateString('es-MX').split('/').reduce((a,c)=>{ if(c.length == 1){ c = '0'+c; } return a = c+'-'+a; });
+        let timeFormat = date.toString().slice(16,24);
+        return `${dateFormat} ${timeFormat}`;
+      }
+
+      let update = ()=>{
+        let where = [['request.modified','>=',format()]];
+        Services.get.aviso({where},function(response){
+          let { error,data } = response;
+          if(!error){
+            data.forEach((aviso)=>{
+              myAvisos.rows.find((row)=>{ return row.aviso.id ==  aviso.id}).update(aviso);
+            });
+            date.setTime(Date.now());;
+          }
+        });
+        setTimeout(update,(1000 * 60));
+      }
+      update();
+
+    }
+
+    myAvisos.rows.update = function(aviso){
+      this.aviso.status = aviso.status;
+      this.inputs.status.aviso.value = aviso.status;
+    }
+
     myAvisos.rows.add = function(aviso){
       this.aviso = aviso;
       this.inputs.text.id.value = aviso.id;
@@ -124,16 +154,40 @@ export default function(Modal,Forms){
 
     Services.get.aviso({where: [['user','=','1']]},function(response){
       if(!response.error){  response.data.forEach(myAvisos.rows.add); }
+      getUpdates();
     });
   }
 
   {
+    let getUpdates = ()=>{
+      let date = new Date();
+      let format = ()=>{
+        let dateFormat = date.toLocaleDateString('es-MX').split('/').reduce((a,c)=>{ if(c.length == 1){ c = '0'+c; } return a = c+'-'+a; });
+        let timeFormat = date.toString().slice(16,24);
+        return `${dateFormat} ${timeFormat}`;
+      }
+
+      let update = ()=>{
+        let where = [['request.created','>=',format()]];
+        Services.get.aviso({where},function(response){
+          let { error,data } = response;
+          if(!error){ data.forEach(UserAvisos.rows.add); }
+          date.setTime(Date.now());;
+        });
+        setTimeout(update,(1000 * 60));
+      }
+
+      update();
+
+    }
+
     UserAvisos.rows.add = function(aviso){
       this.inputs.status.aviso.disable(false);
 
       this.aviso = aviso;
       this.inputs.text.id.value = aviso.id;
       this.inputs.text.type.value = aviso.type;
+      this.inputs.text.user.value = aviso.user;
       this.inputs.status.aviso.value = aviso.status;
 
       aviso = this.aviso;
@@ -142,7 +196,7 @@ export default function(Modal,Forms){
         let value = this.value;
         aviso.status = value
         let update = {
-          where: [['id','=',aviso.id]],
+          where: [['request.id','=',aviso.id]],
           aviso: {status: value}
         }
         Services.update.aviso(update,()=>{})
@@ -152,12 +206,8 @@ export default function(Modal,Forms){
 
     Services.get.aviso({},function(response){
         if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
-    })
-
-    Services.get.aviso({},function(response){
-      if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
+        getUpdates();
     });
-
   }
 
 
