@@ -11455,7 +11455,6 @@
 
       Services.get.user({},(response)=>{
         if(!response.error){
-          console.log(response);
           response.data.forEach(Users.rows.add);
         }
       });
