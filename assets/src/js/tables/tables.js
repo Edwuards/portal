@@ -10,15 +10,15 @@ export default function(Modal,Forms){
   const Tables = [
     new Table({
       name: 'users',
-      html: HTML.users
+      html: 'users'
     }),
     new Table({
       name: 'userAvisos',
-      html: HTML.userAvisos
+      html: 'userAvisos'
     }),
     new Table({
       name: 'myAvisos',
-      html: HTML.myAvisos
+      html: 'myAvisos'
     })
   ];
 
@@ -64,7 +64,17 @@ export default function(Modal,Forms){
 
     }
 
-    Users.buttons.addUser.events.on('click',openForm(forms.create,()=>{ return true }));
+    {
+      let close = undefined;
+      Users.open = function(){
+        close = Users.buttons.addUser.events.on('click',openForm(forms.create,()=>{ return true }));
+      }
+      Users.close = function(){
+        Users.buttons.addUser.events.unregister('click',close);
+      }
+    }
+
+
 
     forms.create.events.on('response',function(response){
       if(!response.error){
@@ -93,7 +103,6 @@ export default function(Modal,Forms){
 
     Services.get.user({},(response)=>{
       if(!response.error){
-        console.log(response);
         response.data.forEach(Users.rows.add);
       }
     });

@@ -16,7 +16,7 @@
         parent::__construct('users');
     }
 
-    private function exist($correo)
+    public function exist($correo)
     {
       $donde = [['email','=',$correo]];
       $this->result = $this->get('id',$donde);
@@ -59,6 +59,43 @@
         $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
       }
       return  $this->get($select,$where,$order,$limit);
+    }
+
+    public function login($user)
+    {
+      if(!$this->exist($user['email']))
+      {
+        $this->response['error'] = true;
+        $this->response['data'] = 'credenciales incorrectas';
+      }
+
+      if(!$this->response['error'])
+      {
+        $where = [['email','=',$user['email']]];
+        $verify = $this->get('*',$where)['data'][0];
+        if(!password_verify($user['password'],$verify['password']))
+        {
+          $this->response['error'] = true;
+          $this->response['data'] = 'credenciales incorrectas';
+        }
+      }
+
+      if(!$this->response['error']){
+        unset($verify['password']);
+        $this->session->set_userdata([
+          'id'=>$verify['id'],
+          'role'=>$verify['role'],
+          'name'=>$verify['name'].' '.$verify['lastname'],
+          'avatar'=>$verify['avatar'],
+          'verified'=>true
+        ]);
+
+        $this->response['data'] = $verify;
+      }
+
+
+      return $this->response;
+
     }
 
   }

@@ -210,6 +210,11 @@ function TextInput(INPUT){
   this.rules.add('not empty',Rules.is.notEmtpy);
 }
 
+function PasswordInput(INPUT){
+  Input.call(this,INPUT);
+  this.element.attr('type','password');
+}
+
 function NumberInput(INPUT){
   Input.call(this,INPUT);
 
@@ -607,6 +612,7 @@ export {
   NumberInput,
   ImageInput,
   StatusInput,
+  PasswordInput,
   Input,
   Button
 }

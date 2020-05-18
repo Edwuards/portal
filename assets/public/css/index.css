@@ -283,6 +283,17 @@ form .select.disabled {
   form .select.disabled label {
     color: #808080; }
 
+form[name="login"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+  form[name="login"] .form-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; }
+
 #modal-cont {
   opacity: 0;
   overflow: hidden;

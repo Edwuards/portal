@@ -2,9 +2,9 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: './src/js/index.js',
+  input: './src/js/login.js',
   output:{
-    file:'./public/js/index.js',
+    file:'./public/js/login.js',
     format: 'iife',
     name:'index',
     globals:{

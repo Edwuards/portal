@@ -97,22 +97,48 @@ class Users extends CI_Controller {
 		$this->resetResponse();
 
 		$method = $this->input->method();
-		if($method != 'post'){
+		if($method != 'post')
+		{
 			$this->response['error'] = true;
 			$this->response['data'] = 'Solo por metódo POST';
 		}
 
-		if(!$this->response['error']){
+		if(!$this->response['error'])
+		{
 			$id = $this->input->post('id');
 			$this->response = $this->Users->delete([['id','=',$id]]);
 		}
 
-		if(!$this->response['error']){
+		if(!$this->response['error'])
+		{
 			$this->response['data'] = $id;
 		}
 
 		$this->json($this->response);
 
 	}
+
+	function login()
+	{
+		$this->resetResponse();
+
+		$method = $this->input->method();
+		if($method != 'post')
+		{
+			$this->response['error'] = true;
+			$this->response['data'] = 'Solo por metódo POST';
+		}
+
+		if(!$this->response['error'])
+		{
+			$user = $this->input->post(null);
+			$this->response = $this->Users->login($user);
+		}
+
+
+		$this->json($this->response);
+
+	}
+
 
 }

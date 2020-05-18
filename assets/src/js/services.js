@@ -4,31 +4,29 @@ function base_url(url){
 
 const Services = {};
 Services.get = {};
-Services.get.form = (name)=>{
+Services.get.form = (name,fn,sync)=>{
   let html = '';
   let settings = {
     url: base_url(`app/forms`),
     method: 'post',
     data:{ name },
-    async: false,
-    success:(data)=>{ html = data }
+    async: sync ? sync : false,
+    success:fn
   };
 
   $.ajax(settings);
 
-  return html;
 }
-Services.get.table = (name)=>{
+Services.get.table = (name,fn)=>{
   let obj = '';
   let settings = {
     url: base_url(`tables/get/${name}`),
     async: false,
-    success:(data)=>{ obj = data }
+    success:fn
   };
 
   $.ajax(settings);
 
-  return obj;
 }
 Services.get.user = (data,fn)=>{
   let obj = '';

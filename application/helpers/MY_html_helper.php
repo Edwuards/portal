@@ -33,6 +33,22 @@
     return $ci->load->view('forms/inputs/text',$overWrite,true);
   }
 
+  function PasswordInput($data){
+    $ci=& get_instance();
+    $overWrite = [
+      'css'=> [
+        'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
+      ],
+      'label'=> isset($data['label']) ? $data['label'] : '',
+      'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
+    ];
+
+    $overWrite['attrs']['data-type'] = 'password';
+
+    return $ci->load->view('forms/inputs/password',$overWrite,true);
+  }
+
   function NumberInput($data){
     $ci=& get_instance();
     $overWrite = [
@@ -185,8 +201,8 @@
   function FormFooter($buttons){
     $html = '';
     foreach ($buttons as $btn) { $html .= $btn.' '; };
-    return '<div class="w-full my-8">
-              <div data="error" class="text-red-500 mx-2 w-full text-sm" >
+    return '<div class="form-footer w-full my-8">
+              <div data="error" class="text-red-500 mx-2 w-3/4 text-sm my-6 text-center" >
               </div>
               <div class="flex"> '.$html.'</div>
             </div>';

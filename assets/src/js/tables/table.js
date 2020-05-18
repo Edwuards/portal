@@ -1,4 +1,5 @@
 import { Observer } from '../helpers.js';
+import { Services } from '../services.js';
 import * as Inputs from '../inputs.js';
 
 function Row(data){
@@ -30,7 +31,7 @@ function Row(data){
     PROPS.alive = false;
   };
 
-  ROW.html(typeof data.html == 'function' ? data.html() : data.html )
+  ROW.html(data.html)
   .addClass('flex w-full h-12 px-4 border-b')
   .attr('data','row');
 
@@ -91,6 +92,7 @@ function Row(data){
       INPUTS.all.push(INPUTS.type[type][name]);
     }
   }
+
 
   const METHODS = {
     'element': {
@@ -172,11 +174,10 @@ function Row(data){
 }
 
 function Table(data){
-  data.html = typeof data.html == 'function' ? data.html() : data.html;
   const TABLE = $(document.createElement('div'));
   const HTML = {
-    row: data.html.row,
-    table: data.html.table
+    row: undefined,
+    table: undefined
   }
   const INSTANCE = this;
   const BUTTONS = {
@@ -218,13 +219,19 @@ function Table(data){
     PROPS.alive = false;
   };
 
-  TABLE.html(HTML.table).addClass('min-w-full h-full bg-gray-200 absolute p-10 hidden overflow-scroll').attr('data-table',data.name);
-  PROPS.body = TABLE.find('.body');
-  TABLE.find('[data-type="button"]').each(function(){
-    let el = $(this),
-    name = el.attr('name');
-    BUTTONS.name[name] = new Inputs.Button(el);
-    BUTTONS.all.push(BUTTONS.name[name]);
+  Services.get.table(data.html,function(html){
+    HTML.row = html.row;
+    HTML.table = html.table;
+
+    TABLE.html(HTML.table)
+    .addClass('min-w-full h-full bg-gray-300 absolute p-10 hidden').attr('data-table',data.name);
+    PROPS.body = TABLE.find('.body');
+    TABLE.find('[data-type="button"]').each(function(){
+      let el = $(this),
+      name = el.attr('name');
+      BUTTONS.name[name] = new Inputs.Button(el);
+      BUTTONS.all.push(BUTTONS.name[name]);
+    });
   });
 
   const METHODS = {

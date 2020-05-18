@@ -97,6 +97,13 @@ export default function(){
     Nav.actions.changeNavBar('calendar');
     Nav.actions.closeMenu();
   };
+  Actions.logout = function(){
+    $.ajax({
+      url:`${window.location.origin}/app/logout`,
+      method: 'post',
+      success:function(){ window.location.href = `${window.location.origin}/app/login`; }
+    });
+  };
 
   [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 

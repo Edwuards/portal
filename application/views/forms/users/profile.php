@@ -76,4 +76,4 @@ $html = [
   <?php echo $html['vacations']; ?>
 </div>
 
-<?php echo FormFooter([$html['send'],$html['edit'],$['cancel']]); ?>
+<?php echo FormFooter([$html['send'],$html['edit'],$html['cancel']]); ?>

@@ -1,6 +1,37 @@
 import { Observer } from '../helpers.js';
 import * as Inputs from '../inputs.js';
 
+const Helper = {
+  notEmptyText: (inputs)=>{
+    for(let input in inputs){
+      input = inputs[input];
+      input.events.on('input',function(){
+        let value = this.value;
+        this.parent[value != '' ? 'addClass' : 'removeClass']('active');
+      })
+    }
+  },
+  notEmptyNumber: (inputs)=>{
+    for(let input in inputs){
+      input = inputs[input];
+      input.events.on('input',function(){
+        let value = this.value;
+        if(!this.parent.hasClass('active')){ this.parent.addClass('active'); }
+        this.value = (value > this.max ? this.max : ( value < this.min ? this.min : value ) );
+      });
+    }
+  },
+  collectValues: (inputs)=>{
+    const MAP = {};
+    for (let type in inputs) {
+      for(let name in inputs[type]){
+        MAP[name] = inputs[type][name][type == 'date' ? 'format': 'value'];
+      }
+    }
+    return MAP;
+  },
+}
+
 function Form(data){
 
   const FORM = $(document.createElement('form'));
@@ -52,8 +83,10 @@ function Form(data){
     }
   }
 
-  FORM.html(typeof data.html == 'function' ? data.html() : data.html );
-  FORM.attr('name',data.name).addClass('h-full');
+
+  FORM.html(data.html);
+
+  FORM.attr('name',data.name).addClass('w-full h-full');
 
   FORM.find('[data-type]').each(function(){
     let el = $(this),
@@ -80,6 +113,9 @@ function Form(data){
         else if(type == 'textarea'){
           el = new Inputs.TextAreaInput(el);
         }
+        else if(type == 'password'){
+          el = new Inputs.PasswordInput(el);
+        }
 
         INPUTS.type[type][name] = el;
       }
@@ -92,26 +128,26 @@ function Form(data){
 
   for(let type in INPUTS.type){
     for (let input in INPUTS.type[type]) {
-      let name = input;
-      if(type == 'date'){
-        input = INPUTS.type.date[input];
-        INPUTS.type.date[name] = new Inputs.DateInput(input.month,input.day,input.year);
+        let name = input;
+        if(type == 'date'){
+          input = INPUTS.type.date[input];
+          INPUTS.type.date[name] = new Inputs.DateInput(input.month,input.day,input.year);
+        }
+        if(type == 'time'){
+          input = INPUTS.type.time[input];
+          INPUTS.type.time[name] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
+        }
+        if(type == 'image'){
+          input = INPUTS.type.image[input];
+          INPUTS.type.image[name] = new Inputs.ImageInput(input.file,input.upload,input.preview);
+        }
+        if(type == 'status'){
+          input = INPUTS.type.status[input];
+          INPUTS.type.status[name] = new Inputs.StatusInput(input.status,input.indicator);
+        }
+        INPUTS.all.push(INPUTS.type[type][name]);
       }
-      if(type == 'time'){
-        input = INPUTS.type.time[input];
-        INPUTS.type.time[name] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
-      }
-      if(type == 'image'){
-        input = INPUTS.type.image[input];
-        INPUTS.type.image[name] = new Inputs.ImageInput(input.file,input.upload,input.preview);
-      }
-      if(type == 'status'){
-        input = INPUTS.type.status[input];
-        INPUTS.type.status[name] = new Inputs.StatusInput(input.status,input.indicator);
-      }
-      INPUTS.all.push(INPUTS.type[type][name]);
     }
-  }
 
   const METHODS = {
     'element': {
@@ -198,4 +234,4 @@ function Form(data){
   Object.defineProperties(this,METHODS);
 }
 
-export { Form }
+export { Form, Helper }

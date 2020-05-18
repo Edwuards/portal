@@ -46,7 +46,7 @@ export default function (){
   }
   Actions.updateMenu = (selected)=>{
     for (let name in Elements.menu.button) {
-      Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('hidden')
+      Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-4 border-blue-600');
     }
   }
 

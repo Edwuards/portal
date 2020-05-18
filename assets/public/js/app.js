@@ -9891,7 +9891,7 @@
     };
     Actions.updateMenu = (selected)=>{
       for (let name in Elements.menu.button) {
-        Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('hidden');
+        Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-4 border-blue-600');
       }
     };
 
@@ -10623,6 +10623,11 @@
     this.element.attr('type','text');
 
     this.rules.add('not empty',Rules.is.notEmtpy);
+  }
+
+  function PasswordInput(INPUT){
+    Input.call(this,INPUT);
+    this.element.attr('type','password');
   }
 
   function NumberInput(INPUT){
@@ -11675,7 +11680,7 @@
 
     FORM.html(data.html);
 
-    FORM.attr('name',data.name).addClass('h-full');
+    FORM.attr('name',data.name).addClass('w-full h-full');
 
     FORM.find('[data-type]').each(function(){
       let el = $(this),
@@ -11701,6 +11706,9 @@
           }
           else if(type == 'textarea'){
             el = new TextAreaInput(el);
+          }
+          else if(type == 'password'){
+            el = new PasswordInput(el);
           }
 
           INPUTS.type[type][name] = el;
@@ -12223,6 +12231,13 @@
       Nav.actions.changeNavBar('calendar');
       Nav.actions.closeMenu();
     };
+    Actions.logout = function(){
+      $.ajax({
+        url:`${window.location.origin}/app/logout`,
+        method: 'post',
+        success:function(){ window.location.href = `${window.location.origin}/app/login`; }
+      });
+    };
 
     [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
@@ -12237,6 +12252,7 @@
     elements.nav.bar.calendar.button.next.on('click',actions.calendar.next);
     elements.nav.bar.calendar.button.prev.on('click',actions.calendar.prev);
     elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
+    elements.nav.menu.button.logout.on('click',actions.logout);
     elements.nav.menu.button.users.on('click',actions.open.table);
     elements.nav.menu.button.myAvisos.on('click',actions.open.table);
     elements.nav.menu.button.userAvisos.on('click',actions.open.table);
