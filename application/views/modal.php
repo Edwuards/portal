@@ -7,9 +7,7 @@
       </button>
     </div>
     <div class="body p-4">
-      <form class="">
-        <?php echo $this->load->view('forms/permisions/permision',[],true); ?>
-      </form>
+      <?php echo $this->load->view('forms/permisions/vacation',[],true); ?>
     </div>
   </div>
 </div>

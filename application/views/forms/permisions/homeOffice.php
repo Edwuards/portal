@@ -1,29 +1,44 @@
 <?php
 
 $html = [
-  'date_start' => DateInput(['group'=>'start']),
-  'date_finish' => DateInput(['group'=>'finish']),
-  'textarea' => TextAreaInput([
-    'label'=>'Descrpción',
-    'css'=>'w-full',
-    'attrs'=>[ 'name'=>'description',]
+  'date_start' => DateInput(['attrs'=>['name'=>'start']]),
+  'date_finish' => DateInput(['css'=>['cont'=>'hidden'],'attrs'=>['name'=>'finish']]),
+  'description' => TextAreaInput([
+    'attrs'=>[
+      'name'=>'description',
+      'placeholder'=>'Agregar Descripción',
+    ]
   ]),
-  'send'=> Button(['text'=>'Enviar','attrs'=>['name'=>'send']])
+  'send'=> Button([
+    'text'=>'solicitar',
+    'attrs'=>['name'=>'send'],
+    'css'=>'py-2 px-4 mx-2 text-sm bg-red-600 text-white rounded'
+  ])
 ];
- ?>
 
-<div class="w-full mb-2">
-  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha</p>
-  <?php echo $html['date_start']; ?>
-</div>
+?>
 
-<div class="hidden">
-  <?php echo $html['date_finish']; ?>
-</div>
+<form name="homeOffice" class="permisions" >
+  <div class="body">
 
-<div class="w-full mb-2">
-  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Asunto</p>
-  <?php echo $html['textarea']; ?>
-</div>
+    <div class="flex items-center mb-6">
+      <div class="w-8 h-8 flex items-center justify-center text-gray-700 mr-2">
+        <i class="far fa-clock"></i>
+      </div>
+      <div class="flex w-full items-center">
+        <?php echo $html['date_start']; ?>
+        <div class="h-px w-2 mx-2 bg-gray-700">
+        </div>
+        <?php echo $html['date_finish']; ?>
+      </div>
+    </div>
+    <div class="flex items-start mb-6">
+      <div class="w-8 h-8 flex items-start justify-center text-gray-700 mr-2 mt-1">
+        <i class="fas fa-align-left"></i>
+      </div>
+      <?php echo $html['description']; ?>
+    </div>
 
-<?php echo FormFooter([$html['send']]); ?>
+  </div>
+  <?php echo FormFooter([$html['send']]); ?>
+</form>

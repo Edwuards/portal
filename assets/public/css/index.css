@@ -92,16 +92,13 @@ form .helper {
 form .helper.active {
   color: #808080; }
 
-form .input,
-form .select,
-form .textarea {
+form input,
+form select,
+form textarea {
   color: black;
   border-bottom: 2px solid #C8C8C8;
   background-color: #FAFAFA;
   transition: border-bottom-color .5s, color .5s; }
-
-form .input.datetime {
-  border-bottom: 2px solid #ffffff; }
 
 form .input.error + .helper,
 form .select.error + .helper,
@@ -144,14 +141,14 @@ form .textarea:hover label,
 form .textarea.notEmtpy label {
   bottom: 60%; }
 
-form .input.active,
-form .select.active,
-form .textarea.active {
+form input:focus,
+form select:focus,
+form textarea:focus {
   color: black;
   border-bottom-color: #888888; }
-  form .input.active label,
-  form .select.active label,
-  form .textarea.active label {
+  form input:focus label,
+  form select:focus label,
+  form textarea:focus label {
     z-index: 20; }
 
 form .input.disabled,
@@ -170,34 +167,32 @@ form[name="login"] {
   flex-direction: column;
   justify-content: center;
   align-items: center; }
-  form[name="login"] .form-footer {
+  form[name="login"] .footer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center; }
 
+.permisions input,
+.permisions select,
+.permisions textarea {
+  border-bottom: 2px solid #ffffff; }
+
 .modal-cont {
   overflow: hidden;
-  transition: opacity .5s; }
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.5s; }
   .modal-cont .modal {
     width: 500px;
     box-shadow: 0px 16px 41px 0px #7a7a7a; }
     .modal-cont .modal .body {
       height: calc(100% - 64px);
       overflow: hidden; }
-  .modal-cont .modal.active {
-    height: 100%;
-    width: 100%;
-    opacity: 1; }
-  .modal-cont .modal.close {
-    transition: height .5s .5s, width .5s; }
 
 .modal-cont.active {
-  opacity: 1;
-  left: 0px; }
-
-.modal-cont.close {
-  transition: opacity 1s, left .5s 1s; }
+  z-index: 50;
+  opacity: 1; }
 
 #dataTable {
   top: 100%;

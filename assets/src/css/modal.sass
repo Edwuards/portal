@@ -1,6 +1,8 @@
 .modal-cont
   overflow: hidden;
-  transition: opacity .5s;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity .5s,;
 
   .modal
     width: 500px;
@@ -9,15 +11,10 @@
     .body
       height: calc(100% - 64px);
       overflow: hidden;
-  .modal.active
-    height: 100%;
-    width: 100%;
-    opacity: 1;
-  .modal.close
-    transition: height .5s .5s, width .5s ;
 
 .modal-cont.active
+  z-index: 50;
   opacity: 1;
-  left: 0px;
-.modal-cont.close
-  transition: opacity 1s, left .5s 1s;
+
+[data="permisions"]
+  .modal

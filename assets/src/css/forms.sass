@@ -37,16 +37,14 @@ form
   .helper.active
     color: #808080;
 
-  .input,
-  .select,
-  .textarea
+  input,
+  select,
+  textarea
     color: black;
     border-bottom: 2px solid #C8C8C8;
     background-color: #FAFAFA;
     transition: border-bottom-color .5s, color .5s;
 
-  .input.datetime
-    border-bottom: 2px solid #ffffff;
 
   .input.error + .helper,
   .select.error + .helper,
@@ -72,9 +70,9 @@ form
     label
       bottom: 60%;
 
-  .input.active,
-  .select.active,
-  .textarea.active,
+  input:focus,
+  select:focus,
+  textarea:focus,
     color: black;
     border-bottom-color: #888888;
     label
@@ -94,8 +92,14 @@ form[name="login"]
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  .form-footer
+  .footer
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+.permisions
+  input,
+  select,
+  textarea
+    border-bottom: 2px solid #ffffff;

@@ -1,20 +1,32 @@
 <?php
 
 $html = [
-  'date_start' => DateInput(['group'=>'start']),
-  'date_finish' => DateInput(['group'=>'finish']),
-  'send'=> Button(['text'=>'Enviar','attrs'=>['name'=>'send']])
+  'date_start' => DateInput(['attrs'=>['name'=>'start']]),
+  'date_finish' => DateInput(['attrs'=>['name'=>'finish']]),
+  'send'=> Button([
+    'text'=>'solicitar',
+    'attrs'=>['name'=>'send'],
+    'css'=>'py-2 px-4 mx-2 text-sm bg-red-600 text-white rounded'
+  ])
 ];
 
 ?>
 
-<div class="w-full mb-2">
-  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha de salida</p>
-  <?php echo $html['date_start']; ?>
-</div>
-<div class="w-full mb-2">
-  <p class="text-blue-700 mx-2 my-4 text-md font-bold">Fecha de regreso</p>
-  <?php echo $html['date_finish']; ?>
-</div>
+<form name="vacation" class="permisions" >
+  <div class="body">
 
-<?php echo FormFooter([$html['send']]); ?>
+    <div class="flex items-center mb-6">
+      <div class="w-8 h-8 flex items-center justify-center text-gray-700 mr-2">
+        <i class="far fa-clock"></i>
+      </div>
+      <div class="flex w-full items-center">
+        <?php echo $html['date_start']; ?>
+        <div class="h-px w-2 mx-2 bg-gray-700">
+        </div>
+        <?php echo $html['date_finish']; ?>
+      </div>
+    </div>
+
+  </div>
+  <?php echo FormFooter([$html['send']]); ?>
+</form>
