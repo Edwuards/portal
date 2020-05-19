@@ -21,6 +21,7 @@
     $ci=& get_instance();
     $overWrite = [
       'css'=> [
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
         'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
         'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
       ],
@@ -28,15 +29,17 @@
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
     ];
 
+    $overWrite['type'] = 'text';
     $overWrite['attrs']['data-type'] = isset($data['attrs']['data-type']) ? $data['attrs']['data-type'] : 'text';
 
-    return $ci->load->view('forms/inputs/text',$overWrite,true);
+    return $ci->load->view('forms/inputs/input',$overWrite,true);
   }
 
   function PasswordInput($data){
     $ci=& get_instance();
     $overWrite = [
       'css'=> [
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
         'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
         'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
       ],
@@ -45,8 +48,9 @@
     ];
 
     $overWrite['attrs']['data-type'] = 'password';
+    $overWrite['type'] = 'password';
 
-    return $ci->load->view('forms/inputs/password',$overWrite,true);
+    return $ci->load->view('forms/inputs/input',$overWrite,true);
   }
 
   function NumberInput($data){
@@ -201,8 +205,8 @@
   function FormFooter($buttons){
     $html = '';
     foreach ($buttons as $btn) { $html .= $btn.' '; };
-    return '<div class="form-footer w-full my-8">
-              <div data="error" class="text-red-500 mx-2 w-3/4 text-sm my-6 text-center" >
+    return '<div class="form-footer w-full mt-6">
+              <div data="error" class="text-red-600 text-sm my-6 text-center" >
               </div>
               <div class="flex"> '.$html.'</div>
             </div>';

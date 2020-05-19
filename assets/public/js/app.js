@@ -10350,6 +10350,7 @@
   function Observer(events){
     const Events = {};
     let ID = 0;
+
     this.event = {
       create: (event)=>{
         let test = undefined;
@@ -10372,7 +10373,9 @@
 
         delete Events[event];
       },
-      get: ()=>{ return Object.keys(Events); }
+      keys: ()=>{ return Object.keys(Events); },
+      get: (event)=>{ return Events[event].map((e)=>{ return e.id }); },
+      exist: (event)=>{ return this.keys().indexOf(event) != -1 }
     };
 
     this.notify = (event,update)=>{
@@ -10392,8 +10395,6 @@
       Events[event].push({id: ID, notify: subscriber});
       return ID;
     };
-
-    this.log = ()=>{ console.log(Events); };
 
     this.unregister = (event,id)=>{
     	let test = undefined ;
@@ -11018,583 +11019,6 @@
 
   }
 
-  function Row(data){
-
-    const ROW = $(document.createElement('div'));
-    const INSTANCE = this;
-    const BUTTONS = {
-      all: [],
-      name: {}
-    };
-    const INPUTS = {
-      all: [],
-      type:{}
-    };
-    const SUBJECT = new Observer(['alive']);
-    const PROPS = {
-      alive:false,
-      id: data.id
-    };
-    const OPEN = ()=>{
-      INPUTS.all.forEach((input)=>{ input.on(); });
-      BUTTONS.all.forEach((btn)=>{ btn.on(); });
-      PROPS.alive = true;
-      return ROW
-    };
-    const CLOSE = ()=>{
-      INPUTS.all.forEach((input)=>{ input.off(); });
-      BUTTONS.all.forEach((btn)=>{ btn.off(); });
-      PROPS.alive = false;
-    };
-
-    ROW.html(data.html)
-    .addClass('flex w-full h-12 px-4 border-b')
-    .attr('data','row');
-
-    ROW.find('[data-type]').each(function(){
-      let el = $(this),
-      type = el.attr('data-type'),
-      name = el.attr('name'),
-      group = el.attr('data-group');
-
-      if(type !== 'button'){
-        if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
-        if(group){
-          if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {}; }
-          INPUTS.type[type][group][name] = el;
-        }
-        else {
-          if(type == 'text'){
-            el = new TextInput(el);
-          }
-          else if(type == 'number'){
-            el = new NumberInput(el);
-          }
-          else if(type == 'select'){
-            el = new SelectInput(el);
-          }
-          else if(type == 'textarea'){
-            el = new TextAreaInput(el);
-          }
-
-          INPUTS.type[type][name] = el;
-        }
-      }
-      else {
-        BUTTONS.name[name] = new Button(el);
-        BUTTONS.all.push(BUTTONS.name[name]);
-      }
-    });
-
-    for(let type in INPUTS.type){
-      for (let input in INPUTS.type[type]) {
-        let name = input;
-        if(type == 'date'){
-          input = INPUTS.type.date[input];
-          INPUTS.type.date[name] = new DateInput(input.month,input.day,input.year);
-        }
-        if(type == 'time'){
-          input = INPUTS.type.time[input];
-          INPUTS.type.time[name] = new TimeInput(input.hour,input.minutes,input.time);
-        }
-        if(type == 'image'){
-          input = INPUTS.type.image[input];
-          INPUTS.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
-        }
-        if(type == 'status'){
-          input = INPUTS.type.status[input];
-          INPUTS.type.status[name] = new StatusInput(input.aviso,input.status);
-        }
-        INPUTS.all.push(INPUTS.type[type][name]);
-      }
-    }
-
-
-    const METHODS = {
-      'element': {
-        get:()=>{ return ROW }
-      },
-      'alive':{
-        get:()=>{ return PROPS.alive; }
-      },
-      'die':{
-        writable: false,
-        value:()=>{ INSTANCE.off(); INSTANCE.element.remove(); }
-      },
-      'id':{
-        get:()=>{ return PROPS.id; }
-      },
-      'on': {
-        configurable: true,
-        get:()=>{ return OPEN; },
-        set:(open)=>{
-          Object.defineProperty(INSTANCE,'open',{
-            configurable: false,
-            writable: false,
-            value:()=>{
-              let form = OPEN();
-              open.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
-              return form;
-            }
-          });
-        }
-      },
-      'off': {
-        configurable: true,
-        get:()=>{ return CLOSE; },
-        set:(close)=>{
-          Object.defineProperty(INSTANCE,'close',{
-            configurable: false,
-            writable: false,
-            value:()=>{
-              CLOSE();
-              close.call({ inputs: INPUTS.type, buttons: BUTTONS.name });
-            }
-          });
-        }
-      },
-      'buttons':{
-        writable: false,
-        value: BUTTONS.name,
-      },
-      'events':{
-        writable: false,
-        value: {
-          on: SUBJECT.register,
-          off: SUBJECT.unregister
-        }
-      },
-      'disable':{
-        writable: false,
-        value: (toggle)=>{
-          INPUTS.all.forEach((input)=>{ input.disable(toggle); });
-        }
-      },
-      'inputs':{
-        writable: false,
-        value: INPUTS.type
-      },
-      'update': {
-        configurable: true,
-        set: (fn)=>{
-          Object.defineProperty(INSTANCE,'update',{
-            configurable: false,
-            writable: false,
-            value: fn
-          });
-        }
-      }
-    };
-
-    Object.defineProperties(this,METHODS);
-  }
-
-  function Table(data){
-    const TABLE = $(document.createElement('div'));
-    const HTML = {
-      row: undefined,
-      table: undefined
-    };
-    const INSTANCE = this;
-    const BUTTONS = {
-      all: [],
-      name: {}
-    };
-    const ROWS = {
-      id: 0,
-      all: [],
-      add: ()=>{
-        let row = ROWS.all[ROWS.all.push(new Row({id:ROWS.id++,html:HTML.row})) - 1];
-        row.disable(true);
-        SUBJECT.notify('addRow',[row]);
-        return row;
-      },
-      remove: ()=>{
-
-      },
-      get: ()=>{ return ROWS.all },
-      find: (find)=>{  return ROWS.all.find(find); }
-    };
-    const SUBJECT = new Observer(['open','close','addRow','removeRow','rowUpdate']);
-    const PROPS = {
-      alive:false,
-      name:data.name,
-      body: undefined
-    };
-    const OPEN = ()=>{
-      TABLE.removeClass('hidden');
-      ROWS.all.forEach((row)=>{ row.on(); });
-      BUTTONS.all.forEach((btn)=>{ btn.on(); });
-      PROPS.alive = true;
-      return TABLE
-    };
-    const CLOSE = ()=>{
-      TABLE.addClass('hidden');
-      ROWS.all.forEach((row)=>{ row.off(); });
-      BUTTONS.all.forEach((btn)=>{ btn.off(); });
-      PROPS.alive = false;
-    };
-
-    Services.get.table(data.html,function(html){
-      HTML.row = html.row;
-      HTML.table = html.table;
-
-      TABLE.html(HTML.table)
-      .addClass('min-w-full h-full bg-gray-300 absolute p-10 hidden').attr('data-table',data.name);
-      PROPS.body = TABLE.find('.body');
-      TABLE.find('[data-type="button"]').each(function(){
-        let el = $(this),
-        name = el.attr('name');
-        BUTTONS.name[name] = new Button(el);
-        BUTTONS.all.push(BUTTONS.name[name]);
-      });
-    });
-
-    const METHODS = {
-      'element': {
-        get:()=>{ return TABLE }
-      },
-      'name':{
-        get:()=>{ return PROPS.name; }
-      },
-      'alive':{
-        get:()=>{ return PROPS.alive; }
-      },
-      'open': {
-        configurable: true,
-        get:()=>{ return OPEN; },
-        set:(open)=>{
-          Object.defineProperty(INSTANCE,'open',{
-            configurable: false,
-            writable: false,
-            value:()=>{
-              let form = OPEN();
-              open.call({ inputs: ROWS, buttons: BUTTONS.name });
-              return form;
-            }
-          });
-        }
-      },
-      'close': {
-        configurable: true,
-        get:()=>{ return CLOSE; },
-        set:(close)=>{
-          Object.defineProperty(INSTANCE,'close',{
-            configurable: false,
-            writable: false,
-            value:()=>{
-              CLOSE();
-              close.call({ inputs: ROWS, buttons: BUTTONS.name });
-            }
-          });
-        }
-      },
-      'buttons':{
-        writable: false,
-        value: BUTTONS.name,
-      },
-      'events':{
-        writable: false,
-        value: {
-          on: SUBJECT.register,
-          off: SUBJECT.unregister
-        }
-      },
-      'rows':{
-        writable: false,
-        value: (()=>{
-          const OBJ = {};
-
-          const METHODS = {
-            'add': {
-              configurable: true,
-              set: (fn)=>{
-                Object.defineProperty(OBJ,'add',{
-                  configurable: false,
-                  value: (data)=>{
-                    let row = ROWS.add();
-                    fn.call(row,data);
-                    PROPS.body.prepend(row.element);
-                    return row;
-                  }
-                });
-              }
-            },
-            'update': {
-              configurable: true,
-              set: (fn)=>{
-                let update = (row)=>{
-                  return function(){
-                    fn.apply(row,arguments);
-                    SUBJECT.notify('rowUpdate',[row]);
-                  }
-                };
-                ROWS.all.forEach((r)=>{ r.update = update(r); });
-                SUBJECT.register('addRow',function(row){ row.update = update(row); });
-                Object.defineProperty(OBJ,'update',{
-                  configurable: false,
-                  enumerable: false,
-                  value: true
-                });
-              }
-            },
-            'get': {
-              writable: false,
-              value: ROWS.get
-            },
-            'find': {
-              writable: false,
-              value: ROWS.find
-            }
-          };
-
-          Object.defineProperties(OBJ,METHODS);
-
-          return OBJ;
-        })()
-      }
-    };
-
-    Object.defineProperties(this,METHODS);
-
-  }
-
-  function tablesInit(Modal,Forms){
-    const Container = $('#dataTable');
-    const State = {
-      open: false
-    };
-    const Tables = [
-      new Table({
-        name: 'users',
-        html: 'users'
-      }),
-      new Table({
-        name: 'userAvisos',
-        html: 'userAvisos'
-      }),
-      new Table({
-        name: 'myAvisos',
-        html: 'myAvisos'
-      })
-    ];
-
-    const Users = Tables[0];
-    const UserAvisos = Tables[1];
-    const myAvisos = Tables[2];
-
-    {
-
-      let forms = {
-        'create':Forms.get('createUser'),
-        'edit':Forms.get('editUser'),
-        'delete':Forms.get('deleteUser')
-      };
-
-      let openForm = (form,data)=>{
-        return function(){
-          let close = form.events.on('close',()=>{
-            Modal.elements.button.close.trigger('click');
-          });
-          Modal.elements.button.close.on('click',()=>{
-            if(form.alive){ form.close(); }
-            form.events.off('close',close);
-            Modal.actions.close();
-            Modal.elements.button.close.off('click');
-          });
-          Modal.actions.open({title: form.title, body: form.open(data()) });
-        }
-      };
-
-      Users.rows.update = function(user){
-        this.user = user;
-        this.inputs.text.id.value = user.id;
-        this.inputs.text.name.value = user.name;
-      };
-
-      Users.rows.add = function(user){
-        this.update(user);
-        this.user = user;
-        let row = this;
-        this.buttons.edit.events.on('click',openForm(forms.edit,()=>{ return row.user; }));
-        this.buttons.delete.events.on('click',openForm(forms.delete,()=>{ return row.user; }));
-
-      };
-
-      {
-        let close = undefined;
-        Users.open = function(){
-          close = Users.buttons.addUser.events.on('click',openForm(forms.create,()=>{ return true }));
-        };
-        Users.close = function(){
-          Users.buttons.addUser.events.unregister('click',close);
-        };
-      }
-
-
-
-      forms.create.events.on('response',function(response){
-        if(!response.error){
-          Users.rows.add(response.data);
-          Modal.elements.button.close.trigger('click');
-        }
-      });
-
-      forms.edit.events.on('response',function(response){
-        if(!response.error){
-          let user = response.data;
-          let row = Users.rows.find((r)=>{ return r.user.id == user.id; });
-          row.update(user);
-          forms.edit.close();
-        }
-
-      });
-
-      forms.delete.events.on('response',function(response){
-        if(!response.error){
-          let user = response.data;
-          let row = Users.rows.find((r)=>{ return r.user.id == user; });
-          row.die();
-        }
-      });
-
-      Services.get.user({},(response)=>{
-        if(!response.error){
-          response.data.forEach(Users.rows.add);
-        }
-      });
-    }
-
-    {
-      let getUpdates = ()=>{
-        let date = new Date();
-        let format = ()=>{
-          let dateFormat = date.toLocaleDateString('es-MX').split('/').reduce((a,c)=>{ if(c.length == 1){ c = '0'+c; } return a = c+'-'+a; });
-          let timeFormat = date.toString().slice(16,24);
-          return `${dateFormat} ${timeFormat}`;
-        };
-
-        let update = ()=>{
-          let where = [['request.modified','>=',format()]];
-          Services.get.aviso({where},function(response){
-            let { error,data } = response;
-            if(!error){
-              data.forEach((aviso)=>{
-                myAvisos.rows.find((row)=>{ return row.aviso.id ==  aviso.id}).update(aviso);
-              });
-              date.setTime(Date.now());          }
-          });
-          setTimeout(update,(1000 * 60));
-        };
-        update();
-
-      };
-
-      myAvisos.rows.update = function(aviso){
-        this.aviso.status = aviso.status;
-        this.inputs.status.aviso.value = aviso.status;
-      };
-
-      myAvisos.rows.add = function(aviso){
-        this.aviso = aviso;
-        this.inputs.text.id.value = aviso.id;
-        this.inputs.text.type.value = aviso.type;
-        this.inputs.status.aviso.value = aviso.status;
-      };
-
-      let forms = {};
-      ['permision','sick','vacation','homeOffice'].forEach((name)=>{
-        forms[name] = Forms.get(name);
-      });
-
-      for(let form in forms){
-        form = forms[form];
-        form.events.on('response',function(response){
-          if(!response.error){
-            let data = response.data;
-            myAvisos.rows.add(response.data);
-          }
-        });
-      }
-
-      Services.get.aviso({where: [['user','=','1']]},function(response){
-        if(!response.error){  response.data.forEach(myAvisos.rows.add); }
-        getUpdates();
-      });
-    }
-
-    {
-      let getUpdates = ()=>{
-        let date = new Date();
-        let format = ()=>{
-          let dateFormat = date.toLocaleDateString('es-MX').split('/').reduce((a,c)=>{ if(c.length == 1){ c = '0'+c; } return a = c+'-'+a; });
-          let timeFormat = date.toString().slice(16,24);
-          return `${dateFormat} ${timeFormat}`;
-        };
-
-        let update = ()=>{
-          let where = [['request.created','>=',format()]];
-          Services.get.aviso({where},function(response){
-            let { error,data } = response;
-            if(!error){ data.forEach(UserAvisos.rows.add); }
-            date.setTime(Date.now());        });
-          setTimeout(update,(1000 * 60));
-        };
-
-        update();
-
-      };
-
-      UserAvisos.rows.add = function(aviso){
-        this.inputs.status.aviso.disable(false);
-
-        this.aviso = aviso;
-        this.inputs.text.id.value = aviso.id;
-        this.inputs.text.type.value = aviso.type;
-        this.inputs.text.user.value = aviso.user;
-        this.inputs.status.aviso.value = aviso.status;
-
-        aviso = this.aviso;
-
-        this.inputs.status.aviso.events.on('change',function(){
-          let value = this.value;
-          aviso.status = value;
-          let update = {
-            where: [['request.id','=',aviso.id]],
-            aviso: {status: value}
-          };
-          Services.update.aviso(update,()=>{});
-        });
-
-      };
-
-      Services.get.aviso({},function(response){
-          if(!response.error){ response.data.forEach(UserAvisos.rows.add); }
-          getUpdates();
-      });
-    }
-
-
-    Tables.forEach((t)=>{ Container.append(t.element); });
-
-    return {
-      open: (name)=>{
-        if(State.open){ State.open.close(); }      let table = Tables.find((t)=>{ return t.name == name; });
-        table.open();
-        State.open = table;
-        if(!Container.hasClass('active')){ Container.addClass('active'); }
-      },
-      close:()=>{
-        if(State.open){
-          State.open.close();
-          State.open = false;
-        }
-        Container.removeClass('active');
-      },
-    }
-
-  }
-
   const Helper = {
     notEmptyText: (inputs)=>{
       for(let input in inputs){
@@ -11958,7 +11382,7 @@
     return Delete
   }
 
-  var User = [
+  [
     Create(),
     Edit(),
     Delete()
@@ -12120,32 +11544,19 @@
     return Vacation
   }
 
-  var Permisions$1 = [
+  [
     Permision(),
     Sick(),
     HomeOffice(),
     Vacation(),
   ];
 
-  function formsInit(){
-    const Forms = [];
-
-    User.forEach((form)=>{ Forms.push(form); });
-    Permisions$1.forEach((form)=>{ Forms.push(form); });
-
-    return {
-      get:(name)=>{ return Forms.find((f)=>{ return f.name == name; }); }
-    }
-
-  }
-
   function actionsInit(){
-    const Forms = formsInit();
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
     const Permisions = permisionsInit();
-    const Tables = tablesInit(Modal,Forms);
+    // const Tables = tablesInit(Modal,Forms);
 
     const Actions = {};
     const Elements = {};
@@ -12153,13 +11564,15 @@
     Actions.update = {};
     Actions.update.date = (format)=>{
       if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-      Nav.elements.date.html(Calendar.formatDate(Calendar.getDate(),format));
+      format = Calendar.formatDate(Calendar.getDate(),format);
+      format = format.slice(0,1).toUpperCase()+format.slice(1);
+      Nav.elements.date.html(format);
     };
     Actions.calendar = {};
     Actions.calendar.render = ()=>{
       Actions.update.date();
       // la barra de navegación mide 64px en altura por eso se la resta.
-      let height = window.innerHeight - 64;
+      let height = window.innerHeight - 68;
       Calendar.setOption('contentHeight',height);
       Calendar.render();
     };
@@ -12185,59 +11598,59 @@
         Permisions.actions.hide();
       }
     };
-    Actions.open.permisions = ()=>{
-      Permisions.actions[Permisions.state.open ? 'close' : 'open']();
-    };
-    Actions.open.permision = function(){
-      let form = Forms.get($(this).attr('name'));
-      Permisions.actions.close();
-      let close = form.events.on('close',()=>{
-        Modal.elements.button.close.trigger('click');
-      });
-      Modal.elements.button.close.on('click',()=>{
-        if(form.alive){ form.close(); }
-        form.events.off('close',close);
-        Modal.actions.close();
-        Modal.elements.button.close.off('click');
-      });
-
-      Modal.actions.open({title: form.title, body: form.open() });
-    };
-    Actions.open.profile = function(){
-      let form = Forms.get('profile');
-      let close = form.events.on('close',()=>{
-        Modal.elements.button.close.trigger('click');
-      });
-      Modal.elements.button.close.on('click',()=>{
-        if(form.alive){ form.close(); }
-        form.events.off('close',close);
-        Modal.actions.close();
-        Modal.elements.button.close.off('click');
-      });
-
-      Modal.actions.open({title: form.title, body: form.open() });
-    };
-    Actions.open.table = function(){
-      let name = $(this).attr('name');
-      Tables.open(name);
-      Nav.elements.button.menu.trigger('click');
-      Nav.actions.updateMenu(name);
-      Nav.actions.changeNavBar(name);
-    };
-    Actions.open.calendar = function(){
-      Tables.close();
-      Nav.elements.button.menu.trigger('click');
-      Nav.actions.updateMenu('calendar');
-      Nav.actions.changeNavBar('calendar');
-      Nav.actions.closeMenu();
-    };
-    Actions.logout = function(){
-      $.ajax({
-        url:`${window.location.origin}/app/logout`,
-        method: 'post',
-        success:function(){ window.location.href = `${window.location.origin}/app/login`; }
-      });
-    };
+    // Actions.open.permisions = ()=>{
+    //   Permisions.actions[Permisions.state.open ? 'close' : 'open']();
+    // }
+    // Actions.open.permision = function(){
+    //   let form = Forms.get($(this).attr('name'));
+    //   Permisions.actions.close();
+    //   let close = form.events.on('close',()=>{
+    //     Modal.elements.button.close.trigger('click');
+    //   });
+    //   Modal.elements.button.close.on('click',()=>{
+    //     if(form.alive){ form.close() }
+    //     form.events.off('close',close);
+    //     Modal.actions.close();
+    //     Modal.elements.button.close.off('click')
+    //   });
+    //
+    //   Modal.actions.open({title: form.title, body: form.open() });
+    // };
+    // Actions.open.profile = function(){
+    //   let form = Forms.get('profile');
+    //   let close = form.events.on('close',()=>{
+    //     Modal.elements.button.close.trigger('click');
+    //   });
+    //   Modal.elements.button.close.on('click',()=>{
+    //     if(form.alive){ form.close() }
+    //     form.events.off('close',close);
+    //     Modal.actions.close();
+    //     Modal.elements.button.close.off('click')
+    //   });
+    //
+    //   Modal.actions.open({title: form.title, body: form.open() });
+    // };
+    // Actions.open.table = function(){
+    //   let name = $(this).attr('name');
+    //   Tables.open(name);
+    //   Nav.elements.button.menu.trigger('click');
+    //   Nav.actions.updateMenu(name);
+    //   Nav.actions.changeNavBar(name);
+    // };
+    // Actions.open.calendar = function(){
+    //   Tables.close();
+    //   Nav.elements.button.menu.trigger('click');
+    //   Nav.actions.updateMenu('calendar');
+    //   Nav.actions.changeNavBar('calendar');
+    //   Nav.actions.closeMenu();
+    // };
+    // Actions.logout = function(){
+    //   $.ajax({
+    //     url:`${window.location.origin}/app/logout`,
+    //     method: 'post',
+    //     success:function(){ window.location.href = `${window.location.origin}/app/login`; }
+    //   });
+    // };
 
     [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 

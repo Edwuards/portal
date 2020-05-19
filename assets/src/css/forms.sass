@@ -17,7 +17,7 @@ textarea:active,
   #{$input}:-webkit-autofill:hover,
   #{$input}:-webkit-autofill:focus,
   #{$input}:-webkit-autofill:active,
-    -webkit-box-shadow: 0 0 0 30px #E8E8E8 inset !important;
+    -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important;
 
 form
   input,
@@ -28,7 +28,7 @@ form
 
   label
     bottom: 0px;
-    transition: all .5s,;
+    transition: all .25s,;
 
   .helper
     font-size: 11px;
@@ -41,53 +41,42 @@ form
   .select,
   .textarea
     color: black;
-    border-bottom: 3px solid #C8C8C8;
-    background-color: #E8E8E8;
+    border-bottom: 2px solid #C8C8C8;
+    background-color: #FAFAFA;
     transition: border-bottom-color .5s, color .5s;
 
-  .select
+  .input.datetime
+    border-bottom: 2px solid #ffffff;
 
   .input.error + .helper,
   .select.error + .helper,
   .textarea.error + .helper
-      color: red;
+    color: red;
 
-
-  .input:hover,
-  .select:hover,
-  .textarea:hover,
   .input.active,
   .select.active,
   .input.notEmtpy,
   .select.notEmtpy,
   .textarea.notEmtpy,
-      background-color: #DCDCDC;
       color: black;
       label
         font-size: 11px;
-        bottom: 50%;
+        bottom: calc(100% - 11px);
       @each $input in ['input','select','textarea']
         #{$input}
           z-index: 11;
-        #{$input}:-webkit-autofill,
-        #{$input}:-webkit-autofill:hover,
-        #{$input}:-webkit-autofill:focus,
-        #{$input}:-webkit-autofill:active,
-          -webkit-box-shadow: 0 0 0 30px #DCDCDC inset !important;
+
 
   .textarea:hover,
   .textarea.notEmtpy,
     label
       bottom: 60%;
 
-  .input:hover,
-  .select:hover,
-  .textarea:hover,
   .input.active,
   .select.active,
   .textarea.active,
     color: black;
-    border-bottom-color: #2b6cb0;
+    border-bottom-color: #888888;
     label
       z-index: 20;
 

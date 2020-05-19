@@ -30,7 +30,7 @@ foreach ($buttons['elements'] as $button) {
     <?php echo $html ?>
   </div>
   <div class="relative open flex justify-end ">
-    <button class="flex h-12 w-12 justify-center items-center rounded-full bg-blue-700 shadow-xl" type="button" name="open">
+    <button class="flex h-12 w-12 justify-center items-center rounded-full bg-red-600 shadow-xl" type="button" name="open">
       <i class="text-lg text-white fas fa-plus"></i>
     </button>
   </div>

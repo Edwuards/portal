@@ -4,7 +4,9 @@
 
  ?>
 <div id="menu" class="bg-gray-200 h-full p-4">
-    <div class="flex w-full mb-4"> <p>Avisame</p> </div>
+    <div class="h-8 flex w-full m-4 sm:hidden">
+       <img src="https://avisame.figment.com.mx/assets/img/logo.png" class="h-full">
+     </div>
     <div class="flex w-full mb-2 px-2 items-center">
       <div class="avatar w-10 h-10">
         <img class="w-full" src="<?php echo $this->session->avatar; ?>" alt="">

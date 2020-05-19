@@ -3,6 +3,7 @@ import { Rules, Test } from './errors.js';
 function Observer(events){
   const Events = {};
   let ID = 0;
+
   this.event = {
     create: (event)=>{
       let test = undefined;
@@ -25,7 +26,9 @@ function Observer(events){
 
       delete Events[event];
     },
-    get: ()=>{ return Object.keys(Events); }
+    keys: ()=>{ return Object.keys(Events); },
+    get: (event)=>{ return Events[event].map((e)=>{ return e.id }); },
+    exist: (event)=>{ return this.keys().indexOf(event) != -1 }
   }
 
   this.notify = (event,update)=>{
@@ -45,8 +48,6 @@ function Observer(events){
     Events[event].push({id: ID, notify: subscriber});
     return ID;
   }
-
-  this.log = ()=>{ console.log(Events); }
 
   this.unregister = (event,id)=>{
   	let test = undefined ;

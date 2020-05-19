@@ -1,6 +1,76 @@
 import { Rules, Test } from './errors.js';
 import { Observer } from './helpers.js';
 
+function EventHandler(element,events){
+  const INSTANCE = this;
+  const OBSERVER = new Observer(events ? events : []);
+  const EVENTS = {
+    on: (type)=>{
+      if(PROPS.alive && !PROPS.events[type]){
+        PROPS.events[type] = true;
+        let register = (type)=>{
+          return function(){
+            INSTANCE.element.off(type);
+            SUBJECT.notify(type,[arguments]);
+            INSTANCE.element.on(type,register(type));
+          }
+        };
+        INSTANCE.element.on(type,register(type));
+      }
+    },
+    off: (type)=>{
+      EVENTS.state[type] = false;
+      INSTANCE.element.off(type);
+    }
+  };
+
+  const PROPS = {
+    events: {},
+    alive: false,
+    element: element
+  };
+  const METHODS = {
+    'element': {
+      get: ()=>{ return PROPS.element; }
+    },
+    'on':{
+      configurable: true,
+      writable: false,
+      value: ()=>{
+        PROPS.alive = true;
+        OBSERVER.events.keys().forEach(EVENTS.on);
+      }
+    },
+    'off':{
+      writable: false,
+      value: ()=>{
+        PROPS.alive = false;
+        OBSERVER.events.keys().forEach(EVENTS.off);
+      }
+    },
+    'events':{
+      writable: false,
+      value: {
+        on: (type,fn)=>{
+          if(OBSERVER.events.exist(type)){ OBSERVER.event.create(type); }
+          let index = SUBJECT.register(type,fn.bind(INSTANCE));
+          EVENTS.on(type);
+          return index;
+        },
+        off: (type,id)=>{
+          let registered = OBSERVER.events.get(type);
+          if(id == undefined){
+            registered.forEach((id)=>{ OBSERVER.unregister(type,id); });
+          }
+          else{
+            OBSERVER.unregister(type,id);
+          }
+        }
+      }
+    }
+  };
+}
+
 function Button(BUTTON){
 
   const SUBJECT = new Observer();
