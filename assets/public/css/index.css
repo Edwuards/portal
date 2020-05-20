@@ -1,47 +1,44 @@
-#permisions {
-  right: 0px;
-  background-color: rgba(255, 255, 255, 0);
+.permision {
+  right: 40px; }
+
+.permision:nth-child(1) {
+  bottom: 105px;
+  transition: bottom .75s; }
+
+.permision:nth-child(4) {
+  bottom: 285px;
+  transition: bottom .75s; }
+
+.permision:nth-child(3) {
+  bottom: 225px;
+  transition: bottom .75s; }
+
+.permision:nth-child(2) {
+  bottom: 165px;
+  transition: bottom .75s; }
+
+.permision.hide {
+  bottom: 45px; }
+  .permision.hide p {
+    display: none; }
+
+.permisions-cont {
+  position: fixed;
+  width: 100px;
+  height: 100px;
   transition: all 1s; }
-  #permisions > div:nth-child(1) {
-    transition: width .5s;
-    transition-delay: 1s; }
-  #permisions > div:nth-child(1).active {
-    transition-delay: 0s; }
-  #permisions .action {
-    opacity: 0; }
-    #permisions .action p {
-      opacity: 0;
-      transition: opacity .5s; }
-    #permisions .action p.active {
-      opacity: 1; }
-  #permisions .action:nth-child(1) {
-    top: 64px;
-    transition: top 1s, opacity 1s; }
-  #permisions .action:nth-child(2) {
-    top: 128px;
-    transition: top 1s, opacity 1s; }
-  #permisions .action:nth-child(3) {
-    top: 192px;
-    transition: top 1s, opacity 1s; }
-  #permisions .action:nth-child(4) {
-    top: 256px;
-    transition: top 1s, opacity 1s; }
-  #permisions .action.active {
-    opacity: 1;
-    top: 0px; }
-  #permisions .open {
-    right: 0px;
-    transition: right 1s; }
-  #permisions .open.hide {
-    right: -100%; }
 
-#permisions.active {
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.9); }
+.permisions-cont.active {
+  width: 100vh;
+  height: 100vh;
+  background-color: white; }
 
-#permisions.hide {
-  right: -100%; }
+@media (min-width: 640px) {
+  .permisions-cont {
+    position: absolute; }
+  .permisions-cont.active {
+    width: 200px;
+    height: 350px; } }
 
 select,
 select:focus,
@@ -243,3 +240,8 @@ body, html {
 
 #menu {
   width: 320px; }
+
+button[name="avisar"] {
+  box-shadow: 0px 3px 47px -3px rgba(0, 0, 0, 0.75);
+  height: 50px;
+  width: 50px; }

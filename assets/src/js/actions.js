@@ -10,7 +10,6 @@ export default function(){
   const Calendar = calendarInit();
   const Nav = navInit();
   const Modal = modalInit();
-  const Permisions = permisionsInit();
   // const Tables = tablesInit(Modal,Forms);
 
   const Actions = {};
@@ -27,7 +26,7 @@ export default function(){
   Actions.calendar.render = ()=>{
     Actions.update.date();
     // la barra de navegación mide 64px en altura por eso se la resta.
-    let height = window.innerHeight - 68;
+    let height = window.innerHeight - 64;
     Calendar.setOption('contentHeight',height);
     Calendar.render();
   }
@@ -107,7 +106,7 @@ export default function(){
   //   });
   // };
 
-  [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
+  [['modal',Modal],['nav',Nav]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 
   return {actions:Actions, elements: Elements}
 }

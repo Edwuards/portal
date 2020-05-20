@@ -9898,54 +9898,6 @@
     return {elements: Elements,actions: Actions,state: State}
   }
 
-  function permisionsInit(){
-    const Actions = {};
-    const Elements = {};
-    const State = {
-      open:false
-    };
-
-    Elements.container = $('#permisions');
-    Elements.button = {};
-    Elements.container.find('button').each(function(){ let el = $(this); Elements.button[el.attr('name')] = el; });
-    Elements.actions = Elements.container.find('.action');
-    Elements.btnContainer = Elements.actions.parent();
-    Elements.openContainer = Elements.button.open.parent();
-
-    Actions.hide = ()=>{
-      Elements.container.addClass('hide');
-    };
-
-    Actions.show = ()=>{
-      Elements.container.removeClass('hide');
-    };
-
-    Actions.open = ()=>{
-      State.open = true;
-      Elements.container.addClass('active');
-      Elements.btnContainer
-      .addClass('active');
-      Elements.button.open.children('i')
-      .removeClass('fa-plus')
-      .addClass('fa-times');
-      Elements.actions.addClass('active').children('p').addClass('active');
-    };
-
-    Actions.close = ()=>{
-      State.open = false;
-      Elements.container.removeClass('active');
-      Elements.btnContainer
-      .removeClass('active');
-      Elements.actions.removeClass('active').children('p').removeClass('active');
-      Elements.button.open.children('i')
-      .removeClass('fa-times')
-      .addClass('fa-plus');
-
-    };
-
-    return {elements: Elements, actions: Actions, state: State};
-  }
-
   function modalInit(){
     const Actions = {};
     const Elements = {
@@ -11555,7 +11507,6 @@
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
-    const Permisions = permisionsInit();
     // const Tables = tablesInit(Modal,Forms);
 
     const Actions = {};
@@ -11572,7 +11523,7 @@
     Actions.calendar.render = ()=>{
       Actions.update.date();
       // la barra de navegación mide 64px en altura por eso se la resta.
-      let height = window.innerHeight - 68;
+      let height = window.innerHeight - 64;
       Calendar.setOption('contentHeight',height);
       Calendar.render();
     };
@@ -11652,7 +11603,7 @@
     //   });
     // };
 
-    [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
+    [['modal',Modal],['nav',Nav]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
   }
@@ -11671,11 +11622,6 @@
     elements.nav.menu.button.userAvisos.on('click',actions.open.table);
     elements.nav.menu.button.calendar.on('click',actions.open.calendar);
     elements.nav.menu.button.myProfile.on('click',actions.open.profile);
-    elements.permisions.button.open.on('click',actions.open.permisions);
-    elements.permisions.button.homeOffice.on('click',actions.open.permision);
-    elements.permisions.button.sick.on('click',actions.open.permision);
-    elements.permisions.button.vacation.on('click',actions.open.permision);
-    elements.permisions.button.permision.on('click',actions.open.permision);
     elements.modal.errors.on('modalError',actions.modalError);
 
 
