@@ -6,40 +6,22 @@ export default function(){
   };
 
   Elements.container = $('#permisions');
-  Elements.button = {};
-  Elements.container.find('button').each(function(){ let el = $(this); Elements.button[el.attr('name')] = el });
-  Elements.actions = Elements.container.find('.action');
-  Elements.btnContainer = Elements.actions.parent();
-  Elements.openContainer = Elements.button.open.parent();
-
-  Actions.hide = ()=>{
-    Elements.container.addClass('hide');
-  }
-
-  Actions.show = ()=>{
-    Elements.container.removeClass('hide');
-  }
+  Elements.permisions = $('.permision');
+  Elements.buttons = Elements.container.find('button.form');
+  Elements.avisar = Elements.container.find('button[name="avisar"]');
 
   Actions.open = ()=>{
     State.open = true;
     Elements.container.addClass('active');
-    Elements.btnContainer
-    .addClass('active');
-    Elements.button.open.children('i')
-    .removeClass('fa-plus')
-    .addClass('fa-times');
-    Elements.actions.addClass('active').children('p').addClass('active');
+    Elements.permisions.removeClass('hide');
+    Elements.avisar.children('i').removeClass('fa-bullhorn').addClass('fa-times');
   }
 
   Actions.close = ()=>{
     State.open = false;
     Elements.container.removeClass('active');
-    Elements.btnContainer
-    .removeClass('active');
-    Elements.actions.removeClass('active').children('p').removeClass('active');
-    Elements.button.open.children('i')
-    .removeClass('fa-times')
-    .addClass('fa-plus');
+    Elements.permisions.addClass('hide');
+    Elements.avisar.children('i').removeClass('fa-times').addClass('fa-bullhorn');
 
   }
 

@@ -1,37 +1,36 @@
-import { HTML } from '../templates.js';
-import { Form } from '../form.js';
-import { Services } from '../../services.js';
+import { Form, Helper } from '../form.js';
 
+const Sick = new Form({
+  title: 'Enfermedad',
+  name: 'sick',
+  url: 'permisions/create',
+});
 
-export default function(){
-  let Sick = undefined;
-  Services.get.form('permisions/sick',function(html){
-    Sick = new Form({
-      name: 'sick',
-      title: 'Enfermedad',
-      html: html,
-      url:'permisions/create'
-    });
+let close = undefined;
 
-    let close = undefined;
-    Sick.open = function(){
-      close = Sick.buttons.send.events.on('click',Sick.send);
-
-    }
-    Sick.send = function(){
-      let data = {
-        notice: 3,
-        date_start: this.inputs.date.start.format,
-        date_finish: this.inputs.date.finish.format,
-      };
-      this.buttons.send.events.unregister('click',close);
-      this.close();
-
-      return { error: false, data }
-
-    }
-
-  });
-
-  return Sick
+Sick.init = function(){
+  Helper.pickerUnfocus(this.inputs);
 }
+
+Sick.open = function(date) {
+  close = this.buttons.send.events.on('click',this.send);
+  date = (date  == undefined ? new Date(Date.now()) : date );
+  Helper.setDate(this.inputs,date);
+}
+
+Sick.close = function(){
+  this.buttons.send.events.off('click',close);
+}
+
+Sick.send = function(){
+  let data = {};
+  data.date_start = this.inputs.date.start.value;
+  data.date_finish = this.inputs.date.finish.value;
+  data.comments = this.inputs.textarea.description.value;
+  data.notice = 3;
+
+  return { error: false, data }
+}
+
+
+export { Sick }

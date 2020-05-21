@@ -2,39 +2,33 @@ import { Observer } from '../helpers.js';
 import * as Inputs from '../inputs.js';
 
 const Helper = {
-  notEmptyText: (inputs)=>{
-    for(let input in inputs){
-      input = inputs[input];
-      input.events.on('input',function(){
-        let value = this.value;
-        this.parent[value != '' ? 'addClass' : 'removeClass']('active');
-      })
-    }
-  },
-  notEmptyNumber: (inputs)=>{
-    for(let input in inputs){
-      input = inputs[input];
-      input.events.on('input',function(){
-        let value = this.value;
-        if(!this.parent.hasClass('active')){ this.parent.addClass('active'); }
-        this.value = (value > this.max ? this.max : ( value < this.min ? this.min : value ) );
-      });
-    }
-  },
-  collectValues: (inputs)=>{
-    const MAP = {};
-    for (let type in inputs) {
-      for(let name in inputs[type]){
-        MAP[name] = inputs[type][name][type == 'date' ? 'format': 'value'];
+  setDate: (inputs,date)=>{
+    if(inputs.date){
+      for (let input in inputs.date){
+        inputs.date[input].picker.setDate(date);
       }
     }
-    return MAP;
+    if(inputs.time){
+      for (let input in inputs.time){
+        inputs.time[input].picker.setDate(date);
+      }
+    }
   },
+  pickerUnfocus: (inputs)=>{
+    if(inputs.date){
+      for (let input in inputs.date){
+        inputs.date[input].events.on('focus',function(){ this.close(); });
+      }
+    }
+    if(inputs.time){
+      for (let input in inputs.time){
+        inputs.time[input].events.on('focus',function(){ this.close(); });
+      }
+    }
+  }
 }
 
 function Form(data){
-
-  const FORM = $(document.createElement('form'));
   const INSTANCE = this;
   const BUTTONS = {
     all: [],
@@ -46,8 +40,9 @@ function Form(data){
   };
   const SUBJECT = new Observer(['open','close','send','response','error']);
   const PROPS = {
+    element:undefined,
     alive:false,
-    title:data.title,
+    title: undefined,
     name:data.name,
     url: data.url,
     async: data.async ? data.async : true,
@@ -55,19 +50,20 @@ function Form(data){
     json: data.json ? data.json : false
   };
   const OPEN = ()=>{
+    if(typeof PROPS.init == 'function' ){ PROPS.init.call(INSTANCE); PROPS.init = true; }
     INPUTS.all.forEach((input)=>{ input.on(); });
     BUTTONS.all.forEach((btn)=>{ btn.on(); });
     PROPS.alive = true;
     SUBJECT.notify('open',[true]);
-    return FORM
+    return PROPS.element
   };
   const CLOSE = ()=>{
-    FORM[0].reset();
+    PROPS.element[0].reset();
+    PROPS.element.detach();
     INPUTS.all.forEach((input)=>{ input.off(); });
     BUTTONS.all.forEach((btn)=>{ btn.off(); });
     PROPS.alive = false;
     SUBJECT.notify('close',[true]);
-
   };
   const SEND = (message)=>{
     SUBJECT.notify('send',[message]);
@@ -83,75 +79,51 @@ function Form(data){
     }
   }
 
+  PROPS.title = `
+    <span class="w-2 h-2 abosolute mx-2 rounded-full bg-teal-600"></span>
+    <p>${data.title}</p>
+  `;
+  $(document).ready(function(){
+    PROPS.element = $(`form[name="${data.name}"]`);
+    PROPS.element.find('[data-type]').each(function(){
 
-  FORM.html(data.html);
-
-  FORM.attr('name',data.name).addClass('w-full h-full');
-
-  FORM.find('[data-type]').each(function(){
-    let el = $(this),
-    type = el.attr('data-type'),
-    name = el.attr('name'),
-    group = el.attr('data-group');
-
-    if(type !== 'button'){
-      if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
-      if(group){
-        if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {} }
-        INPUTS.type[type][group][name] = el;
-      }
-      else{
-        if(type == 'text'){
-          el = new Inputs.TextInput(el);
-        }
-        else if(type == 'number'){
-          el = new Inputs.NumberInput(el);
-        }
-        else if(type == 'select'){
-          el = new Inputs.SelectInput(el);
-        }
-        else if(type == 'textarea'){
-          el = new Inputs.TextAreaInput(el);
-        }
-        else if(type == 'password'){
-          el = new Inputs.PasswordInput(el);
-        }
-
+      let el = $(this),
+      type = el.attr('data-type'),
+      name = el.attr('name');
+      if(type !== 'button'){
+        if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
         INPUTS.type[type][name] = el;
       }
-    }
-    else{
-      BUTTONS.name[name] = new Inputs.Button(el);
-      BUTTONS.all.push(BUTTONS.name[name]);
-    }
-  });
+      else{
+        BUTTONS.name[name] = new Inputs.Button(el);
+        BUTTONS.all.push(BUTTONS.name[name]);
+      }
+    });
 
-  for(let type in INPUTS.type){
-    for (let input in INPUTS.type[type]) {
+    for(let type in INPUTS.type){
+      for (let input in INPUTS.type[type]) {
         let name = input;
         if(type == 'date'){
           input = INPUTS.type.date[input];
-          INPUTS.type.date[name] = new Inputs.DateInput(input.month,input.day,input.year);
+          INPUTS.type.date[name] = new Inputs.DateInput(input);
         }
-        if(type == 'time'){
+        else if(type == 'time'){
           input = INPUTS.type.time[input];
-          INPUTS.type.time[name] = new Inputs.TimeInput(input.hour,input.minutes,input.time);
+          INPUTS.type.time[name] = new Inputs.TimeInput(input);
         }
-        if(type == 'image'){
-          input = INPUTS.type.image[input];
-          INPUTS.type.image[name] = new Inputs.ImageInput(input.file,input.upload,input.preview);
-        }
-        if(type == 'status'){
-          input = INPUTS.type.status[input];
-          INPUTS.type.status[name] = new Inputs.StatusInput(input.status,input.indicator);
+        else if(type == 'textarea' || type == 'text'){
+          input = INPUTS.type[type][input];
+          INPUTS.type[type][name] = new Inputs.Input(input);
         }
         INPUTS.all.push(INPUTS.type[type][name]);
       }
     }
 
+  });
+
   const METHODS = {
     'element': {
-      get:()=>{ return FORM }
+      get:()=>{ return PROPS.element }
     },
     'name':{
       get:()=>{ return PROPS.name; }
@@ -160,7 +132,6 @@ function Form(data){
       get:()=>{ return PROPS.alive; }
     },
     'title':{
-      set:(title)=>{ PROPS.title = title;},
       get:()=>{ return PROPS.title; }
     },
     'open': {
@@ -204,6 +175,16 @@ function Form(data){
         });
       }
     },
+    'init': {
+      configurable: true,
+      set:(init)=>{
+        PROPS.init = init;
+        Object.defineProperty(INSTANCE,'init',{
+          writable: false,
+          value:true,
+        });
+      }
+    },
     'buttons':{
       writable: false,
       value: BUTTONS.name,
@@ -214,14 +195,10 @@ function Form(data){
     },
     'events':{
       writable: false,
-      value: (()=>{
-        const OBJ = {};
-        Object.defineProperties(OBJ,{
-          'on':{ get: ()=>{ return SUBJECT.register } },
-          'off':{ get: ()=>{ return SUBJECT.unregister } },
-        })
-        return OBJ
-      })()
+      value: {
+        on: SUBJECT.register,
+        off: SUBJECT.unregister
+      }
     },
     'disable': {
       writable: false,

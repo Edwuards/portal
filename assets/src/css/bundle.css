@@ -1,4 +1,5 @@
 @import 'bundle/base.css';
 @import 'jquery-datetimepicker/jquery.datetimepicker.css';
 @import '@fullcalendar/core/main.css';
+@import 'flatpickr/dist/flatpickr.css';
 @import '@fullcalendar/daygrid/main.css';

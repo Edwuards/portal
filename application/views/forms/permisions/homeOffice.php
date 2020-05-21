@@ -2,7 +2,7 @@
 
 $html = [
   'date_start' => DateInput(['attrs'=>['name'=>'start']]),
-  'date_finish' => DateInput(['css'=>['cont'=>'hidden'],'attrs'=>['name'=>'finish']]),
+  'date_finish' => DateInput(['attrs'=>['name'=>'finish']]),
   'description' => TextAreaInput([
     'attrs'=>[
       'name'=>'description',

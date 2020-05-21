@@ -28,8 +28,9 @@ function Observer(events){
     },
     keys: ()=>{ return Object.keys(Events); },
     get: (event)=>{ return Events[event].map((e)=>{ return e.id }); },
-    exist: (event)=>{ return this.keys().indexOf(event) != -1 }
+    exist: (event)=>{ return this.event.keys().indexOf(event) != -1 }
   }
+
 
   this.notify = (event,update)=>{
     let test = Rules.is.defined(event,Events);

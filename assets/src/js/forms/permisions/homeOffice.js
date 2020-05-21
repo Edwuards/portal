@@ -1,40 +1,35 @@
-import { HTML } from '../templates.js';
-import { Form } from '../form.js';
-import { Services } from '../../services.js';
+import { Form, Helper } from '../form.js';
 
-export default function(){
-  let HomeOffice = undefined;
-  Services.get.form('permisions/homeOffice',function(html){
-    HomeOffice = new Form({
-      name: 'homeOffice',
-      title: 'Home Office',
-      html: html,
-      url:'permisions/create'
-    });
+const HomeOffice = new Form({
+  title: 'Home Office',
+  name: 'homeOffice',
+  url: 'permisions/create',
+});
 
-    let close = undefined;
-    HomeOffice.open = function(){
-      close = this.buttons.send.events.on('click',HomeOffice.send);
+let close = undefined;
 
-    }
-    HomeOffice.send = function(){
-      this.inputs.date.finish.value = (this.inputs.date.start.value.getTime()/1000);
-
-      let data = {
-        notice: 4,
-        comments: this.inputs.textarea.description.value,
-        date_start: this.inputs.date.start.format,
-        date_finish: this.inputs.date.finish.format,
-      };
-
-      this.close();
-      this.buttons.send.events.unregister('click',close);
-
-      return { error: false, data }
-
-    }
-
-  });
-
-  return HomeOffice
+HomeOffice.init = function(){
+  Helper.pickerUnfocus(this.inputs);
 }
+
+HomeOffice.open = function(date) {
+  close = this.buttons.send.events.on('click',this.send);
+  date = (date  == undefined ? new Date(Date.now()) : date );
+  Helper.setDate(this.inputs,date);
+}
+
+HomeOffice.close = function(){
+  this.buttons.send.events.off('click',close);
+}
+
+HomeOffice.send = function(){
+  let data = {};
+  data.date_start = this.inputs.date.start.value;
+  data.date_finish = this.inputs.date.finish.value;
+  data.comments = this.inputs.textarea.description.value;
+  data.notice = 4;
+
+  return { error: false, data }
+}
+
+export { HomeOffice }

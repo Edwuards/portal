@@ -2,15 +2,14 @@ import { default as calendarInit } from './calendar.js';
 import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
-import { default as tablesInit } from './tables/tables.js';
-import { default as formsInit } from './forms/forms.js';
+import { default as formsInit } from './forms/index.js';
 
 export default function(){
-  const Forms = formsInit();
   const Calendar = calendarInit();
   const Nav = navInit();
   const Modal = modalInit();
-  // const Tables = tablesInit(Modal,Forms);
+  const Permisions = permisionsInit();
+  const Forms = formsInit();
 
   const Actions = {};
   const Elements = {};
@@ -23,6 +22,11 @@ export default function(){
     Nav.elements.date.html(format);
   }
   Actions.calendar = {};
+  Actions.calendar.addEvent = ({start,end,id,title})=>{
+    start = new Date(start * 1000);
+    end = new Date(end * 1000);
+    Calendar.addEvent({id,title,start,end});
+  }
   Actions.calendar.render = ()=>{
     Actions.update.date();
     // la barra de navegación mide 64px en altura por eso se la resta.
@@ -52,34 +56,49 @@ export default function(){
       Permisions.actions.hide();
     }
   }
-  // Actions.open.permisions = ()=>{
-  //   Permisions.actions[Permisions.state.open ? 'close' : 'open']();
-  // }
-  // Actions.open.permision = function(){
-  //   let form = Forms.get($(this).attr('name'));
-  //   Permisions.actions.close();
-  //   let close = form.events.on('close',()=>{
-  //     Modal.elements.button.close.trigger('click');
-  //   });
-  //   Modal.elements.button.close.on('click',()=>{
-  //     if(form.alive){ form.close() }
-  //     form.events.off('close',close);
-  //     Modal.actions.close();
-  //     Modal.elements.button.close.off('click')
-  //   });
-  //
-  //   Modal.actions.open({title: form.title, body: form.open() });
-  // };
+  Actions.avisar = ()=>{
+    Permisions.actions[Permisions.state.open ? 'close' : 'open']();
+  }
+  Actions.open.permision = function(){
+    let form = Forms.get($(this).attr('name'));
+    Permisions.actions.close();
+
+    let send = form.events.on('send',function(request){
+      let { error, data } = request;
+      if(!error){
+        let response = form.events.on('response',function(res){
+          let { error, data } =  res;
+          if(!error){Actions.calendar.addEvent(data);}
+          form.events.off('response',response);
+        });
+      }
+      form.close()
+    });
+
+    let close = form.events.on('close',function(){
+      form.events.off('send',send);
+      Modal.elements.close.trigger('click');
+    });
+
+    Modal.elements.close.on('click',()=>{
+      if(form.alive){ form.close() }
+      form.events.off('close',close);
+      Modal.actions.close();
+      Modal.elements.close.off('click')
+    });
+
+    Modal.actions.open({title: form.title, body: form.open() });
+  };
   // Actions.open.profile = function(){
   //   let form = Forms.get('profile');
   //   let close = form.events.on('close',()=>{
-  //     Modal.elements.button.close.trigger('click');
+  //     Modal.elements.close.trigger('click');
   //   });
-  //   Modal.elements.button.close.on('click',()=>{
+  //   Modal.elements.close.on('click',()=>{
   //     if(form.alive){ form.close() }
   //     form.events.off('close',close);
   //     Modal.actions.close();
-  //     Modal.elements.button.close.off('click')
+  //     Modal.elements.close.off('click')
   //   });
   //
   //   Modal.actions.open({title: form.title, body: form.open() });
@@ -106,7 +125,7 @@ export default function(){
   //   });
   // };
 
-  [['modal',Modal],['nav',Nav]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
+  [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; })
 
   return {actions:Actions, elements: Elements}
 }

@@ -36,13 +36,14 @@
     {
       $select = '
         request.id,
-        notice.title as type,
+        notice.id as type,
+        notice.title as title,
         concat(users.name," ",users.lastname) as user,
         request.status,
       ';
 
-      foreach (['date_start','date_finish'] as $date) {
-        $select .= 'UNIX_TIMESTAMP(request.'.$date.') as '.$date.',';
+      foreach (['date_start'=>'start','date_finish'=>'end'] as $key => $alias) {
+        $select .= 'UNIX_TIMESTAMP(request.'.$key.') as '.$alias.',';
       }
 
       if(!count($order)){ $order = [['request.status','desc']]; }

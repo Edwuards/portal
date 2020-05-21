@@ -1,12 +1,6 @@
-import { default as Permision } from './permision.js';
-import { default as Sick } from './sick.js';
-import { default as HomeOffice } from './homeOffice.js';
-import { default as Vacation } from './vacation.js';
+import { Vacation } from './vacation.js';
+import { Permision } from './permision.js';
+import { Sick } from './sick.js';
+import { HomeOffice } from './homeOffice.js';
 
-
-export default [
-  Permision(),
-  Sick(),
-  HomeOffice(),
-  Vacation(),
-];
+export default [ Vacation,Permision,Sick,HomeOffice ]

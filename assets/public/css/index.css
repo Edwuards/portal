@@ -3,19 +3,19 @@
 
 .permision:nth-child(1) {
   bottom: 105px;
-  transition: bottom .75s; }
+  transition: bottom .45s; }
 
 .permision:nth-child(4) {
   bottom: 285px;
-  transition: bottom .75s; }
+  transition: bottom .45s; }
 
 .permision:nth-child(3) {
   bottom: 225px;
-  transition: bottom .75s; }
+  transition: bottom .45s; }
 
 .permision:nth-child(2) {
   bottom: 165px;
-  transition: bottom .75s; }
+  transition: bottom .45s; }
 
 .permision.hide {
   bottom: 45px; }
@@ -26,7 +26,7 @@
   position: fixed;
   width: 100px;
   height: 100px;
-  transition: all 1s; }
+  transition: all .45s; }
 
 .permisions-cont.active {
   width: 100vh;
@@ -233,7 +233,7 @@ body, html {
   width: calc(100vw + 320px);
   left: -320px;
   position: relative;
-  transition: left 1s; }
+  transition: left .5s; }
 
 #content.open {
   left: 0px; }

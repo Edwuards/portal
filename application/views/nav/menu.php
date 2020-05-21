@@ -1,9 +1,29 @@
 <?php
-  $css = '';
-  if($this->session->role < 2){ $css = 'hidden'; }
+  $html = '';
+  $buttons = [
+    'users'=> [
+      ['name'=>'perfil','icon'=>'fas fa-user','text'=>'Mi Perfil'],
+      ['name'=>'avisos','icon'=>'fas fa-envelope','text'=>'Mis Avisos'],
+      ['name'=>'calendar','icon'=>'far fa-calendar-alt','text'=>'Calendario'],
+      ['name'=>'logout','icon'=>'fas fa-power-off','text'=>'Cerrar Sesión']
+    ]
+  ];
+
+  foreach ($buttons['users'] as $button) {
+    $html .= '
+    <button class="flex items-center mb-4 ml-2 pl-2 items-center '.
+    ($button['name'] == 'calendar' ?  'border-l-2' : '')
+    .' border-red-600" type="button" name="'.$button['name'].'">
+      <i class="text-md '.$button['icon'].'"></i>
+      <p class="ml-2">'.$button['text'].'</p>
+    </button>';
+  }
+
+  $buttons['users'] = $html; $html = '';
+
 
  ?>
-<div id="menu" class="bg-gray-200 h-full p-4">
+<div id="menu" class="bg-gray-200 text-gray-700 h-full p-4">
     <div class="h-8 flex w-full m-4 sm:hidden">
        <img src="https://avisame.figment.com.mx/assets/img/logo.png" class="h-full">
      </div>
@@ -17,30 +37,7 @@
       </div>
     </div>
     <div class="w-full mt-6" >
-      <button class="flex w-full mb-2 p-2 items-center hidden" type="button" name="myProfile">
-        <i class="w-10 text-xl far fa-user-circle"></i>
-        <p class="ml-2">Perfil</p>
-      </button>
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="logout">
-        <i class="w-10 text-xl fas fa-door-open"></i>
-        <p class="ml-2">Salir</p>
-      </button>
-      <button class="flex w-full mb-2 p-2 items-center border-l-4 border-blue-600" type="button" name="calendar">
-        <i class="w-10 text-xl far fa-calendar"></i>
-        <p class="ml-2">Calendario</p>
-      </button>
-      <button class="flex w-full mb-2 p-2 items-center" type="button" name="myAvisos">
-        <i class="w-10 fas fa-envelope"></i>
-        <p class="ml-2">Mis Avisos</p>
-      </button>
-      <button class="flex w-full mb-2 p-2 items-center <?php echo $css; ?>" type="button" name="users">
-        <i class="w-10 text-xl fas fa-users"></i>
-        <p class="ml-2">Usuarios</p>
-      </button>
-      <button class="flex w-full mb-2 p-2 items-center <?php echo $css; ?>" type="button" name="userAvisos">
-        <i class="w-10 text-xl fas fa-clipboard-list"></i>
-        <p class="ml-2">Avisos de usuarios</p>
-      </button>
+      <?php echo $buttons['users']; ?>
 
     </div>
 </div>

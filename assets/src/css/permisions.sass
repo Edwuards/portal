@@ -3,12 +3,12 @@
 
 .permision:nth-child(1)
   bottom: 105px;
-  transition: bottom .75s;
+  transition: bottom .45s;
 
 @for $i from 4 through 2
   .permision:nth-child(#{$i})
     bottom: 105px + (60px * ($i - 1));
-    transition: bottom .75s ;
+    transition: bottom .45s ;
 
 .permision.hide
   bottom: 45px;
@@ -19,7 +19,7 @@
   position: fixed;
   width: 100px;
   height: 100px;
-  transition: all 1s;
+  transition: all .45s;
 
 .permisions-cont.active
   width: 100vh;

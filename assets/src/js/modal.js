@@ -8,30 +8,23 @@ export default function(){
     footer: $('#modal > .footer')
   }
 
-  Elements.title = Elements.header.find('.title > p');
-  Elements.button = {};
-  Elements.errors = Elements.container.find('.errors');
-  Elements.footer.find('button').each(function(){
-    let el = $(this);
-    Elements.button[el.attr('name')] = el;
-  });
-  Elements.allButtons = Elements.footer.find('button');
-  Elements.button.close = Elements.header.find('button[name="close"]');
+  Elements.title = Elements.header.find('.title');
+  Elements.close = Elements.header.find('button[name="close"]');
 
   Actions.open = (data)=>{
     Elements.title.html(data.title);
     Elements.body.html(data.body);
-
-    Elements.container.addClass('active').removeClass('close');
-    Elements.modal.addClass('active').removeClass('close');
+    Elements.container.addClass('active');
+    Elements.container.on('click',function(e){
+      if($(e.target).hasClass('modal-cont')){
+        Elements.close.trigger('click')
+      }
+    });
   }
 
   Actions.close = ()=>{
-    Elements.container.addClass('close').removeClass('active');
-    Elements.modal.addClass('close').removeClass('active');
-    Elements.title.html('');
-    Elements.body.html('');
-    Elements.allButtons.addClass('hidden');
+    Elements.container.off('click');
+    Elements.container.removeClass('active');
   }
 
   return { elements: Elements, actions: Actions}

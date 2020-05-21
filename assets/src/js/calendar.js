@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 
 export default function (){
   const Options = {
+    eventLimit: 3,
     plugins: [ dayGridPlugin ],
     defaultView: 'dayGridMonth',
     locale: esLocale,

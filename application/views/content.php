@@ -6,4 +6,7 @@
     <?php $this->load->view('permisions'); ?>
   </div>
 </section>
+<section name="forms" class="hidden">
+  <?php $this->load->view('forms/index',['load'=>['permisions']]); ?>
+</section>
 <?php $this->load->view('modal'); ?>

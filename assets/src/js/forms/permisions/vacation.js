@@ -1,36 +1,36 @@
-import { HTML } from '../templates.js';
-import { Form } from '../form.js';
-import { Services } from '../../services.js';
+import { Form, Helper } from '../form.js';
 
-export default function(){
-  let Vacation = undefined;
-  Services.get.form('permisions/vacation',function(html){
-    Vacation = new Form({
-      name: 'vacation',
-      title: 'Vacación',
-      html: html,
-      url:'permisions/create'
-    });
+const Vacation = new Form({
+  title: 'Vacación',
+  name: 'vacation',
+  url: 'permisions/create',
+});
 
-    let close = undefined;
-    Vacation.send = function(){
-      let data = {
-        notice: 2,
-        date_start: this.inputs.date.start.format,
-        date_finish: this.inputs.date.finish.format,
-      };
+let close = undefined;
 
-      this.buttons.send.events.unregister('click',close);
-      this.close();
-
-      return { error: false, data }
-
-    }
-    Vacation.open = function(){
-      close = this.buttons.send.events.on('click',Vacation.send);
-    }
-
-  });
-
-  return Vacation
+Vacation.init = function(){
+  Helper.pickerUnfocus(this.inputs);
 }
+
+Vacation.open = function(date){
+  close = this.buttons.send.events.on('click',this.send);
+  date = (date  == undefined ? new Date(Date.now()) : date );
+  Helper.setDate(this.inputs,date);
+}
+
+Vacation.close = function(){
+  this.buttons.send.events.off('click',close);
+}
+
+Vacation.send = function(){
+  let data = {};
+  data.date_start = this.inputs.date.start.value;
+  data.date_finish = this.inputs.date.finish.value;
+  data.notice = 2;
+
+  return { error: false, data }
+}
+
+
+
+export { Vacation }
