@@ -4,6 +4,7 @@
   <div class="body w-screen relative">
     <div id="calendar" class="w-full"></div>
     <?php $this->load->view('permisions'); ?>
+    <?php $this->load->view('avisos'); ?>
   </div>
 </section>
 <section name="forms" class="hidden">
