@@ -13583,12 +13583,310 @@
 
   }
 
+  function Aviso({type,title,user,start,end}){
+
+    type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
+    start = flatpickr.formatDate(start, 'j M Y h:i K');
+    end = flatpickr.formatDate(end, 'j M Y h:i K');
+
+    return `
+  <div class=" shadow-xl bg-white text-gray-700 p-2 rounded m-4">
+    <div class="flex items-center">
+      <div class="w-12 h-12 mx-2 flex item-center rounded-full overflow-hidden">
+        <img src="${window.location.origin}/assets/public/img/placeholder.jpeg" class="w-full">
+      </div>
+      <div class="mx-2">
+
+        <div class="flex justify-between text-sm my-1">
+          <p class="w-40">${user}</p>
+          <p class="flex items-center justify-end w-32">
+            <span class="mx-2 w-2 h-2 ${type} relative rounded-full"></span>
+            ${title}
+          </p>
+        </div>
+
+        <div class="flex items-center text-sm my-2">
+          <i class="fas fa-calendar-alt"></i>
+          <div class="flex items-center ml-1">
+            <p class="text-xs mx-1 w-32">${start}</p>
+            <p class="mx-1">-</p>
+            <p class="text-xs mx-1 w-32">${end}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="w-full flex mt-2 justify-between items-center">
+      <button type="button" name="view" class="ml-2 flex items-center text-xs text-gray-500">
+        <i class="fas fa-eye mr-2"></i>
+        <p>Ver más</p>
+      </button>
+      <div class="flex justify-end">
+        <button type="button" class="flex items-center text-xs  text-green-600 px-2 py-1 rounded mx-1" name="approve">
+            <i class="fas fa-check"></i>
+            <p class="ml-2 text-xs">Aprobar</p>
+        </button>
+        <button type="button" class="flex items-center text-xs text-red-600 px-2 py-1 rounded mx-1" name="decline">
+            <i class="fas fa-times"></i>
+            <p class="ml-2 text-xs">Rechazar</p>
+        </button>
+    </div>
+    </div>
+  </div>`;
+
+  }
+
+  function Card({id,status,start,end,user,title,type},TEMPLATE){
+    const CARD = $(document.createElement('div'));
+    const PROPS = {
+      id,
+      start: new Date(start * 1000),
+      end: new Date(end * 1000),
+      type,
+      user,
+      title,
+      status
+    };
+    const BUTTONS = {};
+    const OBSERVER = new Observer(['updateStatus']);
+    const METHODS = {
+      'aviso':{
+        writable: false,
+        value : {
+          id: PROPS.id,
+          start: PROPS.start,
+          end: PROPS.end,
+          user: PROPS.user,
+          title: PROPS.title,
+          status: PROPS.status
+        }
+      },
+      'element': {
+        writable: false,
+        value: CARD
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS
+      },
+      'on':{
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          for (let name in BUTTONS) {
+            BUTTONS[name].on();
+          }
+        }
+      },
+      'off':{
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          for (let name in BUTTONS) {
+            BUTTONS[name].off();
+          }
+        }
+      },
+      'status':{
+        get:()=>{ return PROPS.status; },
+        set:(status)=>{
+          PROPS.status = status ;
+          OBSERVER.notify('updateStatus',[{id: PROPS.id, status}]);
+        }
+      },
+      'events': {
+        writable: false,
+        value: {
+          on: OBSERVER.register,
+          off: OBSERVER.unregister,
+        }
+      }
+    };
+
+    CARD.addClass('card relative')
+    .html(TEMPLATE(PROPS))
+    .find('button')
+    .each(function(){
+      let name = $(this).attr('name');
+      BUTTONS[name] = new Button($(this));
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function Aviso$1(aviso){
+    const INSTANCE = this;
+    Card.call(this,aviso,Aviso);
+    this.buttons.approve.events.on('click',function(){ INSTANCE.status = 1; });
+    this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+  }
+
+  function Avisos(name){
+    const INSTANCE = this;
+    const CONTAINER = $(`[data-avisos="${name}"]`);
+    const SECTIONS = {};
+    const BUTTONS = {};
+    const PROPS = {
+      alive: false,
+      avisos: [],
+      current: [],
+      state: 2
+    };
+    const STATE = (current,state)=>{
+      if(state !== PROPS.status){
+        PROPS.status = state;
+        for(let button in BUTTONS){
+          BUTTONS[button].element[ current == button ? 'addClass' : 'removeClass']('text-gray-700 border-b-2 border-red-600');
+          SECTIONS[button][ current == button ? 'removeClass' : 'addClass']('hidden');
+        }
+        PROPS.current.forEach(aviso => aviso.off());
+        PROPS.current = [];
+        PROPS.avisos.forEach((aviso)=>{
+          if(aviso.status == state){ aviso.on(); PROPS.current.push(aviso); }
+        });
+      }
+    };
+    const METHODS = {
+      'open':{
+        writable: false,
+        value: ()=>{
+          PROPS.alive = true;
+          for (let name in BUTTONS) { BUTTONS[name].on(); }
+          PROPS.current.forEach(aviso => aviso.on() );
+        }
+      },
+      'close':{
+        writable: false,
+        value: ()=>{
+          PROPS.alive = false;
+          for (let name in BUTTONS) { BUTTONS[name].off(); }
+          PROPS.current.forEach(aviso => aviso.off() );
+        }
+      },
+      'add': {
+        writable: false,
+        value: (aviso)=>{
+          let status = aviso.status;
+          aviso = PROPS.avisos[PROPS.avisos.push(new Aviso$1(aviso)) - 1];
+          if(status == 1){ SECTIONS.approved.append(aviso.element); }
+          else if(status == 2){ SECTIONS.pending.append(aviso.element); }
+          else { SECTIONS.declined.append(aviso.element); }
+
+          if(PROPS.state == status){ PROPS.current.push(aviso); }
+
+          aviso.events.on('updateStatus',function(){
+            console.log(arguments);
+          });
+
+        }
+      }
+
+    };
+
+    CONTAINER
+    .children('.body')
+    .find('section').each(function(){
+      let el = $(this);
+      SECTIONS[el.attr('name')] = el;
+    });
+
+    CONTAINER
+    .children('.header')
+    .find('button').each(function(){
+      let el = $(this),
+      name = el.attr('name'),
+      state = el.attr('data');
+
+      BUTTONS[name] = new Button(el);
+      BUTTONS[name].events.on('click',function(){ STATE(name,state); });
+    });
+
+    Object.defineProperties(this,METHODS);
+
+    console.log(INSTANCE);
+  }
+
+  function base_url(url){
+    return `${window.location.origin}/${url}`;
+  }
+  const Services = {};
+  Services.get = {};
+  Services.get.form = (name,fn,sync)=>{
+    let settings = {
+      url: base_url(`app/forms`),
+      method: 'post',
+      data:{ name },
+      async: sync ? sync : false,
+      success:fn
+    };
+
+    $.ajax(settings);
+
+  };
+  Services.get.table = (name,fn)=>{
+    let settings = {
+      url: base_url(`tables/get/${name}`),
+      async: false,
+      success:fn
+    };
+
+    $.ajax(settings);
+
+  };
+  Services.get.user = (data,fn)=>{
+    let settings = {
+      url: base_url(`users/get`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+  Services.get.aviso = (data,fn)=>{
+    let settings = {
+      url: base_url(`permisions/get`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+
+  Services.update = {};
+  Services.update.aviso = (data,fn)=>{
+    let settings = {
+      url: base_url(`permisions/update`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+
+  var avisosInit = ()=>{
+    const UserAvisos = new Avisos('users');
+    Services.get.aviso({},function(response){
+      let {error,data} = response;
+      if(!error){ data.forEach(aviso => UserAvisos.add(aviso)); }
+    });
+    
+    return { UserAvisos }
+  };
+
   function actionsInit(){
     const Calendar = calendarInit();
     const Nav = navInit();
     const Modal = modalInit();
     const Permisions = permisionsInit();
     const Forms = formsInit();
+    const { UserAvisos } = avisosInit();
 
     const Actions = {};
     const Elements = {};
@@ -13708,69 +14006,6 @@
 
     return {actions:Actions, elements: Elements}
   }
-
-  function base_url(url){
-    return `${window.location.origin}/${url}`;
-  }
-  const Services = {};
-  Services.get = {};
-  Services.get.form = (name,fn,sync)=>{
-    let settings = {
-      url: base_url(`app/forms`),
-      method: 'post',
-      data:{ name },
-      async: sync ? sync : false,
-      success:fn
-    };
-
-    $.ajax(settings);
-
-  };
-  Services.get.table = (name,fn)=>{
-    let settings = {
-      url: base_url(`tables/get/${name}`),
-      async: false,
-      success:fn
-    };
-
-    $.ajax(settings);
-
-  };
-  Services.get.user = (data,fn)=>{
-    let settings = {
-      url: base_url(`users/get`),
-      data: data,
-      method: 'post',
-      async: true,
-      success: fn
-    };
-
-    $.ajax(settings);
-  };
-  Services.get.aviso = (data,fn)=>{
-    let settings = {
-      url: base_url(`permisions/get`),
-      data: data,
-      method: 'post',
-      async: true,
-      success: fn
-    };
-
-    $.ajax(settings);
-  };
-
-  Services.update = {};
-  Services.update.aviso = (data,fn)=>{
-    let settings = {
-      url: base_url(`permisions/update`),
-      data: data,
-      method: 'post',
-      async: true,
-      success: fn
-    };
-
-    $.ajax(settings);
-  };
 
   function Events(){
     const {actions,elements} = actionsInit();

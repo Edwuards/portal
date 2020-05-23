@@ -3,6 +3,7 @@ import { default as navInit } from './nav.js';
 import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
 import { default as formsInit } from './forms/index.js';
+import { default as avisosInit } from './avisos/index.js';
 
 export default function(){
   const Calendar = calendarInit();
@@ -10,6 +11,7 @@ export default function(){
   const Modal = modalInit();
   const Permisions = permisionsInit();
   const Forms = formsInit();
+  const { UserAvisos } = avisosInit();
 
   const Actions = {};
   const Elements = {};
