@@ -1,8 +1,16 @@
-export default function (){
+export default function ({Calendar,UserAvisos,myAvisos,Users, Profile}){
   const Elements = {};
   const Actions = {};
   const State = {
     menu: false,
+    current: 'calendar'
+  };
+  const Content = {
+    'calendar': Calendar,
+    'userAvisos': UserAvisos,
+    'myAvisos': myAvisos,
+    'users': Users,
+    'profile': Profile,
   };
 
   Elements.container = $('nav')
@@ -46,9 +54,18 @@ export default function (){
   }
   Actions.updateMenu = (selected)=>{
     for (let name in Elements.menu.button) {
-      Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-4 border-blue-600');
+      Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-2 border-red-600');
     }
   }
-
+  Actions.content = (name)=>{
+    if(Content[name] && State.current !== name){
+      State.current = name;
+      for (let content in Content) {
+        Content[content][ content == name ? 'open' : 'close' ]();
+      }
+      Actions.updateMenu(name);
+      Actions.changeNavBar(name);
+    }
+  }
   return {elements: Elements,actions: Actions,state: State}
 }

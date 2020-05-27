@@ -45,6 +45,7 @@ function EventHandler(element,events){
       }
     },
     'off':{
+      configurable: true,
       writable: false,
       value: ()=>{
         PROPS.alive = false;
@@ -157,6 +158,107 @@ function Input(INPUT){
   Object.defineProperties(this,METHODS);
 }
 
+function SelectInput(INPUT){
+  Input.call(this,INPUT);
+
+  const OPTIONS = {
+    add: (option)=>{
+      let el = $(document.createElement('option'));
+      el.text(option.text).val(option.value);
+      this.element.append(el);
+    },
+    select:(value)=>{
+      this.options.get().removeAttr('selected');
+      this.element.find(`[value="${value}"]`).attr('selected','selected');
+    },
+    remove: (value)=>{
+      this.element.find(`[value="${value}"]`).remove();
+    },
+    get: ()=>{ return this.element.children(); },
+    find: (value)=>{ return this.element.find(`[value="${value}"]`); }
+  };
+
+  const METHODS = {
+    'value':{
+      set: (value)=>{
+        this.element.val(value);
+        this.options.select(value);
+      },
+      get: ()=>{
+        return this.element.val().trim();
+      }
+    },
+    'options':{
+      writable: false,
+      value: OPTIONS
+    }
+  };
+
+  Object.defineProperties(this,METHODS);
+}
+
+function ImageInput(INPUT,BUTTON,IMG){
+  Input.call(this,INPUT);
+  BUTTON = new Button(BUTTON);
+  const INSTANCE = this;
+  const ON = INSTANCE.on;
+  const OFF = INSTANCE.off;
+  const PROPS = {
+    img: IMG,
+    reader: new FileReader(),
+    file: undefined,
+    data: undefined,
+    changed: false,
+  };
+  const METHODS = {
+    'changed': {
+      get: ()=>{ return PROPS.changed; }
+    },
+    'value': {
+      get:()=>{ return PROPS.file }
+    },
+    'src':{
+      set: (value)=>{ PROPS.img.attr('src',value); }
+    },
+    'on': {
+      configurable: true,
+      writable: false,
+      value: function(){
+        ON.call(this);
+        BUTTON.on();
+      }
+    },
+    'off': {
+      configurable: true,
+      writable: false,
+      value: function(){
+        OFF.call(this);
+        BUTTON.off();
+        IMG.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+      }
+    }
+  };
+
+  Object.defineProperties(this,METHODS);
+
+  PROPS.reader.onload = (e)=>{
+    PROPS.img.attr('src',e.target.result);
+    PROPS.data = e.target.result;
+  };
+
+  BUTTON.events.on('click',function(){
+    INSTANCE.element.val('');
+    INSTANCE.element.trigger('click');
+  });
+
+  this.events.on('change',function(){
+    PROPS.changed = true;
+    PROPS.file = this.element[0].files[0];
+    PROPS.reader.readAsDataURL(PROPS.file);
+  });
+
+}
+
 function DateInput(INPUT){
   const PICKER = flatpickr(INPUT,{
     locale: Spanish,
@@ -178,12 +280,24 @@ function DateInput(INPUT){
       writable: false,
       value: ()=>{
         $(document).on('click.exitPicker',function(e){
-          let close = e.target.classList.toString().indexOf('flatpickr') == -1;
-          if(close){ PICKER.close(); $(document).off('click.exitPicker'); }
+          e = e.target;
+          let search = true, found = false;
+          while(search){
+            if(e.tagName !== 'BODY'){
+              found = e.classList.toString().indexOf('flatpickr') != -1
+              if(found){ search = false};
+            }
+            else{
+              search = false;
+            }
+            e = e.parentElement;
+          }
+          if(!found){ PICKER.close(); $(document).off('click.exitPicker'); }
         });
       }
     },
     'value':{
+      set: (date)=>{ PICKER.setDate(date); },
       get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'Y-m-d'); }
     }
   }
@@ -221,6 +335,7 @@ function TimeInput(INPUT){
       }
     },
     'value':{
+      set:(value)=>{ PICKER.setDate(date); },
       get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'H:i:s'); }
     }
   }
@@ -232,6 +347,8 @@ function TimeInput(INPUT){
 export {
   TimeInput,
   DateInput,
+  SelectInput,
+  ImageInput,
   Button,
   Input
 }

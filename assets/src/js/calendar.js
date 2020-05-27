@@ -24,5 +24,9 @@ export default function (){
   }
   const CALENDAR = new Calendar(Elements.calendar[0],Options);
 
-  return CALENDAR
+  return {
+    instance: CALENDAR,
+    open: ()=>{ Elements.calendar.addClass('active'); },
+    close: ()=>{Elements.calendar.removeClass('active'); }
+  }
 }

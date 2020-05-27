@@ -17,12 +17,12 @@ const Helper = {
   pickerUnfocus: (inputs)=>{
     if(inputs.date){
       for (let input in inputs.date){
-        inputs.date[input].events.on('focus',function(){ this.close(); });
+        inputs.date[input].events.on('click',function(){ this.close(); });
       }
     }
     if(inputs.time){
       for (let input in inputs.time){
-        inputs.time[input].events.on('focus',function(){ this.close(); });
+        inputs.time[input].events.on('click',function(){ this.close(); });
       }
     }
   }
@@ -79,20 +79,33 @@ function Form(data){
     }
   }
 
-  PROPS.title = `
-    <span class="w-2 h-2 abosolute mx-2 rounded-full bg-teal-600"></span>
-    <p>${data.title}</p>
-  `;
+  {
+    let color = {'homeOffice':'bg-indigo-600','sick':'bg-blue-600','vacation':'bg-teal-600','permision':'bg-green-600'};
+    color = color[data.name] ? color[data.name] : '';
+    PROPS.title = `
+      <span class="w-2 h-2 abosolute mx-2 ${color} rounded-full "></span>
+      <p>${data.title}</p>
+    `;
+  }
+
   $(document).ready(function(){
     PROPS.element = $(`form[name="${data.name}"]`);
     PROPS.element.find('[data-type]').each(function(){
 
       let el = $(this),
       type = el.attr('data-type'),
-      name = el.attr('name');
+      name = el.attr('name'),
+      group = el.attr('data-group');
       if(type !== 'button'){
+
         if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
-        INPUTS.type[type][name] = el;
+        if(group){
+          if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {}; }
+          INPUTS.type[type][group][name] = el;
+        }
+        else{
+          INPUTS.type[type][name] = el;
+        }
       }
       else{
         BUTTONS.name[name] = new Inputs.Button(el);
@@ -111,9 +124,17 @@ function Form(data){
           input = INPUTS.type.time[input];
           INPUTS.type.time[name] = new Inputs.TimeInput(input);
         }
-        else if(type == 'textarea' || type == 'text'){
+        else if(type == 'textarea' || type == 'text' || type == 'number'){
           input = INPUTS.type[type][input];
           INPUTS.type[type][name] = new Inputs.Input(input);
+        }
+        else if(type == 'select'){
+          input = INPUTS.type[type][input];
+          INPUTS.type[type][name] = new Inputs.SelectInput(input);
+        }
+        else if(type == 'image'){
+          input = INPUTS.type.image[input];
+          INPUTS.type.image[name] = new Inputs.ImageInput(input.file,input.upload,input.preview);
         }
         INPUTS.all.push(INPUTS.type[type][name]);
       }

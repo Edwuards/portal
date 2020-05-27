@@ -3445,10 +3445,15 @@
       }
     };
 
-    PROPS.title = `
-    <span class="w-2 h-2 abosolute mx-2 rounded-full bg-teal-600"></span>
-    <p>${data.title}</p>
-  `;
+    {
+      let color = {'homeOffice':'bg-indigo-600','sick':'bg-blue-600','vacation':'bg-teal-600','permision':'bg-green-600'};
+      color = color[data.name] ? color[data.name] : '';
+      PROPS.title = `
+      <span class="w-2 h-2 abosolute mx-2 ${color} rounded-full "></span>
+      <p>${data.title}</p>
+    `;
+    }
+
     $(document).ready(function(){
       PROPS.element = $(`form[name="${data.name}"]`);
       PROPS.element.find('[data-type]').each(function(){
@@ -3593,20 +3598,21 @@
     Object.defineProperties(this,METHODS);
   }
 
-  const Login = new Form({
-    title: 'Login',
-    name: 'login',
-    url: 'users/login',
+  const Verify = new Form({
+    title: 'Verify',
+    name: 'verify',
+    url: 'users/verify',
   });
 
   let close = undefined;
-  Login.open = function(){
-    close = this.buttons.send.events.on('click',Login.send);
+
+  Verify.open = function(){
+    close = this.buttons.send.events.on('click',Verify.send);
   };
 
-  Login.send = function(){
+  Verify.send = function(){
     $('[data="error"]').text('');
-    Login.buttons.send.events.off('click',close);
+    Verify.buttons.send.events.off('click',close);
 
     let data = {};
     data.email = this.inputs.text.email.value;
@@ -3614,9 +3620,9 @@
     return {error: false, data };
   };
 
-  Login.events.on('response',function(response){
+  Verify.events.on('response',function(response){
     if(response.error){
-      close = Login.buttons.send.events.on('click',Login.send);
+      close = Verify.buttons.send.events.on('click',Verify.send);
       $('[data="error"]').text(response.data);
     }
     else {
@@ -3625,7 +3631,7 @@
   });
 
   $$1(document).ready(function(){
-    $$1('#login').append(Login.open());
+    $$1('#login').append(Verify.open());
   });
 
 }($));

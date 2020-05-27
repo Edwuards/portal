@@ -170,6 +170,17 @@ form[name="login"] {
     justify-content: center;
     align-items: center; }
 
+form[name="verify"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+  form[name="verify"] .footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; }
+
 .permisions input,
 .permisions select,
 .permisions textarea {
@@ -221,6 +232,14 @@ th.fc-day-header.fc-widget-header {
 .fc-unthemed td.fc-today {
   background: #fbf0b2; }
 
+#calendar {
+  background-color: white;
+  position: relative;
+  z-index: 0; }
+
+#calendar.active {
+  z-index: 5; }
+
 body, html {
   overflow: hidden;
   width: 100%;
@@ -246,5 +265,40 @@ button[name="avisar"] {
   height: 50px;
   width: 50px; }
 
-[data-avisos] > .body {
+[data-avisos].active {
+  z-index: 20; }
+
+[data-avisos] {
+  z-index: 0; }
+  [data-avisos] > .body {
+    height: calc(100% - 48px); }
+    [data-avisos] > .body .card .message {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      opacity: 0;
+      z-index: 0;
+      transition: opacity .5s; }
+    [data-avisos] > .body .card.approved .message,
+    [data-avisos] > .body .card.declined .message {
+      opacity: 1;
+      z-index: 11; }
+    [data-avisos] > .body .card.approved .message {
+      background-color: #38a169; }
+    [data-avisos] > .body .card.declined .message {
+      background-color: #e53e3e; }
+
+[data-users="list"].active {
+  z-index: 20; }
+
+[data-users="list"] > .body {
   height: calc(100% - 48px); }
+  [data-users="list"] > .body .card.delete > div {
+    border: 2px solid red; }
+
+[data-users="create"] > .body {
+  height: calc(100% - 48px); }
+
+[data-users="profile"].active {
+  z-index: 20; }

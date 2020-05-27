@@ -3,6 +3,7 @@
     <i class="text-md fas fa-bars"></i>
   </button>
   <?php $this->load->view('nav/calendar'); ?>
+  <?php $this->load->view('nav/profile'); ?>
   <?php $this->load->view('nav/users'); ?>
   <?php $this->load->view('nav/myAvisos'); ?>
   <?php $this->load->view('nav/userAvisos'); ?>

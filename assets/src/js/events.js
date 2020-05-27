@@ -11,7 +11,11 @@ function Events(){
   elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
   elements.permisions.avisar.on('click',actions.avisar);
   elements.permisions.buttons.on('click',actions.open.permision);
-
+  elements.nav.menu.button.profile.on('click',actions.open.menuContent);
+  elements.nav.menu.button.myAvisos.on('click',actions.open.menuContent);
+  elements.nav.menu.button.userAvisos.on('click',actions.open.menuContent);
+  elements.nav.menu.button.calendar.on('click',actions.open.menuContent);
+  elements.nav.menu.button.users.on('click',actions.open.menuContent);
 }
 
 export { Events }

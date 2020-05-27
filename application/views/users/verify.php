@@ -3,5 +3,6 @@
     <div class="w-1/2 my-8" >
       <img src="https://avisame.figment.com.mx/assets/img/logo.png" alt="">
     </div>
+    <?php $this->load->view('forms/users/verify',$user); ?>
   </div>
 </section>

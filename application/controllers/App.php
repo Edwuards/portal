@@ -23,7 +23,7 @@ class App extends CI_Controller {
 			'js'=>['jquery','login'],
 			'css'=>['base','index']
 		];
-		$views = ['login'=>''];
+		$views = ['users/login'=>''];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Login']);
 	}
 
@@ -47,30 +47,67 @@ class App extends CI_Controller {
 			'js'=>['jquery','app'],
 			'css'=>['base','index']
 		];
-		$views = ['content'=>''];
+		$views = ['content'=>['work'=>$this->work_areas()]];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
-	public function forms()
+	public function verify($id,$code)
 	{
+		$user = null;
+		$this->load->model('UsersModel','Users');
+		$where = [
+			['users.id','=',(string)$id],
+			['users.verified','=','0']
+		];
 
-		$method = $this->input->method();
-		if($method != 'post')
+		$response = $this->Users->get('email,code',$where);
+
+		if(!$response['error'])
 		{
+			$user = $response['data'][0];
+			$response['error'] = !password_verify($code,$user['code']);
+		}
+
+
+		if(!$response['error'])
+		{
+			unset($user['code']);
+			$scripts = [
+				'js'=>['jquery','verify'],
+				'css'=>['base','index']
+			];
+			$views = ['users/verify'=>['user'=>$user]];
+			$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Verificar']);
+		}
+		else{
 			redirect('app/login');
 		}
 
-		$name = $this->input->post('name');
-		if($name !== 'users/login' && !$this->session->verified )
-		{
-			redirect('app/login');
-		}
-
-		$html = $this->load->view('forms/'.$name,'',true);
-		$this->output
-		->set_content_type('text/html')
-		->set_output($html);
 	}
+
+	public function test(){
+		echo password_hash('figment',PASSWORD_DEFAULT);
+	}
+
+
+	private function work_areas()
+	{
+		$this->load->database();
+		$areas = $this->db->select('id,title')
+		->from('work_areas')
+		->get()->result_array();
+
+
+		$positions = $this->db->select('id,title,area')
+		->from('work_positions')
+		->get()->result_array();
+
+		return ['areas'=>$areas,'positions'=>$positions];
+
+	}
+
+
+
 
 
 }

@@ -24,8 +24,8 @@ Vacation.close = function(){
 
 Vacation.send = function(){
   let data = {};
-  data.date_start = this.inputs.date.start.value;
-  data.date_finish = this.inputs.date.finish.value;
+  data.date_start = this.inputs.date.start.value+' 10:00:00';
+  data.date_finish = this.inputs.date.finish.value+' 10:00:00';
   data.notice = 2;
 
   return { error: false, data }

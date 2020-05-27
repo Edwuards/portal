@@ -25,13 +25,31 @@
     return $ci->load->view('forms/inputs/input',$overWrite,true);
   }
 
+  function NumberInput($data){
+    $ci=& get_instance();
+    $overWrite = [
+      'css'=> [
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
+        'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
+      ],
+      'label'=> isset($data['label']) ? $data['label'] : '',
+      'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
+    ];
+
+    $overWrite['type'] = 'number';
+    $overWrite['attrs']['data-type'] = 'number';
+
+    return $ci->load->view('forms/inputs/input',$overWrite,true);
+  }
+
   function DateInput($data){
     $ci=& get_instance();
     $overWrite = [
       'css'=> [
         'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : 'h-8',
         'input'=> isset($data['css']['input']) ? $data['css']['input'] : 'text-center',
-        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : 'w-24',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : 'w-24 mx-1',
       ],
       'label'=> isset($data['label']) ? $data['label'] : '',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
@@ -76,7 +94,7 @@
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
     ];
 
-    $overWrite['attrs']['data-type'] = 'password';
+    $overWrite['attrs']['data-type'] = 'text';
     $overWrite['type'] = 'password';
 
     return $ci->load->view('forms/inputs/input',$overWrite,true);
@@ -85,7 +103,11 @@
   function SelectInput($data){
     $ci=& get_instance();
     $overWrite = [
-      'css'=> isset($data['css']) ? $data['css'] : '',
+      'css'=> [
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
+        'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
+      ],
       'label'=> isset($data['label']) ? $data['label'] : '',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : [],
       'options'=> isset($data['options']) ? $data['options'] : ''

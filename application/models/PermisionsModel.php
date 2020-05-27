@@ -19,8 +19,8 @@
     public function create($permision)
     {
       $this->response = [ 'error'=>false, 'data'=>false ];
-      $permision['user'] = 1;
       $permision['status'] = 2;
+      $permision['user'] = $this->session->id;
 
       $this->response = $this->insert($permision);
 
@@ -38,6 +38,7 @@
         request.id,
         notice.id as type,
         notice.title as title,
+        notice.color as color,
         concat(users.name," ",users.lastname) as user,
         request.status,
       ';

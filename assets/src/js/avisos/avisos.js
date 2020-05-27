@@ -1,4 +1,3 @@
-import { Aviso } from './cards/index.js';
 import { Button } from '../inputs.js';
 
 function Avisos(name){
@@ -13,14 +12,16 @@ function Avisos(name){
     state: 2
   };
   const ADD = (aviso)=>{
-    if(status == 1){ SECTIONS.approved.append(aviso.element); }
-    else if(status == 2){ SECTIONS.pending.append(aviso.element); }
-    else { SECTIONS.declined.append(aviso.element); }
+    aviso = PROPS.avisos[PROPS.avisos.push(aviso) - 1];
+    let status = aviso.status;
+    if(status == 1){ SECTIONS.approved.prepend(aviso.element); }
+    else if(status == 2){ SECTIONS.pending.prepend(aviso.element); }
+    else { SECTIONS.declined.prepend(aviso.element); }
 
     if(PROPS.alive){ aviso.on(); }
     if(PROPS.state == status){ PROPS.current.push(aviso); }
 
-  }
+  };
   const STATE = (current,state)=>{
     if(state !== PROPS.status){
       PROPS.status = state;
@@ -42,34 +43,38 @@ function Avisos(name){
         PROPS.alive = true;
         for (let name in BUTTONS) { BUTTONS[name].on(); }
         PROPS.current.forEach(aviso => aviso.on() );
+        CONTAINER.addClass('active');
       }
     },
     'close':{
       writable: false,
       value: ()=>{
+        CONTAINER.removeClass('active');
         PROPS.alive = false;
         for (let name in BUTTONS) { BUTTONS[name].off(); }
         PROPS.current.forEach(aviso => aviso.off() );
       }
     },
-    'add': {
+    'update':{
       writable: false,
       value: (aviso)=>{
-        let status = aviso.status;
-        aviso = PROPS.avisos[PROPS.avisos.push(new Aviso(aviso)) - 1];
-        if(status == 1){ SECTIONS.approved.append(aviso.element); }
-        else if(status == 2){ SECTIONS.pending.append(aviso.element); }
-        else { SECTIONS.declined.append(aviso.element); }
-
-        if(PROPS.state == status){ PROPS.current.push(aviso); }
-
-        aviso.events.on('updateStatus',function(){
-          console.log(arguments);
+        aviso.off();
+        aviso.element.detach();
+        if(aviso.status){ SECTIONS.approved.prepend(aviso.element); }
+        else{ SECTIONS.declined.prepend(aviso.element); }
+      }
+    },
+    'add': {
+      configurable: true,
+      set: (fn)=>{
+        Object.defineProperty(INSTANCE,'add',{
+          writable: false,
+          value: function(){
+            ADD(fn.apply(null,arguments));
+          }
         });
-
       }
     }
-
   }
 
   CONTAINER
@@ -92,7 +97,6 @@ function Avisos(name){
 
   Object.defineProperties(this,METHODS);
 
-  console.log(INSTANCE);
 }
 
 

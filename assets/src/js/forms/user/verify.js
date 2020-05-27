@@ -1,19 +1,20 @@
 import { Form, Helper } from '../form.js';
 
-const Login = new Form({
-  title: 'Login',
-  name: 'login',
-  url: 'users/login',
+const Verify = new Form({
+  title: 'Verify',
+  name: 'verify',
+  url: 'users/verify',
 });
 
 let close = undefined;
-Login.open = function(){
-  close = this.buttons.send.events.on('click',Login.send);
+
+Verify.open = function(){
+  close = this.buttons.send.events.on('click',Verify.send);
 }
 
-Login.send = function(){
+Verify.send = function(){
   $('[data="error"]').text('');
-  Login.buttons.send.events.off('click',close);
+  Verify.buttons.send.events.off('click',close);
 
   let data = {}
   data.email = this.inputs.text.email.value;
@@ -21,9 +22,9 @@ Login.send = function(){
   return {error: false, data };
 }
 
-Login.events.on('response',function(response){
+Verify.events.on('response',function(response){
   if(response.error){
-    close = Login.buttons.send.events.on('click',Login.send);
+    close = Verify.buttons.send.events.on('click',Verify.send);
     $('[data="error"]').text(response.data);
   }
   else{
@@ -32,4 +33,4 @@ Login.events.on('response',function(response){
 });
 
 
-export {Login}
+export {Verify}

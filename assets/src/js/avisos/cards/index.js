@@ -57,7 +57,7 @@ function Card({id,status,start,end,user,title,type},TEMPLATE){
     'status':{
       get:()=>{ return PROPS.status; },
       set:(status)=>{
-        PROPS.status = status ;
+        PROPS.status = Number(status) ;
         OBSERVER.notify('updateStatus',[{id: PROPS.id, status}]);
       }
     },
@@ -82,12 +82,35 @@ function Card({id,status,start,end,user,title,type},TEMPLATE){
 
 }
 
-function Aviso(aviso){
+function AvisoReadCard(aviso){
+  const INSTANCE = this;
+  Card.call(this,aviso,HTML.AvisoReadOnly);
+}
+
+function AvisoUpdateCard(aviso){
   const INSTANCE = this;
   Card.call(this,aviso,HTML.Aviso);
-  this.buttons.approve.events.on('click',function(){ INSTANCE.status = 1; });
-  this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+
+  this.message = this.element.find('.message');
+
+  aviso.status = Number(aviso.status);
+
+
+  if(aviso.status == 1){
+    this.buttons.approve.element.addClass('hidden');
+    this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+  }
+
+  if(aviso.status == 2){
+    this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+    this.buttons.approve.events.on('click',function(){ INSTANCE.status = 1; });
+  }
+
+  if(!aviso.status){
+    this.buttons.approve.element.addClass('hidden');
+    this.buttons.decline.element.addClass('hidden');
+  }
 }
 
 
-export { Aviso }
+export { AvisoUpdateCard, AvisoReadCard }

@@ -64,6 +64,25 @@ class Permisions extends CI_Controller {
 
 	}
 
+	public function mine()
+	{
+		$this->resetResponse();
+
+		$method = $this->input->method();
+		if($method != 'post'){
+			$this->response['error'] = true;
+			$this->response['data'] = 'Solo por metódo POST';
+		}
+		else{
+			$query = $this->input->post('where');
+			$query = is_array($query) ? $query : [];
+			$this->response = $this->Permisions->find($query);
+		}
+
+		$this->json($this->response);
+
+	}
+
 	public function update()
 	{
 		$this->resetResponse();
@@ -78,7 +97,7 @@ class Permisions extends CI_Controller {
 			$where = $this->input->post('where');
 			if( !is_array($where) || (count($where) == 0) ){
 				$this->response['error'] = true;
-				$this->response['message'] = 'Necesitas una cluasura where --> [[key,operand,value]]';
+				$this->response['data'] = 'Necesitas una cluasura where --> [[key,operand,value]]';
 			}
 		}
 

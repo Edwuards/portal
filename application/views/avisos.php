@@ -1,4 +1,4 @@
-<div data-avisos="users" class="w-full h-full absolute top-0 z-50 bg-gray-300 ">
+<div data-avisos="<?php echo $name; ?>" class="w-full h-full absolute top-0 bg-gray-300 ">
   <div class="header w-full h-12 bg-white shadow-lg pl-16  text-gray-500">
     <button data="2" type="button" name="pending" class="p-1 border-b-2 border-red-600 ml-2 mr-4 hover:text-gray-700 text-gray-700">Pendiente</button>
     <button data="1" type="button" name="approved" class="p-1 mr-4 hover:text-gray-700">Aprobados</button>

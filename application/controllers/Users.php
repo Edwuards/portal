@@ -12,6 +12,7 @@ class Users extends CI_Controller {
 		$this->load->model('UsersModel','Users');
 	}
 
+
 	private function json($data)
 	{
 		$this->output
@@ -36,6 +37,16 @@ class Users extends CI_Controller {
 		else{
 			$user = $this->input->post(NULL);
 			$this->response = $this->Users->create($user);
+		}
+
+		if(!$this->response['error']){
+			$user = $this->response['data'];
+			$this->Users->email([
+				'to'=>$user['email'],
+				'subject'=>'Bienvenido',
+				'message'=>$this->load->view('emails/verify',['user'=>$user],true)
+			]);
+			unset($user['code']);
 		}
 
 		$this->json($this->response);
@@ -118,7 +129,7 @@ class Users extends CI_Controller {
 
 	}
 
-	function login()
+	public function login()
 	{
 		$this->resetResponse();
 
@@ -140,5 +151,57 @@ class Users extends CI_Controller {
 
 	}
 
+	public function verify()
+	{
+		$this->resetResponse();
+
+		$method = $this->input->method();
+		if($method != 'post')
+		{
+			$this->response['error'] = true;
+			$this->response['data'] = 'Solo por metódo POST';
+		}
+
+		if(!$this->response['error'])
+		{
+			$email = $this->input->post('email');
+			$password = $this->input->post('password');
+			$verify = [
+				'password'=>password_hash($password, PASSWORD_DEFAULT ),
+				'verified'=>1
+			];
+
+			$this->response = $this->Users->update($verify,[['users.email','=',(string)$email]]);
+		}
+
+		if(!$this->response['error']){
+			$this->login(['email'=>$email,'password'=>$password]);
+		}
+
+		$this->json($this->response);
+
+	}
+
+	function profile()
+	{
+		$this->resetResponse();
+
+		$method = $this->input->method();
+		if($method != 'post'){
+			$this->response['error'] = true;
+			$this->response['data'] = 'Solo por metódo POST';
+		}
+		else{
+			$where = [['users.id','=',$this->session->id]];
+			$this->response = $this->Users->find($where);
+		}
+
+		if(!$this->response['error']){
+			$this->response['data'] = $this->response['data'][0];
+		}
+
+		$this->json($this->response);
+
+	}
 
 }

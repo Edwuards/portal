@@ -267,9 +267,23 @@
       return $this->response;
     }
 
-    public function join($select,$join = [],$where = [],$order=[],$limit=[]){
+    public function join($select,$join = [],$where = [],$order=[],$limit=[])
+    {
       return $this->get($select,$where,$order,$limit,$join);
     }
+
+    public function email($email){
+
+      $this->load->library('email');
+      $this->email->from('avisame@figment.com.mx', 'Figment');
+      $this->email->to($email['to']);
+
+      $this->email->subject($email['subject']);
+      $this->email->message($email['message']);
+
+      $this->email->send();
+    }
+
 
     public function json($data)
     {
@@ -277,6 +291,7 @@
   		->set_content_type('application/json')
   		->set_output(json_encode($data));
     }
+
 
 
   }

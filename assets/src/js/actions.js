@@ -4,14 +4,16 @@ import { default as permisionsInit } from './permisions.js';
 import { default as modalInit } from './modal.js';
 import { default as formsInit } from './forms/index.js';
 import { default as avisosInit } from './avisos/index.js';
+import { default as usersInit } from './users/index.js';
 
 export default function(){
   const Calendar = calendarInit();
-  const Nav = navInit();
   const Modal = modalInit();
   const Permisions = permisionsInit();
   const Forms = formsInit();
-  const { UserAvisos } = avisosInit();
+  const { Users,Profile } = usersInit();
+  const { UserAvisos, myAvisos } = avisosInit();
+  const Nav = navInit({Calendar,UserAvisos,myAvisos, Users,Profile});
 
   const Actions = {};
   const Elements = {};
@@ -19,43 +21,49 @@ export default function(){
   Actions.update = {};
   Actions.update.date = (format)=>{
     if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-    format = Calendar.formatDate(Calendar.getDate(),format);
+    format = Calendar.instance.formatDate(Calendar.instance.getDate(),format);
     format = format.slice(0,1).toUpperCase()+format.slice(1);
     Nav.elements.date.html(format);
   }
   Actions.calendar = {};
-  Actions.calendar.addEvent = ({start,end,id,title})=>{
+  Actions.calendar.addEvent = ({start,end,id,title,color})=>{
     start = new Date(start * 1000);
     end = new Date(end * 1000);
-    Calendar.addEvent({id,title,start,end});
+    Calendar.instance.addEvent({
+      id,
+      start,
+      end,
+      title,
+      backgroundColor: color,
+      borderColor: color,
+      textColor: '#ffffff',
+    });
   }
   Actions.calendar.render = ()=>{
     Actions.update.date();
     // la barra de navegación mide 64px en altura por eso se la resta.
     let height = window.innerHeight - 64;
-    Calendar.setOption('contentHeight',height);
-    Calendar.render();
+    Calendar.instance.setOption('contentHeight',height);
+    Calendar.instance.render();
   }
   Actions.calendar.next = ()=>{
-    Calendar.next();
+    Calendar.instance.next();
     Actions.update.date();
   }
   Actions.calendar.prev = ()=>{
-    Calendar.prev();
+    Calendar.instance.prev();
     Actions.update.date();
   }
   Actions.calendar.today = ()=>{
-    Calendar.today();
+    Calendar.instance.today();
     Actions.update.date();
   }
   Actions.open.menu = ()=>{
     if(Nav.state.menu){
       Nav.actions.closeMenu();
-      Permisions.actions.show();
     }
     else{
       Nav.actions.openMenu();
-      Permisions.actions.hide();
     }
   }
   Actions.avisar = ()=>{
@@ -70,7 +78,10 @@ export default function(){
       if(!error){
         let response = form.events.on('response',function(res){
           let { error, data } =  res;
-          if(!error){Actions.calendar.addEvent(data);}
+          if(!error){
+            Actions.calendar.addEvent(data);
+            myAvisos.add(data);
+          }
           form.events.off('response',response);
         });
       }
@@ -105,13 +116,11 @@ export default function(){
   //
   //   Modal.actions.open({title: form.title, body: form.open() });
   // };
-  // Actions.open.table = function(){
-  //   let name = $(this).attr('name');
-  //   Tables.open(name);
-  //   Nav.elements.button.menu.trigger('click');
-  //   Nav.actions.updateMenu(name);
-  //   Nav.actions.changeNavBar(name);
-  // };
+  Actions.open.menuContent = function(){
+    let name = $(this).attr('name');
+    Nav.elements.button.menu.trigger('click');
+    Nav.actions.content(name)
+  };
   // Actions.open.calendar = function(){
   //   Tables.close();
   //   Nav.elements.button.menu.trigger('click');

@@ -9845,14 +9845,26 @@
     };
     const CALENDAR = new Calendar(Elements.calendar[0],Options);
 
-    return CALENDAR
+    return {
+      instance: CALENDAR,
+      open: ()=>{ Elements.calendar.addClass('active'); },
+      close: ()=>{Elements.calendar.removeClass('active'); }
+    }
   }
 
-  function navInit (){
+  function navInit ({Calendar,UserAvisos,myAvisos,Users, Profile}){
     const Elements = {};
     const Actions = {};
     const State = {
       menu: false,
+      current: 'calendar'
+    };
+    const Content = {
+      'calendar': Calendar,
+      'userAvisos': UserAvisos,
+      'myAvisos': myAvisos,
+      'users': Users,
+      'profile': Profile,
     };
 
     Elements.container = $('nav');
@@ -9896,10 +9908,19 @@
     };
     Actions.updateMenu = (selected)=>{
       for (let name in Elements.menu.button) {
-        Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-4 border-blue-600');
+        Elements.menu.button[name][selected != name ? 'removeClass' : 'addClass' ]('border-l-2 border-red-600');
       }
     };
-
+    Actions.content = (name)=>{
+      if(Content[name] && State.current !== name){
+        State.current = name;
+        for (let content in Content) {
+          Content[content][ content == name ? 'open' : 'close' ]();
+        }
+        Actions.updateMenu(name);
+        Actions.changeNavBar(name);
+      }
+    };
     return {elements: Elements,actions: Actions,state: State}
   }
 
@@ -13049,6 +13070,7 @@
         }
       },
       'off':{
+        configurable: true,
         writable: false,
         value: ()=>{
           PROPS.alive = false;
@@ -13161,6 +13183,107 @@
     Object.defineProperties(this,METHODS);
   }
 
+  function SelectInput(INPUT){
+    Input.call(this,INPUT);
+
+    const OPTIONS = {
+      add: (option)=>{
+        let el = $(document.createElement('option'));
+        el.text(option.text).val(option.value);
+        this.element.append(el);
+      },
+      select:(value)=>{
+        this.options.get().removeAttr('selected');
+        this.element.find(`[value="${value}"]`).attr('selected','selected');
+      },
+      remove: (value)=>{
+        this.element.find(`[value="${value}"]`).remove();
+      },
+      get: ()=>{ return this.element.children(); },
+      find: (value)=>{ return this.element.find(`[value="${value}"]`); }
+    };
+
+    const METHODS = {
+      'value':{
+        set: (value)=>{
+          this.element.val(value);
+          this.options.select(value);
+        },
+        get: ()=>{
+          return this.element.val().trim();
+        }
+      },
+      'options':{
+        writable: false,
+        value: OPTIONS
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+  }
+
+  function ImageInput(INPUT,BUTTON,IMG){
+    Input.call(this,INPUT);
+    BUTTON = new Button(BUTTON);
+    const INSTANCE = this;
+    const ON = INSTANCE.on;
+    const OFF = INSTANCE.off;
+    const PROPS = {
+      img: IMG,
+      reader: new FileReader(),
+      file: undefined,
+      data: undefined,
+      changed: false,
+    };
+    const METHODS = {
+      'changed': {
+        get: ()=>{ return PROPS.changed; }
+      },
+      'value': {
+        get:()=>{ return PROPS.file }
+      },
+      'src':{
+        set: (value)=>{ PROPS.img.attr('src',value); }
+      },
+      'on': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          ON.call(this);
+          BUTTON.on();
+        }
+      },
+      'off': {
+        configurable: true,
+        writable: false,
+        value: function(){
+          OFF.call(this);
+          BUTTON.off();
+          IMG.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+        }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+    PROPS.reader.onload = (e)=>{
+      PROPS.img.attr('src',e.target.result);
+      PROPS.data = e.target.result;
+    };
+
+    BUTTON.events.on('click',function(){
+      INSTANCE.element.val('');
+      INSTANCE.element.trigger('click');
+    });
+
+    this.events.on('change',function(){
+      PROPS.changed = true;
+      PROPS.file = this.element[0].files[0];
+      PROPS.reader.readAsDataURL(PROPS.file);
+    });
+
+  }
+
   function DateInput(INPUT){
     const PICKER = flatpickr(INPUT,{
       locale: Spanish,
@@ -13182,12 +13305,23 @@
         writable: false,
         value: ()=>{
           $(document).on('click.exitPicker',function(e){
-            let close = e.target.classList.toString().indexOf('flatpickr') == -1;
-            if(close){ PICKER.close(); $(document).off('click.exitPicker'); }
+            e = e.target;
+            let search = true, found = false;
+            while(search){
+              if(e.tagName !== 'BODY'){
+                found = e.classList.toString().indexOf('flatpickr') != -1;
+                if(found){ search = false;}            }
+              else {
+                search = false;
+              }
+              e = e.parentElement;
+            }
+            if(!found){ PICKER.close(); $(document).off('click.exitPicker'); }
           });
         }
       },
       'value':{
+        set: (date)=>{ PICKER.setDate(date); },
         get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'Y-m-d'); }
       }
     };
@@ -13225,6 +13359,7 @@
         }
       },
       'value':{
+        set:(value)=>{ PICKER.setDate(date); },
         get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'H:i:s'); }
       }
     };
@@ -13249,12 +13384,12 @@
     pickerUnfocus: (inputs)=>{
       if(inputs.date){
         for (let input in inputs.date){
-          inputs.date[input].events.on('focus',function(){ this.close(); });
+          inputs.date[input].events.on('click',function(){ this.close(); });
         }
       }
       if(inputs.time){
         for (let input in inputs.time){
-          inputs.time[input].events.on('focus',function(){ this.close(); });
+          inputs.time[input].events.on('click',function(){ this.close(); });
         }
       }
     }
@@ -13311,20 +13446,33 @@
       }
     };
 
-    PROPS.title = `
-    <span class="w-2 h-2 abosolute mx-2 rounded-full bg-teal-600"></span>
-    <p>${data.title}</p>
-  `;
+    {
+      let color = {'homeOffice':'bg-indigo-600','sick':'bg-blue-600','vacation':'bg-teal-600','permision':'bg-green-600'};
+      color = color[data.name] ? color[data.name] : '';
+      PROPS.title = `
+      <span class="w-2 h-2 abosolute mx-2 ${color} rounded-full "></span>
+      <p>${data.title}</p>
+    `;
+    }
+
     $(document).ready(function(){
       PROPS.element = $(`form[name="${data.name}"]`);
       PROPS.element.find('[data-type]').each(function(){
 
         let el = $(this),
         type = el.attr('data-type'),
-        name = el.attr('name');
+        name = el.attr('name'),
+        group = el.attr('data-group');
         if(type !== 'button'){
+
           if(!INPUTS.type[type]){ INPUTS.type[type] = {}; }
-          INPUTS.type[type][name] = el;
+          if(group){
+            if(!INPUTS.type[type][group]){ INPUTS.type[type][group] = {}; }
+            INPUTS.type[type][group][name] = el;
+          }
+          else {
+            INPUTS.type[type][name] = el;
+          }
         }
         else {
           BUTTONS.name[name] = new Button(el);
@@ -13343,9 +13491,17 @@
             input = INPUTS.type.time[input];
             INPUTS.type.time[name] = new TimeInput(input);
           }
-          else if(type == 'textarea' || type == 'text'){
+          else if(type == 'textarea' || type == 'text' || type == 'number'){
             input = INPUTS.type[type][input];
             INPUTS.type[type][name] = new Input(input);
+          }
+          else if(type == 'select'){
+            input = INPUTS.type[type][input];
+            INPUTS.type[type][name] = new SelectInput(input);
+          }
+          else if(type == 'image'){
+            input = INPUTS.type.image[input];
+            INPUTS.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
           }
           INPUTS.all.push(INPUTS.type[type][name]);
         }
@@ -13467,8 +13623,8 @@
 
   Vacation.send = function(){
     let data = {};
-    data.date_start = this.inputs.date.start.value;
-    data.date_finish = this.inputs.date.finish.value;
+    data.date_start = this.inputs.date.start.value+' 10:00:00';
+    data.date_finish = this.inputs.date.finish.value+' 10:00:00';
     data.notice = 2;
 
     return { error: false, data }
@@ -13530,8 +13686,8 @@
 
   Sick.send = function(){
     let data = {};
-    data.date_start = this.inputs.date.start.value;
-    data.date_finish = this.inputs.date.finish.value;
+    data.date_start = this.inputs.date.start.value+' 10:00:00';
+    data.date_finish = this.inputs.date.finish.value+' 10:00:00';
     data.comments = this.inputs.textarea.description.value;
     data.notice = 3;
 
@@ -13562,8 +13718,8 @@
 
   HomeOffice.send = function(){
     let data = {};
-    data.date_start = this.inputs.date.start.value;
-    data.date_finish = this.inputs.date.finish.value;
+    data.date_start = this.inputs.date.start.value + ' 10:00:00';
+    data.date_finish = this.inputs.date.finish.value + ' 10:00:00';
     data.comments = this.inputs.textarea.description.value;
     data.notice = 4;
 
@@ -13583,6 +13739,105 @@
 
   }
 
+  function Avisos(name){
+    const INSTANCE = this;
+    const CONTAINER = $(`[data-avisos="${name}"]`);
+    const SECTIONS = {};
+    const BUTTONS = {};
+    const PROPS = {
+      alive: false,
+      avisos: [],
+      current: [],
+      state: 2
+    };
+    const ADD = (aviso)=>{
+      aviso = PROPS.avisos[PROPS.avisos.push(aviso) - 1];
+      let status = aviso.status;
+      if(status == 1){ SECTIONS.approved.prepend(aviso.element); }
+      else if(status == 2){ SECTIONS.pending.prepend(aviso.element); }
+      else { SECTIONS.declined.prepend(aviso.element); }
+
+      if(PROPS.alive){ aviso.on(); }
+      if(PROPS.state == status){ PROPS.current.push(aviso); }
+
+    };
+    const STATE = (current,state)=>{
+      if(state !== PROPS.status){
+        PROPS.status = state;
+        for(let button in BUTTONS){
+          BUTTONS[button].element[ current == button ? 'addClass' : 'removeClass']('text-gray-700 border-b-2 border-red-600');
+          SECTIONS[button][ current == button ? 'removeClass' : 'addClass']('hidden');
+        }
+        PROPS.current.forEach(aviso => aviso.off());
+        PROPS.current = [];
+        PROPS.avisos.forEach((aviso)=>{
+          if(aviso.status == state){ aviso.on(); PROPS.current.push(aviso); }
+        });
+      }
+    };
+    const METHODS = {
+      'open':{
+        writable: false,
+        value: ()=>{
+          PROPS.alive = true;
+          for (let name in BUTTONS) { BUTTONS[name].on(); }
+          PROPS.current.forEach(aviso => aviso.on() );
+          CONTAINER.addClass('active');
+        }
+      },
+      'close':{
+        writable: false,
+        value: ()=>{
+          CONTAINER.removeClass('active');
+          PROPS.alive = false;
+          for (let name in BUTTONS) { BUTTONS[name].off(); }
+          PROPS.current.forEach(aviso => aviso.off() );
+        }
+      },
+      'update':{
+        writable: false,
+        value: (aviso)=>{
+          aviso.off();
+          aviso.element.detach();
+          if(aviso.status){ SECTIONS.approved.prepend(aviso.element); }
+          else { SECTIONS.declined.prepend(aviso.element); }
+        }
+      },
+      'add': {
+        configurable: true,
+        set: (fn)=>{
+          Object.defineProperty(INSTANCE,'add',{
+            writable: false,
+            value: function(){
+              ADD(fn.apply(null,arguments));
+            }
+          });
+        }
+      }
+    };
+
+    CONTAINER
+    .children('.body')
+    .find('section').each(function(){
+      let el = $(this);
+      SECTIONS[el.attr('name')] = el;
+    });
+
+    CONTAINER
+    .children('.header')
+    .find('button').each(function(){
+      let el = $(this),
+      name = el.attr('name'),
+      state = el.attr('data');
+
+      BUTTONS[name] = new Button(el);
+      BUTTONS[name].events.on('click',function(){ STATE(name,state); });
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
   function Aviso({type,title,user,start,end}){
 
     type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
@@ -13590,7 +13845,8 @@
     end = flatpickr.formatDate(end, 'j M Y h:i K');
 
     return `
-  <div class=" shadow-xl bg-white text-gray-700 p-2 rounded m-4">
+  <div class="message absolute w-full h-full font-bold sm:text-xl"></div>
+  <div class="z-10 relative shadow-xl bg-white text-gray-700 p-2 rounded m-4">
     <div class="flex items-center">
       <div class="w-12 h-12 mx-2 flex item-center rounded-full overflow-hidden">
         <img src="${window.location.origin}/assets/public/img/placeholder.jpeg" class="w-full">
@@ -13599,10 +13855,10 @@
 
         <div class="flex justify-between text-sm my-1">
           <p class="w-40">${user}</p>
-          <p class="flex items-center justify-end w-32">
-            <span class="mx-2 w-2 h-2 ${type} relative rounded-full"></span>
-            ${title}
-          </p>
+          <div class="flex items-center justify-end w-32">
+            <div class="mx-2 w-2 h-2 ${type} rounded-full"></div>
+            <p>${title}</p>
+          </div>
         </div>
 
         <div class="flex items-center text-sm my-2">
@@ -13630,7 +13886,52 @@
             <i class="fas fa-times"></i>
             <p class="ml-2 text-xs">Rechazar</p>
         </button>
+      </div>
     </div>
+  </div>`;
+
+  }
+
+
+  function AvisoReadOnly({type,title,user,start,end}){
+
+    type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
+    start = flatpickr.formatDate(start, 'j M Y h:i K');
+    end = flatpickr.formatDate(end, 'j M Y h:i K');
+
+    return `
+  <div class="message absolute w-full h-full font-bold sm:text-xl"></div>
+  <div class="z-10 relative shadow-xl bg-white text-gray-700 p-2 rounded m-4">
+    <div class="flex items-center">
+      <div class="mx-2">
+
+        <div class="flex items-center text-sm my-1">
+            <div class="mr-2 w-2 h-2 ${type} rounded-full"></div>
+            <p>${title}</p>
+        </div>
+
+        <div class="flex items-center text-sm my-2">
+          <i class="fas fa-calendar-alt"></i>
+          <div class="flex items-center justify-between ml-1">
+            <p class="text-xs mx-1 w-32">${start}</p>
+            <p class="mx-1">-</p>
+            <p class="text-xs mx-1 w-32">${end}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="w-full flex mt-2 justify-between items-center">
+      <button type="button" name="view" class="ml-2 flex items-center text-xs text-gray-500">
+        <i class="fas fa-eye mr-2"></i>
+        <p>Ver más</p>
+      </button>
+      <div class="flex justify-end hidden">
+        <button type="button" class="flex items-center text-xs text-red-600 px-2 py-1 rounded mx-1" name="cancel">
+            <i class="fas fa-trash"></i>
+            <p class="ml-2 text-xs">Cancelar</p>
+        </button>
+      </div>
     </div>
   </div>`;
 
@@ -13690,7 +13991,7 @@
       'status':{
         get:()=>{ return PROPS.status; },
         set:(status)=>{
-          PROPS.status = status ;
+          PROPS.status = Number(status) ;
           OBSERVER.notify('updateStatus',[{id: PROPS.id, status}]);
         }
       },
@@ -13715,96 +14016,33 @@
 
   }
 
-  function Aviso$1(aviso){
-    const INSTANCE = this;
-    Card.call(this,aviso,Aviso);
-    this.buttons.approve.events.on('click',function(){ INSTANCE.status = 1; });
-    this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+  function AvisoReadCard(aviso){
+    Card.call(this,aviso,AvisoReadOnly);
   }
 
-  function Avisos(name){
+  function AvisoUpdateCard(aviso){
     const INSTANCE = this;
-    const CONTAINER = $(`[data-avisos="${name}"]`);
-    const SECTIONS = {};
-    const BUTTONS = {};
-    const PROPS = {
-      alive: false,
-      avisos: [],
-      current: [],
-      state: 2
-    };
-    const STATE = (current,state)=>{
-      if(state !== PROPS.status){
-        PROPS.status = state;
-        for(let button in BUTTONS){
-          BUTTONS[button].element[ current == button ? 'addClass' : 'removeClass']('text-gray-700 border-b-2 border-red-600');
-          SECTIONS[button][ current == button ? 'removeClass' : 'addClass']('hidden');
-        }
-        PROPS.current.forEach(aviso => aviso.off());
-        PROPS.current = [];
-        PROPS.avisos.forEach((aviso)=>{
-          if(aviso.status == state){ aviso.on(); PROPS.current.push(aviso); }
-        });
-      }
-    };
-    const METHODS = {
-      'open':{
-        writable: false,
-        value: ()=>{
-          PROPS.alive = true;
-          for (let name in BUTTONS) { BUTTONS[name].on(); }
-          PROPS.current.forEach(aviso => aviso.on() );
-        }
-      },
-      'close':{
-        writable: false,
-        value: ()=>{
-          PROPS.alive = false;
-          for (let name in BUTTONS) { BUTTONS[name].off(); }
-          PROPS.current.forEach(aviso => aviso.off() );
-        }
-      },
-      'add': {
-        writable: false,
-        value: (aviso)=>{
-          let status = aviso.status;
-          aviso = PROPS.avisos[PROPS.avisos.push(new Aviso$1(aviso)) - 1];
-          if(status == 1){ SECTIONS.approved.append(aviso.element); }
-          else if(status == 2){ SECTIONS.pending.append(aviso.element); }
-          else { SECTIONS.declined.append(aviso.element); }
+    Card.call(this,aviso,Aviso);
 
-          if(PROPS.state == status){ PROPS.current.push(aviso); }
+    this.message = this.element.find('.message');
 
-          aviso.events.on('updateStatus',function(){
-            console.log(arguments);
-          });
+    aviso.status = Number(aviso.status);
 
-        }
-      }
 
-    };
+    if(aviso.status == 1){
+      this.buttons.approve.element.addClass('hidden');
+      this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+    }
 
-    CONTAINER
-    .children('.body')
-    .find('section').each(function(){
-      let el = $(this);
-      SECTIONS[el.attr('name')] = el;
-    });
+    if(aviso.status == 2){
+      this.buttons.decline.events.on('click',function(){ INSTANCE.status = 0; });
+      this.buttons.approve.events.on('click',function(){ INSTANCE.status = 1; });
+    }
 
-    CONTAINER
-    .children('.header')
-    .find('button').each(function(){
-      let el = $(this),
-      name = el.attr('name'),
-      state = el.attr('data');
-
-      BUTTONS[name] = new Button(el);
-      BUTTONS[name].events.on('click',function(){ STATE(name,state); });
-    });
-
-    Object.defineProperties(this,METHODS);
-
-    console.log(INSTANCE);
+    if(!aviso.status){
+      this.buttons.approve.element.addClass('hidden');
+      this.buttons.decline.element.addClass('hidden');
+    }
   }
 
   function base_url(url){
@@ -13812,28 +14050,6 @@
   }
   const Services = {};
   Services.get = {};
-  Services.get.form = (name,fn,sync)=>{
-    let settings = {
-      url: base_url(`app/forms`),
-      method: 'post',
-      data:{ name },
-      async: sync ? sync : false,
-      success:fn
-    };
-
-    $.ajax(settings);
-
-  };
-  Services.get.table = (name,fn)=>{
-    let settings = {
-      url: base_url(`tables/get/${name}`),
-      async: false,
-      success:fn
-    };
-
-    $.ajax(settings);
-
-  };
   Services.get.user = (data,fn)=>{
     let settings = {
       url: base_url(`users/get`),
@@ -13845,9 +14061,30 @@
 
     $.ajax(settings);
   };
+  Services.get.profile = (fn)=>{
+    let settings = {
+      url: base_url(`users/profile`),
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
   Services.get.aviso = (data,fn)=>{
     let settings = {
       url: base_url(`permisions/get`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+  Services.get.myAvisos = (data,fn)=>{
+    let settings = {
+      url: base_url(`permisions/mine`),
       data: data,
       method: 'post',
       async: true,
@@ -13870,23 +14107,579 @@
     $.ajax(settings);
   };
 
+  Services.delete = {};
+  Services.delete.user = (data,fn)=>{
+    let settings = {
+      url: base_url(`users/delete`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
+
   var avisosInit = ()=>{
     const UserAvisos = new Avisos('users');
+    UserAvisos.add = function(aviso){
+      let status = aviso.status;
+      aviso = new AvisoUpdateCard(aviso);
+
+      aviso.events.on('updateStatus',function(data){
+        let {id,status} = data;
+        let update = {
+          aviso:{status},
+          where:[['request.id','=',id]]
+        };
+
+        Services.update.aviso(update,function(response){
+          let {error,data} = response;
+          if(!error){
+            if(status){
+              aviso.buttons.approve.element.addClass('hidden');
+              aviso.message.text('Aprobado');
+              aviso.element.addClass('approved');
+            }
+            else {
+              aviso.message.text('Rechazado');
+              aviso.element.addClass('declined');
+              aviso.buttons.approve.element.addClass('hidden');
+              aviso.buttons.decline.element.addClass('hidden');
+            }
+            setTimeout(()=>{
+              UserAvisos.update(aviso);
+              aviso.message.text('');
+              aviso.element.removeClass('approved declined');
+            },1000);
+          }
+        });
+      });
+
+      return aviso;
+    };
+
+    const myAvisos = new Avisos('mine');
+    myAvisos.add = function(aviso){
+      let status = aviso.status;
+      aviso = new AvisoReadCard(aviso);
+
+      aviso.events.on('updateStatus',function(data){
+        let {id,status} = data;
+        let update = {
+          aviso:{status},
+          where:[['request.id','=',id]]
+        };
+
+        Services.update.aviso(update,function(response){
+          let {error,data} = response;
+          if(!error){
+
+            UserAvisos.update(aviso);
+
+          }
+        });
+      });
+
+      return aviso;
+    };
+
     Services.get.aviso({},function(response){
       let {error,data} = response;
       if(!error){ data.forEach(aviso => UserAvisos.add(aviso)); }
     });
-    
-    return { UserAvisos }
+
+    Services.get.myAvisos({},function(response){
+      let {error,data} = response;
+      if(!error){ data.forEach(aviso => myAvisos.add(aviso)); }
+    });
+
+    return { UserAvisos,myAvisos }
+  };
+
+  function User({fullname,email,avatar,position}){
+
+    return `
+    <div class="flex flex-col items-center p-6 w-64 bg-white text-gray-700">
+      <div class="w-16 mb-4 rounded-full overflow-hidden">
+        <img class="avatar w-full" src="${avatar}" alt="">
+      </div>
+      <div class="">
+        <p name="position" class="text-xs text-center text-gray-700 font-bold mb-2">${position}</p>
+        <p name="fullname" class="text-sm text-center mb-2">${fullname}</p>
+        <p name="email" class="text-xs text-center text-gray-500 mb-2">${email}</p>
+      </div>
+
+      <div class="flex justify-between mt-4">
+        <button type="button" name="view" class="font-bold text-xs flex items-center text-gray-600">
+          <i class="fas fa-eye mx-2"></i>
+          Ver Perfil
+        </button>
+      </div>
+    </div>
+    `;
+
+  }
+
+  function Card$1(user,TEMPLATE){
+    user.work_start = new Date(user.work_start * 1000);
+    user.birthday = new Date(user.birthday * 1000);
+    const CARD = $(document.createElement('div'));
+    const PROPS = {
+      user
+    };
+    const BUTTONS = {};
+    const OBSERVER = new Observer(['updateStatus']);
+    const METHODS = {
+      'user':{
+        get: ()=>{ return PROPS.user },
+        set: (value)=>{ PROPS.user = value; }
+      },
+      'element': {
+        writable: false,
+        value: CARD
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS
+      },
+      'on':{
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          for (let name in BUTTONS) {
+            BUTTONS[name].on();
+          }
+        }
+      },
+      'off':{
+        configurable: true,
+        writable: false,
+        value: ()=>{
+          for (let name in BUTTONS) {
+            BUTTONS[name].off();
+          }
+        }
+      },
+      'events': {
+        writable: false,
+        value: {
+          on: OBSERVER.register,
+          off: OBSERVER.unregister,
+        }
+      }
+    };
+
+    CARD.addClass('card relative m-4')
+    .html(TEMPLATE(PROPS.user))
+    .find('button')
+    .each(function(){
+      let name = $(this).attr('name');
+      BUTTONS[name] = new Button($(this));
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function User$1(user){
+    const INSTANCE = this;
+    Card$1.call(this,user,User);
+    this.element.find('[name]').each(function(){
+      let el = $(this);
+      INSTANCE[el.attr('name')] = el;
+    });
+
+    this.update = (user)=>{
+      user.work_start = new Date(user.work_start * 1000);
+      user.birthday = new Date(user.birthday * 1000);
+      INSTANCE.user = user;
+      INSTANCE.position.html(user.position);
+      INSTANCE.fullname.html(user.fullname);
+      INSTANCE.email.html(user.email);
+    };
+
+  }
+
+  const Create = new Form({
+    title: 'Nuevo Usuario',
+    name: 'userCreate',
+    url: 'users/create',
+  });
+
+
+  Create.init = function(){
+    Helper.pickerUnfocus(this.inputs);
+    let positions = this.inputs.select.work_position;
+    let areas = this.inputs.select.work_area;
+    areas.events.on('change',function(){
+      let found = false;
+      positions.options.get().addClass('hidden').removeAttr('selected').each(function(){
+        let el = $(this);
+        if(!found && (el.attr('data-area') == areas.value)){ el.attr('selected','selected'); found = true;}
+        el[el.attr('data-area') == areas.value ? 'removeClass' : 'addClass']('hidden');
+      });
+    });
+  };
+
+  Create.open = function(date) {
+    date = (date  == undefined ? new Date(Date.now()) : date );
+    Helper.setDate(this.inputs,date);
+  };
+
+  Create.send = function(){
+    let data = {};
+    data.name = this.inputs.text.name.value;
+    data.lastname = this.inputs.text.lastname.value;
+    data.email = this.inputs.text.email.value;
+    data.work_start = this.inputs.date.work_start.value;
+    data.work_position = this.inputs.select.work_position.value;
+    data.birthday = this.inputs.date.birthday.value;
+    data.vacations = this.inputs.number.vacations.value;
+
+    return { error: false, data }
+  };
+
+  const Edit = new Form({
+    title: 'Editar Usuario',
+    name: 'userEdit',
+    url: 'users/edit',
+  });
+
+
+  Edit.init = function(){
+    Helper.pickerUnfocus(this.inputs);
+    let positions = this.inputs.select.work_position;
+    let areas = this.inputs.select.work_area;
+    areas.events.on('change',function(){
+      let found = false;
+      positions.options.get().addClass('hidden').removeAttr('selected').each(function(){
+        let el = $(this);
+        if(!found && (el.attr('data-area') == areas.value)){ el.attr('selected','selected'); found = true;}
+        el[el.attr('data-area') == areas.value ? 'removeClass' : 'addClass']('hidden');
+      });
+    });
+  };
+
+  Edit.open = function(user) {
+    this.disable(true);
+    this.user = user;
+    this.inputs.image.avatar.src = user.avatar;
+    this.inputs.text.name.value = user.name;
+    this.inputs.text.lastname.value = user.lastname;
+    this.inputs.text.email.value = user.email;
+    this.inputs.date.birthday.value = user.birthday;
+    this.inputs.date.work_start.value = user.work_start;
+    this.inputs.number.vacations.value = user.vacations;
+    this.inputs.select.work_area.value = user.work_area;
+    this.inputs.select.work_position.value = user.work_position;
+  };
+
+  Edit.send = function(){
+    let data = {};
+    data.name = this.inputs.text.name.value;
+    data.lastname = this.inputs.text.lastname.value;
+    data.email = this.inputs.text.email.value;
+    data.work_position = this.inputs.select.work_position.value;
+    data.work_start = this.inputs.date.work_start.value;
+    data.birthday = this.inputs.date.birthday.value;
+    data.vacations = this.inputs.number.vacations.value;
+
+    let where = [['users.id','=',this.user.id]];
+
+    return { error: false, data: {user:data,where} }
+
+  };
+
+  const Profile = new Form({
+    title: '',
+    name: 'userProfile',
+    url: 'users/edit',
+  });
+
+
+  Profile.init = function(){
+    Helper.pickerUnfocus(this.inputs);
+    let positions = this.inputs.select.work_position;
+    let areas = this.inputs.select.work_area;
+    areas.events.on('change',function(){
+      let found = false;
+      positions.options.get().addClass('hidden').removeAttr('selected').each(function(){
+        let el = $(this);
+        if(!found && (el.attr('data-area') == areas.value)){ el.attr('selected','selected'); found = true;}
+        el[el.attr('data-area') == areas.value ? 'removeClass' : 'addClass']('hidden');
+      });
+    });
+  };
+
+  Profile.open = function(user) {
+    this.disable(true);
+    this.user = user;
+    this.inputs.image.avatar.src = user.avatar;
+    this.inputs.text.name.value = user.name;
+    this.inputs.text.lastname.value = user.lastname;
+    this.inputs.text.email.value = user.email;
+    this.inputs.date.birthday.value = user.birthday;
+    this.inputs.date.work_start.value = user.work_start;
+    this.inputs.number.vacations.value = user.vacations;
+    this.inputs.select.work_area.value = user.work_area;
+    this.inputs.select.work_position.value = user.work_position;
+  };
+
+  function UsersList(name){
+    const CONTAINER = $(`[data-users="${name}"]`);
+    const LIST = CONTAINER.find('[name="list"]');
+    const BUTTONS = {};
+    const PROPS = {
+      alive: false,
+      users: [],
+    };
+    const SECTIONS = {
+      create: new Component$1('create',Create),
+      edit: new Component$1('edit',Edit),
+    };
+    const ADD = (user)=>{
+      user = PROPS.users[PROPS.users.push(new User$1(user)) -1 ];
+      user.buttons.view.events.on('click',function(){
+        SECTIONS.edit.open(user.user);
+      });
+      if(PROPS.alive){ user.on(); }
+      LIST.append(user.element);
+
+    };
+    const UPDATE = (user)=>{
+      PROPS.users.find((card)=>{ return card.user.id == user.id}).update(user);
+    };
+    const DELETE = ()=>{
+      PROPS.users.forEach((card)=>{
+        if(card.element.hasClass('delete')){
+          Services.delete.user({id:card.user.id},function(response){
+            let {error,data} = response;
+            if(!error){ card.off(); card.element.remove(); }
+          });
+        }    });
+    };
+    const METHODS = {
+      'open':{
+        writable: false,
+        value: ()=>{
+          PROPS.alive = true;
+          for (let name in BUTTONS) { BUTTONS[name].on(); }
+          PROPS.users.forEach(user => user.on() );
+          CONTAINER.addClass('active');
+        }
+      },
+      'close':{
+        writable: false,
+        value: ()=>{
+          CONTAINER.removeClass('active');
+          PROPS.alive = false;
+          for (let name in BUTTONS) { BUTTONS[name].off(); }
+          PROPS.users.forEach(user => user.off() );
+        }
+      },
+      'update':{
+        writable: false,
+        value: (aviso)=>{
+
+        }
+      },
+      'add': {
+        configurable: true,
+        value: ADD
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS,
+      }
+    };
+
+
+    CONTAINER
+    .children('.header')
+    .find('button').each(function(){
+      let el = $(this),
+      name = el.attr('name'),
+      state = el.attr('data');
+
+      BUTTONS[name] = new Button(el);
+    });
+
+    Object.defineProperties(this,METHODS);
+
+
+    {
+      let btns = this.buttons;
+      btns.create.events.on('click',function(){
+        SECTIONS.create.open();
+      });
+
+      btns.create.events.on('click',function(){
+        SECTIONS.create.open();
+      });
+
+      btns.cancel.events.on('click',function(){
+        btns.delete.element.data('active',true).removeClass('hidden');
+        btns.confirm.element.addClass('hidden');
+        btns.cancel.element.addClass('hidden');
+        btns.create.element.removeClass('hidden');
+
+        CONTAINER.find('.card.delete').removeClass('delete');
+        CONTAINER.find('.card').off('click.delete');
+      });
+
+      btns.confirm.events.on('click',function(){
+        DELETE();
+        btns.cancel.element.trigger('click');
+      });
+
+      btns.delete.events.on('click',function(){
+        CONTAINER.find('.card').on('click.delete',function(){
+          $(this).toggleClass('delete');
+        });
+        btns.delete.element.data('active',true).addClass('hidden');
+        btns.create.element.addClass('hidden');
+        btns.cancel.element.removeClass('hidden');
+        btns.confirm.element.removeClass('hidden');
+      });
+    }
+
+    SECTIONS.edit.buttons.edit.events.on('click',function(){
+      let btns = SECTIONS.edit.buttons;
+      SECTIONS.edit.form.disable(false);
+      btns.edit.element.addClass('hidden');
+      btns.send.element.removeClass('hidden');
+    });
+    SECTIONS.edit.buttons.send.events.on('click',SECTIONS.edit.form.send);
+    SECTIONS.edit.buttons.cancel.events.on('click',function(){
+      let btns = SECTIONS.edit.buttons;
+
+      btns.edit.element.removeClass('hidden');
+      btns.send.element.addClass('hidden');
+
+      SECTIONS.edit.close();
+    });
+    SECTIONS.edit.form.events.on('response',function(response){
+      let { error, data} = response;
+      if(!error){ UPDATE(data);
+        let btns = SECTIONS.edit.buttons;
+        btns.edit.element.removeClass('hidden');
+        btns.send.element.addClass('hidden');
+        SECTIONS.edit.close();
+      }
+    });
+    SECTIONS.create.buttons.cancel.events.on('click',SECTIONS.create.close);
+    SECTIONS.create.buttons.send.events.on('click',SECTIONS.create.form.send);
+    SECTIONS.create.form.events.on('response',function(response){
+      let { error, data} = response;
+      if(!error){ADD(data); SECTIONS.create.close(); }
+    });
+
+
+  }
+
+  function Component$1(name,form){
+    const CONTAINER = $(`[data-users="${name}"]`);
+    const BUTTONS = {};
+    const FORM = form;
+
+    const METHODS = {
+      'element':{
+        get:()=>{ return CONTAINER }
+      },
+      'open':{
+        configurable:true,
+        writable: false,
+        value: (data)=>{
+          data ? FORM.open(data) : FORM.open();
+          for (let name in BUTTONS) { BUTTONS[name].on(); }
+          CONTAINER.removeClass('hidden');
+        }
+      },
+      'close':{
+        configurable:true,
+        writable: false,
+        value: ()=>{
+          FORM.close();
+          CONTAINER.addClass('hidden');
+          for (let name in BUTTONS) { BUTTONS[name].off(); }
+          CONTAINER.find('section').html(FORM.element);
+        }
+      },
+      'buttons':{
+        writable: false,
+        value: BUTTONS,
+      },
+      'form': {
+        get:()=>{ return FORM }
+      }
+    };
+
+
+
+    CONTAINER
+    .children('.header')
+    .find('button').each(function(){
+      let el = $(this),
+      name = el.attr('name'),
+      state = el.attr('data');
+
+      BUTTONS[name] = new Button(el);
+    });
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  function UserProfile(){
+    Component$1.call(this,'profile',Profile);
+    const METHODS = {
+      'open':{
+        writable: false,
+        value: (data)=>{
+          this.form.open(this.user);
+          this.element.addClass('active');
+        }
+      },
+      'close':{
+        writable: false,
+        value: ()=>{
+          this.element.removeClass('active');
+        }
+      }
+    };
+
+    Object.defineProperties(this,METHODS);
+
+  }
+
+  var usersInit = ()=>{
+    const Users = new UsersList('list');
+    const Profile = new UserProfile();
+
+
+    Services.get.profile(function(response){
+      let {error,data} = response;
+      if(!error){
+        Profile.user = data;
+        Services.get.user({where:[['users.id','!=',Profile.user.id]]},function(response){
+          let {error,data} = response;
+          if(!error){ data.forEach(user => Users.add(user)); }
+        });
+      }
+    });
+
+    return { Users, Profile }
   };
 
   function actionsInit(){
     const Calendar = calendarInit();
-    const Nav = navInit();
     const Modal = modalInit();
     const Permisions = permisionsInit();
     const Forms = formsInit();
-    const { UserAvisos } = avisosInit();
+    const { Users,Profile } = usersInit();
+    const { UserAvisos, myAvisos } = avisosInit();
+    const Nav = navInit({Calendar,UserAvisos,myAvisos, Users,Profile});
 
     const Actions = {};
     const Elements = {};
@@ -13894,43 +14687,49 @@
     Actions.update = {};
     Actions.update.date = (format)=>{
       if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-      format = Calendar.formatDate(Calendar.getDate(),format);
+      format = Calendar.instance.formatDate(Calendar.instance.getDate(),format);
       format = format.slice(0,1).toUpperCase()+format.slice(1);
       Nav.elements.date.html(format);
     };
     Actions.calendar = {};
-    Actions.calendar.addEvent = ({start,end,id,title})=>{
+    Actions.calendar.addEvent = ({start,end,id,title,color})=>{
       start = new Date(start * 1000);
       end = new Date(end * 1000);
-      Calendar.addEvent({id,title,start,end});
+      Calendar.instance.addEvent({
+        id,
+        start,
+        end,
+        title,
+        backgroundColor: color,
+        borderColor: color,
+        textColor: '#ffffff',
+      });
     };
     Actions.calendar.render = ()=>{
       Actions.update.date();
       // la barra de navegación mide 64px en altura por eso se la resta.
       let height = window.innerHeight - 64;
-      Calendar.setOption('contentHeight',height);
-      Calendar.render();
+      Calendar.instance.setOption('contentHeight',height);
+      Calendar.instance.render();
     };
     Actions.calendar.next = ()=>{
-      Calendar.next();
+      Calendar.instance.next();
       Actions.update.date();
     };
     Actions.calendar.prev = ()=>{
-      Calendar.prev();
+      Calendar.instance.prev();
       Actions.update.date();
     };
     Actions.calendar.today = ()=>{
-      Calendar.today();
+      Calendar.instance.today();
       Actions.update.date();
     };
     Actions.open.menu = ()=>{
       if(Nav.state.menu){
         Nav.actions.closeMenu();
-        Permisions.actions.show();
       }
       else {
         Nav.actions.openMenu();
-        Permisions.actions.hide();
       }
     };
     Actions.avisar = ()=>{
@@ -13945,7 +14744,10 @@
         if(!error){
           let response = form.events.on('response',function(res){
             let { error, data } =  res;
-            if(!error){Actions.calendar.addEvent(data);}
+            if(!error){
+              Actions.calendar.addEvent(data);
+              myAvisos.add(data);
+            }
             form.events.off('response',response);
           });
         }
@@ -13980,13 +14782,11 @@
     //
     //   Modal.actions.open({title: form.title, body: form.open() });
     // };
-    // Actions.open.table = function(){
-    //   let name = $(this).attr('name');
-    //   Tables.open(name);
-    //   Nav.elements.button.menu.trigger('click');
-    //   Nav.actions.updateMenu(name);
-    //   Nav.actions.changeNavBar(name);
-    // };
+    Actions.open.menuContent = function(){
+      let name = $(this).attr('name');
+      Nav.elements.button.menu.trigger('click');
+      Nav.actions.content(name);
+    };
     // Actions.open.calendar = function(){
     //   Tables.close();
     //   Nav.elements.button.menu.trigger('click');
@@ -14017,7 +14817,11 @@
     elements.nav.bar.calendar.button.today.on('click',actions.calendar.today);
     elements.permisions.avisar.on('click',actions.avisar);
     elements.permisions.buttons.on('click',actions.open.permision);
-
+    elements.nav.menu.button.profile.on('click',actions.open.menuContent);
+    elements.nav.menu.button.myAvisos.on('click',actions.open.menuContent);
+    elements.nav.menu.button.userAvisos.on('click',actions.open.menuContent);
+    elements.nav.menu.button.calendar.on('click',actions.open.menuContent);
+    elements.nav.menu.button.users.on('click',actions.open.menuContent);
   }
 
   $$1(document).ready(Events);

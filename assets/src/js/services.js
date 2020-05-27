@@ -4,35 +4,22 @@ function base_url(url){
 
 const Services = {};
 Services.get = {};
-Services.get.form = (name,fn,sync)=>{
-  let html = '';
-  let settings = {
-    url: base_url(`app/forms`),
-    method: 'post',
-    data:{ name },
-    async: sync ? sync : false,
-    success:fn
-  };
-
-  $.ajax(settings);
-
-}
-Services.get.table = (name,fn)=>{
-  let obj = '';
-  let settings = {
-    url: base_url(`tables/get/${name}`),
-    async: false,
-    success:fn
-  };
-
-  $.ajax(settings);
-
-}
 Services.get.user = (data,fn)=>{
   let obj = '';
   let settings = {
     url: base_url(`users/get`),
     data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
+Services.get.profile = (fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`users/profile`),
     method: 'post',
     async: true,
     success: fn
@@ -52,12 +39,38 @@ Services.get.aviso = (data,fn)=>{
 
   $.ajax(settings);
 }
+Services.get.myAvisos = (data,fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`permisions/mine`),
+    data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
 
 Services.update = {};
 Services.update.aviso = (data,fn)=>{
   let obj = '';
   let settings = {
     url: base_url(`permisions/update`),
+    data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
+
+Services.delete = {}
+Services.delete.user = (data,fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`users/delete`),
     data: data,
     method: 'post',
     async: true,
