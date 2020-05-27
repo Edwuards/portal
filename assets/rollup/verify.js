@@ -2,7 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: './src/js/verify.js',
+  input: './src/js/app/verify.js',
   output:{
     file:'./public/js/verify.js',
     format: 'iife',

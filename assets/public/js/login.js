@@ -3445,10 +3445,15 @@
       }
     };
 
-    PROPS.title = `
-    <span class="w-2 h-2 abosolute mx-2 rounded-full bg-teal-600"></span>
-    <p>${data.title}</p>
-  `;
+    {
+      let color = {'homeOffice':'bg-indigo-600','sick':'bg-blue-600','vacation':'bg-teal-600','permision':'bg-green-600'};
+      color = color[data.name] ? color[data.name] : '';
+      PROPS.title = `
+      <span class="w-2 h-2 abosolute mx-2 ${color} rounded-full "></span>
+      <p>${data.title}</p>
+    `;
+    }
+
     $(document).ready(function(){
       PROPS.element = $(`form[name="${data.name}"]`);
       PROPS.element.find('[data-type]').each(function(){

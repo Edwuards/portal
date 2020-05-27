@@ -19,8 +19,12 @@
     public function create($permision)
     {
       $this->response = [ 'error'=>false, 'data'=>false ];
+      $date = new DateTime('now', new DateTimeZone('America/Mexico_City'));
+      $date = $date->format('Y-m-d H:i:s');
       $permision['status'] = 2;
       $permision['user'] = $this->session->id;
+      $permision['modified'] = $date;
+      $permision['created'] = $date;
 
       $this->response = $this->insert($permision);
 

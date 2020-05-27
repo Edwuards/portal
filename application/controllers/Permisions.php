@@ -103,6 +103,9 @@ class Permisions extends CI_Controller {
 
 		if(!$this->response['error']){
 			$aviso = $this->input->post('aviso');
+
+			$aviso['modified'] = new DateTime('now', new DateTimeZone('America/Mexico_City'));
+			$aviso['modified'] = $aviso['modified']->format('Y-m-d H:i:s');
 			$this->response = $this->Permisions->update($aviso,$where);
 		}
 

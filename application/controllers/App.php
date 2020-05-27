@@ -19,6 +19,8 @@ class App extends CI_Controller {
 
 	public function login()
 	{
+		if($this->session->verified){ redirect('app/dashboard'); }
+
 		$scripts = [
 			'js'=>['jquery','login'],
 			'css'=>['base','index']
@@ -29,14 +31,14 @@ class App extends CI_Controller {
 
 	public function logout()
 	{
-		// $method = $this->input->method();
-		// if($method != 'post')
-		// {
-		// 	redirect('app/dashboard');
-		// }
-		// else{
+		$method = $this->input->method();
+		if($method != 'post')
+		{
+			redirect('app/dashboard');
+		}
+		else{
 			$this->session->sess_destroy();
-		// }
+		}
 	}
 
 	public function dashboard()
@@ -44,7 +46,7 @@ class App extends CI_Controller {
 		if(!$this->session->verified){ redirect('app/login'); }
 
 		$scripts = [
-			'js'=>['jquery','app'],
+			'js'=>['jquery',($this->session->role > 1 ? 'user2' : 'user1')],
 			'css'=>['base','index']
 		];
 		$views = ['content'=>['work'=>$this->work_areas()]];
@@ -86,7 +88,8 @@ class App extends CI_Controller {
 	}
 
 	public function test(){
-		echo password_hash('figment',PASSWORD_DEFAULT);
+		$fecha = new DateTime('now', new DateTimeZone('America/Mexico_City'));
+		print_r($fecha->format('Y-m-d H:i:s'));
 	}
 
 

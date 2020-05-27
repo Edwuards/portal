@@ -1,4 +1,4 @@
-import { Verify } from './forms/user/verify.js';
+import { Verify } from '../forms/user/verify.js';
 import $ from 'jquery';
 
 $(document).ready(function(){

@@ -14768,46 +14768,26 @@
 
       Modal.actions.open({title: form.title, body: form.open() });
     };
-    // Actions.open.profile = function(){
-    //   let form = Forms.get('profile');
-    //   let close = form.events.on('close',()=>{
-    //     Modal.elements.close.trigger('click');
-    //   });
-    //   Modal.elements.close.on('click',()=>{
-    //     if(form.alive){ form.close() }
-    //     form.events.off('close',close);
-    //     Modal.actions.close();
-    //     Modal.elements.close.off('click')
-    //   });
-    //
-    //   Modal.actions.open({title: form.title, body: form.open() });
-    // };
     Actions.open.menuContent = function(){
       let name = $(this).attr('name');
       Nav.elements.button.menu.trigger('click');
       Nav.actions.content(name);
     };
-    // Actions.open.calendar = function(){
-    //   Tables.close();
-    //   Nav.elements.button.menu.trigger('click');
-    //   Nav.actions.updateMenu('calendar');
-    //   Nav.actions.changeNavBar('calendar');
-    //   Nav.actions.closeMenu();
-    // };
-    // Actions.logout = function(){
-    //   $.ajax({
-    //     url:`${window.location.origin}/app/logout`,
-    //     method: 'post',
-    //     success:function(){ window.location.href = `${window.location.origin}/app/login`; }
-    //   });
-    // };
+
+    Actions.logout = function(){
+      $.ajax({
+        url:`${window.location.origin}/app/logout`,
+        method: 'post',
+        success:function(){ window.location.href = `${window.location.origin}/app/login`; }
+      });
+    };
 
     [['modal',Modal],['nav',Nav],['permisions',Permisions]].forEach((data)=>{ Elements[data[0]] = data[1].elements; });
 
     return {actions:Actions, elements: Elements}
   }
 
-  function Events(){
+  function User1(){
     const {actions,elements} = actionsInit();
 
     actions.calendar.render();
@@ -14819,11 +14799,10 @@
     elements.permisions.buttons.on('click',actions.open.permision);
     elements.nav.menu.button.profile.on('click',actions.open.menuContent);
     elements.nav.menu.button.myAvisos.on('click',actions.open.menuContent);
-    elements.nav.menu.button.userAvisos.on('click',actions.open.menuContent);
     elements.nav.menu.button.calendar.on('click',actions.open.menuContent);
-    elements.nav.menu.button.users.on('click',actions.open.menuContent);
+    elements.nav.menu.button.logout.on('click',actions.logout);
   }
 
-  $$1(document).ready(Events);
+  $$1(document).ready(User1);
 
 }($));
