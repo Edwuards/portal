@@ -12,8 +12,10 @@ export default function(){
   const Permisions = permisionsInit();
   const Forms = formsInit();
   const { Users,Profile } = usersInit();
-  const { UserAvisos, myAvisos } = avisosInit();
+  const { UserAvisos, myAvisos } = avisosInit(Calendar);
   const Nav = navInit({Calendar,UserAvisos,myAvisos, Users,Profile});
+
+
 
   const Actions = {};
   const Elements = {};

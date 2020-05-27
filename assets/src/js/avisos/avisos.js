@@ -13,7 +13,7 @@ function Avisos(name){
   };
   const ADD = (aviso)=>{
     aviso = PROPS.avisos[PROPS.avisos.push(aviso) - 1];
-    let status = aviso.status;
+    let status = Number(aviso.status);
     if(status == 1){ SECTIONS.approved.prepend(aviso.element); }
     else if(status == 2){ SECTIONS.pending.prepend(aviso.element); }
     else { SECTIONS.declined.prepend(aviso.element); }

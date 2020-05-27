@@ -1,6 +1,6 @@
 import flatpickr from 'flatpickr';
 
-function Aviso({type,title,user,start,end}){
+function Aviso({id,type,title,user,start,end}){
 
   type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
   start = flatpickr.formatDate(start, 'j M Y h:i K');
@@ -35,10 +35,9 @@ function Aviso({type,title,user,start,end}){
       </div>
     </div>
     <div class="w-full flex mt-2 justify-between items-center">
-      <button type="button" name="view" class="ml-2 flex items-center text-xs text-gray-500">
-        <i class="fas fa-eye mr-2"></i>
-        <p>Ver más</p>
-      </button>
+      <p class="ml-2 flex items-center text-xs text-gray-500">
+        #${id}
+      </p>
       <div class="flex justify-end">
         <button type="button" class="flex items-center text-xs  text-green-600 px-2 py-1 rounded mx-1" name="approve">
             <i class="fas fa-check"></i>

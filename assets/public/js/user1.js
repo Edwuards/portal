@@ -9829,6 +9829,7 @@
       plugins: [ main ],
       defaultView: 'dayGridMonth',
       locale: es,
+      displayEventTime: false,
       header: { left: '', center: '', right: '' },
       columnHeaderText: function(date) {
         let short = window.innerWidth > 640;
@@ -13752,7 +13753,7 @@
     };
     const ADD = (aviso)=>{
       aviso = PROPS.avisos[PROPS.avisos.push(aviso) - 1];
-      let status = aviso.status;
+      let status = Number(aviso.status);
       if(status == 1){ SECTIONS.approved.prepend(aviso.element); }
       else if(status == 2){ SECTIONS.pending.prepend(aviso.element); }
       else { SECTIONS.declined.prepend(aviso.element); }
@@ -13838,7 +13839,7 @@
 
   }
 
-  function Aviso({type,title,user,start,end}){
+  function Aviso({id,type,title,user,start,end}){
 
     type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
     start = flatpickr.formatDate(start, 'j M Y h:i K');
@@ -13873,10 +13874,9 @@
       </div>
     </div>
     <div class="w-full flex mt-2 justify-between items-center">
-      <button type="button" name="view" class="ml-2 flex items-center text-xs text-gray-500">
-        <i class="fas fa-eye mr-2"></i>
-        <p>Ver más</p>
-      </button>
+      <p class="ml-2 flex items-center text-xs text-gray-500">
+        #${id}
+      </p>
       <div class="flex justify-end">
         <button type="button" class="flex items-center text-xs  text-green-600 px-2 py-1 rounded mx-1" name="approve">
             <i class="fas fa-check"></i>
@@ -13937,7 +13937,7 @@
 
   }
 
-  function Card({id,status,start,end,user,title,type},TEMPLATE){
+  function Card({id,status,start,end,user,title,type,email},TEMPLATE){
     const CARD = $(document.createElement('div'));
     const PROPS = {
       id,
@@ -13946,7 +13946,8 @@
       type,
       user,
       title,
-      status
+      status,
+      email
     };
     const BUTTONS = {};
     const OBSERVER = new Observer(['updateStatus']);
@@ -13992,7 +13993,7 @@
         get:()=>{ return PROPS.status; },
         set:(status)=>{
           PROPS.status = Number(status) ;
-          OBSERVER.notify('updateStatus',[{id: PROPS.id, status}]);
+          OBSERVER.notify('updateStatus',[{id: PROPS.id, status,email}]);
         }
       },
       'events': {
@@ -14120,16 +14121,18 @@
     $.ajax(settings);
   };
 
-  var avisosInit = ()=>{
+  var avisosInit = (Calendar)=>{
+    const ID = $('[data-user-id]').attr('data-user-id');
     const UserAvisos = new Avisos('users');
     UserAvisos.add = function(aviso){
       let status = aviso.status;
       aviso = new AvisoUpdateCard(aviso);
 
       aviso.events.on('updateStatus',function(data){
-        let {id,status} = data;
+        let {id,status,email} = data;
         let update = {
           aviso:{status},
+          email:email,
           where:[['request.id','=',id]]
         };
 
@@ -14174,25 +14177,38 @@
         Services.update.aviso(update,function(response){
           let {error,data} = response;
           if(!error){
-
-            UserAvisos.update(aviso);
-
+            myAvisos.update(aviso);
           }
         });
       });
 
       return aviso;
     };
+    const addEvent = ({start,end,id,title,color})=>{
+      start = new Date(start * 1000);
+      end = new Date(end * 1000);
+      Calendar.instance.addEvent({
+        id,
+        start,
+        end,
+        title,
+        backgroundColor: color,
+        borderColor: color,
+        textColor: '#ffffff',
+      });
+    };
 
     Services.get.aviso({},function(response){
       let {error,data} = response;
-      if(!error){ data.forEach(aviso => UserAvisos.add(aviso)); }
+      if(!error){
+        data.forEach((aviso)=>{
+          (aviso.userID == ID ? myAvisos : UserAvisos).add(aviso);
+          if(Number(aviso.status)){ addEvent(aviso); }
+        });
+
+      }
     });
 
-    Services.get.myAvisos({},function(response){
-      let {error,data} = response;
-      if(!error){ data.forEach(aviso => myAvisos.add(aviso)); }
-    });
 
     return { UserAvisos,myAvisos }
   };
@@ -14678,8 +14694,10 @@
     const Permisions = permisionsInit();
     const Forms = formsInit();
     const { Users,Profile } = usersInit();
-    const { UserAvisos, myAvisos } = avisosInit();
+    const { UserAvisos, myAvisos } = avisosInit(Calendar);
     const Nav = navInit({Calendar,UserAvisos,myAvisos, Users,Profile});
+
+
 
     const Actions = {};
     const Elements = {};

@@ -8,6 +8,7 @@ export default function (){
     plugins: [ dayGridPlugin ],
     defaultView: 'dayGridMonth',
     locale: esLocale,
+    displayEventTime: false,
     header: { left: '', center: '', right: '' },
     columnHeaderText: function(date) {
       let short = window.innerWidth > 640;

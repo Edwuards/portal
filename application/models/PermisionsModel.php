@@ -40,11 +40,13 @@
     {
       $select = '
         request.id,
+        request.user as userID,
         notice.id as type,
         notice.title as title,
         notice.color as color,
         concat(users.name," ",users.lastname) as user,
         request.status,
+        users.email,
       ';
 
       foreach (['date_start'=>'start','date_finish'=>'end'] as $key => $alias) {

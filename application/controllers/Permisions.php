@@ -10,6 +10,7 @@ class Permisions extends CI_Controller {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->model('PermisionsModel','Permisions');
+
 	}
 
 	private function json($data)
@@ -57,6 +58,7 @@ class Permisions extends CI_Controller {
 		else{
 			$query = $this->input->post('where');
 			$query = is_array($query) ? $query : [];
+			if($this->session->role < 2){ $query[] = ['request.user','=',$this->session->id]; }
 			$this->response = $this->Permisions->find($query);
 		}
 
@@ -103,7 +105,7 @@ class Permisions extends CI_Controller {
 
 		if(!$this->response['error']){
 			$aviso = $this->input->post('aviso');
-
+			$email = $this->input->post('email');
 			$aviso['modified'] = new DateTime('now', new DateTimeZone('America/Mexico_City'));
 			$aviso['modified'] = $aviso['modified']->format('Y-m-d H:i:s');
 			$this->response = $this->Permisions->update($aviso,$where);
@@ -111,6 +113,11 @@ class Permisions extends CI_Controller {
 
 		if(!$this->response['error']){
 			$this->response['data'] = $this->Permisions->find($where)['data'][0];
+			$this->Permisions->email([
+				'to'=>$email,
+				'subject'=>'Permiso Actualizado',
+				'message'=>$this->load->view('emails/permision',$this->response['data'],true)
+			]);
 		}
 
 		$this->json($this->response);

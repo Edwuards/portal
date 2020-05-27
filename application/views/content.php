@@ -14,3 +14,5 @@
   <?php $this->load->view('forms/index',['load'=>['permisions']]); ?>
 </section>
 <?php $this->load->view('modal'); ?>
+<div class="hidden" data-user-id="<?php echo $this->session->id; ?>">
+</div>
