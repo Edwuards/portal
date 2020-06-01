@@ -1,4 +1,5 @@
 import { Form, Helper } from '../form.js';
+import { Services } from '../../services.js';
 
 const Profile = new Form({
   title: '',
@@ -19,10 +20,26 @@ Profile.init = function(){
       el[el.attr('data-area') == areas.value ? 'removeClass' : 'addClass']('hidden');
     });
   });
+  {
+    let profile = this;
+    profile.inputs.image.avatar.events.on('imgReady',function(){
+      let src = this.src;
+      let user = {'avatar':src};
+      console.log(user);
+      Services.update.user({
+        where:[['users.id','=',profile.user.id]],
+        user
+      },function(response){
+
+      });
+      $('#menu .avatar img').attr('src',user.avatar);
+    });
+  }
 }
 
 Profile.open = function(user) {
   this.disable(true);
+  this.inputs.image.avatar.disable(false);
   this.user = user;
   this.inputs.image.avatar.src = user.avatar;
   this.inputs.text.name.value = user.name;
@@ -33,6 +50,7 @@ Profile.open = function(user) {
   this.inputs.number.vacations.value = user.vacations;
   this.inputs.select.work_area.value = user.work_area;
   this.inputs.select.work_position.value = user.work_position;
+
 }
 //
 // Profile.send = function(){

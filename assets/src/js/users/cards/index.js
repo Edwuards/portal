@@ -77,6 +77,7 @@ function User(user){
     user.work_start = new Date(user.work_start * 1000);
     user.birthday = new Date(user.birthday * 1000);
     INSTANCE.user = user;
+    INSTANCE.avatar.attr('src',user.avatar);
     INSTANCE.position.html(user.position);
     INSTANCE.fullname.html(user.fullname);
     INSTANCE.email.html(user.email);

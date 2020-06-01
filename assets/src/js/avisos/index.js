@@ -17,21 +17,21 @@ export default (Calendar)=>{
         email:email,
         where:[['request.id','=',id]]
       };
+      if(status){
+        aviso.buttons.approve.element.addClass('hidden');
+        aviso.message.text('Aprobado');
+        aviso.element.addClass('approved');
+      }
+      else{
+        aviso.message.text('Rechazado');
+        aviso.element.addClass('declined');
+        aviso.buttons.approve.element.addClass('hidden');
+        aviso.buttons.decline.element.addClass('hidden');
+      }
 
       Services.update.aviso(update,function(response){
         let {error,data} = response;
         if(!error){
-          if(status){
-            aviso.buttons.approve.element.addClass('hidden');
-            aviso.message.text('Aprobado');
-            aviso.element.addClass('approved');
-          }
-          else{
-            aviso.message.text('Rechazado');
-            aviso.element.addClass('declined');
-            aviso.buttons.approve.element.addClass('hidden');
-            aviso.buttons.decline.element.addClass('hidden');
-          }
           setTimeout(()=>{
             UserAvisos.update(aviso);
             aviso.message.text('');

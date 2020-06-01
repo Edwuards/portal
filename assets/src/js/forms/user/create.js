@@ -35,7 +35,8 @@ Create.send = function(){
   data.work_position = this.inputs.select.work_position.value;
   data.birthday = this.inputs.date.birthday.value;
   data.vacations = this.inputs.number.vacations.value;
-
+  data.avatar = this.inputs.image.avatar.src;
+  
   return { error: false, data }
 }
 

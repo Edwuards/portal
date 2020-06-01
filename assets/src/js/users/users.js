@@ -32,10 +32,8 @@ function UsersList(name){
   const DELETE = ()=>{
     PROPS.users.forEach((card)=>{
       if(card.element.hasClass('delete')){
-        Services.delete.user({id:card.user.id},function(response){
-          let {error,data} = response;
-          if(!error){ card.off(); card.element.remove(); }
-        })
+        card.off(); card.element.remove();
+        Services.delete.user({id:card.user.id},function(response){})
       };
     });
   }
@@ -141,18 +139,34 @@ function UsersList(name){
   });
   SECTIONS.edit.form.events.on('response',function(response){
     let { error, data} = response;
-    if(!error){ UPDATE(data);
+    if(!error){
+      UPDATE(data);
       let btns = SECTIONS.edit.buttons;
       btns.edit.element.removeClass('hidden');
       btns.send.element.addClass('hidden');
-      SECTIONS.edit.close();
     }
+  });
+  SECTIONS.edit.form.events.on('send',function(response){
+    let { error, data} = response;
+    if(!error){ SECTIONS.edit.close(); }
   });
   SECTIONS.create.buttons.cancel.events.on('click',SECTIONS.create.close);
   SECTIONS.create.buttons.send.events.on('click',SECTIONS.create.form.send);
+  SECTIONS.create.form.events.on('send',function(response){
+    let { error, data} = response;
+
+    if(!error){
+      let {name,lastname,email,avatar} = data;
+      let fullname = name+' '+lastname;
+      let position = '';
+      ADD({fullname,position,email,avatar}); SECTIONS.create.close();
+    }
+  });
   SECTIONS.create.form.events.on('response',function(response){
     let { error, data} = response;
-    if(!error){ADD(data); SECTIONS.create.close(); }
+    if(!error){
+      PROPS.users.find((card)=>{ return card.user.email == data.email; }).update(data);
+    }
   });
 
 

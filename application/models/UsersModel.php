@@ -37,7 +37,9 @@
         $multi = rand(2,6);
         for ($i=0; $i < 5; $i++) { $random *= $multi; }
         $code = (string)$random;
-        $user['avatar'] = 'https://scontent.fmex1-1.fna.fbcdn.net/v/t1.0-9/87105879_2932147320180000_864174972170403840_n.png?_nc_cat=107&_nc_sid=85a577&_nc_ohc=iDIiMDlQrYoAX8EkUIZ&_nc_ht=scontent.fmex1-1.fna&oh=cd1a48c38e0769b499d0cdeab2d1fd67&oe=5EDF6664';
+        if($user['avatar'] == ''){
+          $user['avatar'] = 'https://scontent.fmex1-1.fna.fbcdn.net/v/t1.0-9/87105879_2932147320180000_864174972170403840_n.png?_nc_cat=107&_nc_sid=85a577&_nc_ohc=iDIiMDlQrYoAX8EkUIZ&_nc_ht=scontent.fmex1-1.fna&oh=cd1a48c38e0769b499d0cdeab2d1fd67&oe=5EDF6664';
+        }
         $user['verified'] = 0;
         $user['role'] = 1;
         $user['code'] = password_hash($random, PASSWORD_DEFAULT);
@@ -68,6 +70,7 @@
       work_position,
       w.area as work_area,
       w.title as position,
+      users.role,
       ';
       foreach (['work_start','birthday'] as $date) {
         $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
@@ -104,11 +107,13 @@
 
       if(!$this->response['error']){
         unset($verify['password']);
+        $verify = $this->find($where)['data'][0];
         $this->session->set_userdata([
           'id'=>$verify['id'],
           'role'=>$verify['role'],
-          'name'=>$verify['name'].' '.$verify['lastname'],
+          'name'=>$verify['fullname'],
           'avatar'=>$verify['avatar'],
+          'position'=>$verify['position'],
           'verified'=>true
         ]);
 

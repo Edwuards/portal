@@ -48,16 +48,14 @@
 
  ?>
 <div id="menu" class="bg-gray-200 text-gray-700 h-full p-4">
-    <div class="h-8 flex w-full m-4 sm:hidden">
-       <img src="<?php echo $this->session->avatar; ?>" class="h-full">
-     </div>
+
     <div class="flex w-full mb-2 px-2 items-center">
-      <div class="avatar w-10 h-10">
-        <img class="w-full" src="<?php echo $this->session->avatar; ?>" alt="">
+      <div class="avatar w-10 h-10 overflow-hidden rounded-full">
+        <img class="w-full h-full" src="<?php echo $this->session->avatar; ?>" alt="">
       </div>
       <div class="ml-4">
         <p class="text-sm font-hairline"><?php echo $this->session->name; ?></p>
-        <p class="text-sm font-hairline">Puesto de Trabajo</p>
+        <p class="text-sm font-hairline"><?php echo $this->session->position; ?> </p>
       </div>
     </div>
     <div class="w-full mt-6" >

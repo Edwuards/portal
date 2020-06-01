@@ -13244,6 +13244,7 @@
         get:()=>{ return PROPS.file }
       },
       'src':{
+        get: ()=>{ return PROPS.data; },
         set: (value)=>{ PROPS.img.attr('src',value); }
       },
       'on': {
@@ -13270,6 +13271,7 @@
     PROPS.reader.onload = (e)=>{
       PROPS.img.attr('src',e.target.result);
       PROPS.data = e.target.result;
+      INSTANCE.element.trigger('imgReady');
     };
 
     BUTTON.events.on('click',function(){
@@ -13753,7 +13755,7 @@
     };
     const ADD = (aviso)=>{
       aviso = PROPS.avisos[PROPS.avisos.push(aviso) - 1];
-      let status = aviso.status;
+      let status = Number(aviso.status);
       if(status == 1){ SECTIONS.approved.prepend(aviso.element); }
       else if(status == 2){ SECTIONS.pending.prepend(aviso.element); }
       else { SECTIONS.declined.prepend(aviso.element); }
@@ -13839,7 +13841,7 @@
 
   }
 
-  function Aviso({id,type,title,user,start,end}){
+  function Aviso({id,type,title,user,start,end,avatar}){
 
     type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
     start = flatpickr.formatDate(start, 'j M Y h:i K');
@@ -13850,7 +13852,7 @@
   <div class="z-10 relative shadow-xl bg-white text-gray-700 p-2 rounded m-4">
     <div class="flex items-center">
       <div class="w-12 h-12 mx-2 flex item-center rounded-full overflow-hidden">
-        <img src="${window.location.origin}/assets/public/img/placeholder.jpeg" class="w-full">
+        <img src="${avatar}" class="w-full">
       </div>
       <div class="mx-2">
 
@@ -13893,7 +13895,7 @@
   }
 
 
-  function AvisoReadOnly({type,title,user,start,end}){
+  function AvisoReadOnly({id,type,title,user,start,end}){
 
     type = (type  == 1 ? 'bg-green-600' : (type == 2 ? 'bg-teal-600' : (type == 3 ? 'bg-blue-600' : 'bg-indigo-600') ));
     start = flatpickr.formatDate(start, 'j M Y h:i K');
@@ -13922,10 +13924,9 @@
       </div>
     </div>
     <div class="w-full flex mt-2 justify-between items-center">
-      <button type="button" name="view" class="ml-2 flex items-center text-xs text-gray-500">
-        <i class="fas fa-eye mr-2"></i>
-        <p>Ver más</p>
-      </button>
+      <p class="ml-2 flex items-center text-xs text-gray-500">
+        #${id}
+      </p>
       <div class="flex justify-end hidden">
         <button type="button" class="flex items-center text-xs text-red-600 px-2 py-1 rounded mx-1" name="cancel">
             <i class="fas fa-trash"></i>
@@ -13937,7 +13938,7 @@
 
   }
 
-  function Card({id,status,start,end,user,title,type,email},TEMPLATE){
+  function Card({id,status,start,end,user,title,type,email,avatar},TEMPLATE){
     const CARD = $(document.createElement('div'));
     const PROPS = {
       id,
@@ -13947,7 +13948,8 @@
       user,
       title,
       status,
-      email
+      email,
+      avatar
     };
     const BUTTONS = {};
     const OBSERVER = new Observer(['updateStatus']);
@@ -14107,6 +14109,17 @@
 
     $.ajax(settings);
   };
+  Services.update.user = (data,fn)=>{
+    let settings = {
+      url: base_url(`users/edit`),
+      data: data,
+      method: 'post',
+      async: true,
+      success: fn
+    };
+
+    $.ajax(settings);
+  };
 
   Services.delete = {};
   Services.delete.user = (data,fn)=>{
@@ -14129,28 +14142,27 @@
       aviso = new AvisoUpdateCard(aviso);
 
       aviso.events.on('updateStatus',function(data){
-        debugger;
         let {id,status,email} = data;
         let update = {
           aviso:{status},
           email:email,
           where:[['request.id','=',id]]
         };
+        if(status){
+          aviso.buttons.approve.element.addClass('hidden');
+          aviso.message.text('Aprobado');
+          aviso.element.addClass('approved');
+        }
+        else {
+          aviso.message.text('Rechazado');
+          aviso.element.addClass('declined');
+          aviso.buttons.approve.element.addClass('hidden');
+          aviso.buttons.decline.element.addClass('hidden');
+        }
 
         Services.update.aviso(update,function(response){
           let {error,data} = response;
           if(!error){
-            if(status){
-              aviso.buttons.approve.element.addClass('hidden');
-              aviso.message.text('Aprobado');
-              aviso.element.addClass('approved');
-            }
-            else {
-              aviso.message.text('Rechazado');
-              aviso.element.addClass('declined');
-              aviso.buttons.approve.element.addClass('hidden');
-              aviso.buttons.decline.element.addClass('hidden');
-            }
             setTimeout(()=>{
               UserAvisos.update(aviso);
               aviso.message.text('');
@@ -14203,7 +14215,7 @@
       let {error,data} = response;
       if(!error){
         data.forEach((aviso)=>{
-          (aviso.user == ID ? myAvisos : UserAvisos).add(aviso);
+          (aviso.userID == ID ? myAvisos : UserAvisos).add(aviso);
           if(Number(aviso.status)){ addEvent(aviso); }
         });
 
@@ -14218,8 +14230,8 @@
 
     return `
     <div class="flex flex-col items-center p-6 w-64 bg-white text-gray-700">
-      <div class="w-16 mb-4 rounded-full overflow-hidden">
-        <img class="avatar w-full" src="${avatar}" alt="">
+      <div class="w-16 h-16 mb-4 rounded-full overflow-hidden">
+        <img name="avatar" class="avatar w-full h-full" src="${avatar}" alt="">
       </div>
       <div class="">
         <p name="position" class="text-xs text-center text-gray-700 font-bold mb-2">${position}</p>
@@ -14311,6 +14323,7 @@
       user.work_start = new Date(user.work_start * 1000);
       user.birthday = new Date(user.birthday * 1000);
       INSTANCE.user = user;
+      INSTANCE.avatar.attr('src',user.avatar);
       INSTANCE.position.html(user.position);
       INSTANCE.fullname.html(user.fullname);
       INSTANCE.email.html(user.email);
@@ -14353,7 +14366,8 @@
     data.work_position = this.inputs.select.work_position.value;
     data.birthday = this.inputs.date.birthday.value;
     data.vacations = this.inputs.number.vacations.value;
-
+    data.avatar = this.inputs.image.avatar.src;
+    
     return { error: false, data }
   };
 
@@ -14401,7 +14415,9 @@
     data.work_start = this.inputs.date.work_start.value;
     data.birthday = this.inputs.date.birthday.value;
     data.vacations = this.inputs.number.vacations.value;
-
+    if(this.inputs.image.avatar.changed){
+      data.avatar = this.inputs.image.avatar.src;
+    }
     let where = [['users.id','=',this.user.id]];
 
     return { error: false, data: {user:data,where} }
@@ -14427,10 +14443,26 @@
         el[el.attr('data-area') == areas.value ? 'removeClass' : 'addClass']('hidden');
       });
     });
+    {
+      let profile = this;
+      profile.inputs.image.avatar.events.on('imgReady',function(){
+        let src = this.src;
+        let user = {'avatar':src};
+        console.log(user);
+        Services.update.user({
+          where:[['users.id','=',profile.user.id]],
+          user
+        },function(response){
+
+        });
+        $('#menu .avatar img').attr('src',user.avatar);
+      });
+    }
   };
 
   Profile.open = function(user) {
     this.disable(true);
+    this.inputs.image.avatar.disable(false);
     this.user = user;
     this.inputs.image.avatar.src = user.avatar;
     this.inputs.text.name.value = user.name;
@@ -14441,6 +14473,7 @@
     this.inputs.number.vacations.value = user.vacations;
     this.inputs.select.work_area.value = user.work_area;
     this.inputs.select.work_position.value = user.work_position;
+
   };
 
   function UsersList(name){
@@ -14470,10 +14503,8 @@
     const DELETE = ()=>{
       PROPS.users.forEach((card)=>{
         if(card.element.hasClass('delete')){
-          Services.delete.user({id:card.user.id},function(response){
-            let {error,data} = response;
-            if(!error){ card.off(); card.element.remove(); }
-          });
+          card.off(); card.element.remove();
+          Services.delete.user({id:card.user.id},function(response){});
         }    });
     };
     const METHODS = {
@@ -14578,18 +14609,34 @@
     });
     SECTIONS.edit.form.events.on('response',function(response){
       let { error, data} = response;
-      if(!error){ UPDATE(data);
+      if(!error){
+        UPDATE(data);
         let btns = SECTIONS.edit.buttons;
         btns.edit.element.removeClass('hidden');
         btns.send.element.addClass('hidden');
-        SECTIONS.edit.close();
       }
+    });
+    SECTIONS.edit.form.events.on('send',function(response){
+      let { error, data} = response;
+      if(!error){ SECTIONS.edit.close(); }
     });
     SECTIONS.create.buttons.cancel.events.on('click',SECTIONS.create.close);
     SECTIONS.create.buttons.send.events.on('click',SECTIONS.create.form.send);
+    SECTIONS.create.form.events.on('send',function(response){
+      let { error, data} = response;
+
+      if(!error){
+        let {name,lastname,email,avatar} = data;
+        let fullname = name+' '+lastname;
+        let position = '';
+        ADD({fullname,position,email,avatar}); SECTIONS.create.close();
+      }
+    });
     SECTIONS.create.form.events.on('response',function(response){
       let { error, data} = response;
-      if(!error){ADD(data); SECTIONS.create.close(); }
+      if(!error){
+        PROPS.users.find((card)=>{ return card.user.email == data.email; }).update(data);
+      }
     });
 
 

@@ -218,6 +218,7 @@ function ImageInput(INPUT,BUTTON,IMG){
       get:()=>{ return PROPS.file }
     },
     'src':{
+      get: ()=>{ return PROPS.data; },
       set: (value)=>{ PROPS.img.attr('src',value); }
     },
     'on': {
@@ -244,6 +245,7 @@ function ImageInput(INPUT,BUTTON,IMG){
   PROPS.reader.onload = (e)=>{
     PROPS.img.attr('src',e.target.result);
     PROPS.data = e.target.result;
+    INSTANCE.element.trigger('imgReady');
   };
 
   BUTTON.events.on('click',function(){

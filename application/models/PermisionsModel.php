@@ -47,6 +47,7 @@
         concat(users.name," ",users.lastname) as user,
         request.status,
         users.email,
+        users.avatar,
       ';
 
       foreach (['date_start'=>'start','date_finish'=>'end'] as $key => $alias) {

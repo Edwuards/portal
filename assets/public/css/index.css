@@ -272,14 +272,16 @@ button[name="avisar"] {
   z-index: 0; }
   [data-avisos] > .body {
     height: calc(100% - 48px); }
-    [data-avisos] > .body .card .message {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      opacity: 0;
-      z-index: 0;
-      transition: opacity .5s; }
+    [data-avisos] > .body .card {
+      height: 150px; }
+      [data-avisos] > .body .card .message {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        opacity: 0;
+        z-index: 0;
+        transition: opacity .5s; }
     [data-avisos] > .body .card.approved .message,
     [data-avisos] > .body .card.declined .message {
       opacity: 1;

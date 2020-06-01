@@ -3,8 +3,8 @@ function User({fullname,email,avatar,position}){
 
   return `
     <div class="flex flex-col items-center p-6 w-64 bg-white text-gray-700">
-      <div class="w-16 mb-4 rounded-full overflow-hidden">
-        <img class="avatar w-full" src="${avatar}" alt="">
+      <div class="w-16 h-16 mb-4 rounded-full overflow-hidden">
+        <img name="avatar" class="avatar w-full h-full" src="${avatar}" alt="">
       </div>
       <div class="">
         <p name="position" class="text-xs text-center text-gray-700 font-bold mb-2">${position}</p>

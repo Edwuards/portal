@@ -2,7 +2,7 @@ import * as HTML from './html.js';
 import { Button } from '../../inputs.js';
 import { Observer } from '../../helpers.js';
 
-function Card({id,status,start,end,user,title,type,email},TEMPLATE){
+function Card({id,status,start,end,user,title,type,email,avatar},TEMPLATE){
   const INSTANCE = this;
   const CARD = $(document.createElement('div'));
   const PROPS = {
@@ -13,7 +13,8 @@ function Card({id,status,start,end,user,title,type,email},TEMPLATE){
     user,
     title,
     status,
-    email
+    email,
+    avatar
   }
   const BUTTONS = {};
   const OBSERVER = new Observer(['updateStatus']);

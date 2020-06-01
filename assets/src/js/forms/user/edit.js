@@ -44,7 +44,9 @@ Edit.send = function(){
   data.work_start = this.inputs.date.work_start.value;
   data.birthday = this.inputs.date.birthday.value;
   data.vacations = this.inputs.number.vacations.value;
-
+  if(this.inputs.image.avatar.changed){
+    data.avatar = this.inputs.image.avatar.src;
+  }
   let where = [['users.id','=',this.user.id]];
 
   return { error: false, data: {user:data,where} }

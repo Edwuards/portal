@@ -65,6 +65,18 @@ Services.update.aviso = (data,fn)=>{
 
   $.ajax(settings);
 }
+Services.update.user = (data,fn)=>{
+  let obj = '';
+  let settings = {
+    url: base_url(`users/edit`),
+    data: data,
+    method: 'post',
+    async: true,
+    success: fn
+  };
+
+  $.ajax(settings);
+}
 
 Services.delete = {}
 Services.delete.user = (data,fn)=>{
@@ -79,5 +91,6 @@ Services.delete.user = (data,fn)=>{
 
   $.ajax(settings);
 }
+
 
 export { Services }
