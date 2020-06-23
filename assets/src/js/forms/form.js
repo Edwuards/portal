@@ -50,9 +50,9 @@ function Form(data){
     json: data.json ? data.json : false
   };
   const OPEN = ()=>{
-    if(typeof PROPS.init == 'function' ){ PROPS.init.call(INSTANCE); PROPS.init = true; }
     INPUTS.all.forEach((input)=>{ input.on(); });
     BUTTONS.all.forEach((btn)=>{ btn.on(); });
+    if(typeof PROPS.init == 'function' ){ PROPS.init.call(INSTANCE); PROPS.init = true; }
     PROPS.alive = true;
     SUBJECT.notify('open',[true]);
     return PROPS.element

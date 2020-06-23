@@ -6,20 +6,14 @@ const Sick = new Form({
   url: 'permisions/create',
 });
 
-let close = undefined;
-
 Sick.init = function(){
   Helper.pickerUnfocus(this.inputs);
+  this.buttons.send.events.on('click',this.send);
 }
 
 Sick.open = function(date) {
-  close = this.buttons.send.events.on('click',this.send);
   date = (date  == undefined ? new Date(Date.now()) : date );
   Helper.setDate(this.inputs,date);
-}
-
-Sick.close = function(){
-  this.buttons.send.events.off('click',close);
 }
 
 Sick.send = function(){

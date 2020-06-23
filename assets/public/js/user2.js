@@ -13420,9 +13420,9 @@
       json: data.json ? data.json : false
     };
     const OPEN = ()=>{
-      if(typeof PROPS.init == 'function' ){ PROPS.init.call(INSTANCE); PROPS.init = true; }
       INPUTS.all.forEach((input)=>{ input.on(); });
       BUTTONS.all.forEach((btn)=>{ btn.on(); });
+      if(typeof PROPS.init == 'function' ){ PROPS.init.call(INSTANCE); PROPS.init = true; }
       PROPS.alive = true;
       SUBJECT.notify('open',[true]);
       return PROPS.element
@@ -13608,20 +13608,14 @@
     url: 'permisions/create',
   });
 
-  let close = undefined;
-
   Vacation.init = function(){
     Helper.pickerUnfocus(this.inputs);
+    this.buttons.send.events.on('click',this.send);
   };
 
   Vacation.open = function(date){
-    close = this.buttons.send.events.on('click',this.send);
     date = (date  == undefined ? new Date(Date.now()) : date );
     Helper.setDate(this.inputs,date);
-  };
-
-  Vacation.close = function(){
-    this.buttons.send.events.off('click',close);
   };
 
   Vacation.send = function(){
@@ -13639,20 +13633,14 @@
     url: 'permisions/create',
   });
 
-  let close$1 = undefined;
-
   Permision.init = function(){
     Helper.pickerUnfocus(this.inputs);
+    this.buttons.send.events.on('click',this.send);
   };
 
   Permision.open = function(date) {
-    close$1 = this.buttons.send.events.on('click',this.send);
     date = (date  == undefined ? new Date(Date.now()) : date );
     Helper.setDate(this.inputs,date);
-  };
-
-  Permision.close = function(){
-    this.buttons.send.events.off('click',close$1);
   };
 
   Permision.send = function(){
@@ -13671,20 +13659,14 @@
     url: 'permisions/create',
   });
 
-  let close$2 = undefined;
-
   Sick.init = function(){
     Helper.pickerUnfocus(this.inputs);
+    this.buttons.send.events.on('click',this.send);
   };
 
   Sick.open = function(date) {
-    close$2 = this.buttons.send.events.on('click',this.send);
     date = (date  == undefined ? new Date(Date.now()) : date );
     Helper.setDate(this.inputs,date);
-  };
-
-  Sick.close = function(){
-    this.buttons.send.events.off('click',close$2);
   };
 
   Sick.send = function(){
@@ -13703,20 +13685,14 @@
     url: 'permisions/create',
   });
 
-  let close$3 = undefined;
-
   HomeOffice.init = function(){
     Helper.pickerUnfocus(this.inputs);
+    this.buttons.send.events.on('click',this.send);
   };
 
   HomeOffice.open = function(date) {
-    close$3 = this.buttons.send.events.on('click',this.send);
     date = (date  == undefined ? new Date(Date.now()) : date );
     Helper.setDate(this.inputs,date);
-  };
-
-  HomeOffice.close = function(){
-    this.buttons.send.events.off('click',close$3);
   };
 
   HomeOffice.send = function(){

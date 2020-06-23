@@ -13,6 +13,10 @@ export default function(){
     });
 
     let send = undefined, cancel = undefined;
+
+  Delete.init = function(){
+    s
+  }
     Delete.open = function(user){
       send = this.buttons.send.events.on('click',Delete.send);
       cancel = this.buttons.cancel.events.on('click',Delete.close);

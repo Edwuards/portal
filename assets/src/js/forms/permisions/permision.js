@@ -6,20 +6,14 @@ const Permision = new Form({
   url: 'permisions/create',
 });
 
-let close = undefined;
-
 Permision.init = function(){
   Helper.pickerUnfocus(this.inputs);
+  this.buttons.send.events.on('click',this.send);
 }
 
 Permision.open = function(date) {
-  close = this.buttons.send.events.on('click',this.send);
   date = (date  == undefined ? new Date(Date.now()) : date );
   Helper.setDate(this.inputs,date);
-}
-
-Permision.close = function(){
-  this.buttons.send.events.off('click',close);
 }
 
 Permision.send = function(){

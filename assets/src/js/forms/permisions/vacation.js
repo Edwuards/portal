@@ -10,16 +10,12 @@ let close = undefined;
 
 Vacation.init = function(){
   Helper.pickerUnfocus(this.inputs);
+  this.buttons.send.events.on('click',this.send);
 }
 
 Vacation.open = function(date){
-  close = this.buttons.send.events.on('click',this.send);
   date = (date  == undefined ? new Date(Date.now()) : date );
   Helper.setDate(this.inputs,date);
-}
-
-Vacation.close = function(){
-  this.buttons.send.events.off('click',close);
 }
 
 Vacation.send = function(){

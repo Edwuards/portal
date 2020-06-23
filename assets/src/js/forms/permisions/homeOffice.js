@@ -6,20 +6,14 @@ const HomeOffice = new Form({
   url: 'permisions/create',
 });
 
-let close = undefined;
-
 HomeOffice.init = function(){
   Helper.pickerUnfocus(this.inputs);
+  this.buttons.send.events.on('click',this.send);
 }
 
 HomeOffice.open = function(date) {
-  close = this.buttons.send.events.on('click',this.send);
   date = (date  == undefined ? new Date(Date.now()) : date );
   Helper.setDate(this.inputs,date);
-}
-
-HomeOffice.close = function(){
-  this.buttons.send.events.off('click',close);
 }
 
 HomeOffice.send = function(){

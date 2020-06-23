@@ -21,45 +21,6 @@ export default function(){
   const Elements = {};
   Actions.open = {};
   Actions.update = {};
-  Actions.update.date = (format)=>{
-    if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-    format = Calendar.instance.formatDate(Calendar.instance.getDate(),format);
-    format = format.slice(0,1).toUpperCase()+format.slice(1);
-    Nav.elements.date.html(format);
-  }
-  Actions.calendar = {};
-  Actions.calendar.addEvent = ({start,end,id,title,color})=>{
-    start = new Date(start * 1000);
-    end = new Date(end * 1000);
-    Calendar.instance.addEvent({
-      id,
-      start,
-      end,
-      title,
-      backgroundColor: color,
-      borderColor: color,
-      textColor: '#ffffff',
-    });
-  }
-  Actions.calendar.render = ()=>{
-    Actions.update.date();
-    // la barra de navegación mide 64px en altura por eso se la resta.
-    let height = window.innerHeight - 64;
-    Calendar.instance.setOption('contentHeight',height);
-    Calendar.instance.render();
-  }
-  Actions.calendar.next = ()=>{
-    Calendar.instance.next();
-    Actions.update.date();
-  }
-  Actions.calendar.prev = ()=>{
-    Calendar.instance.prev();
-    Actions.update.date();
-  }
-  Actions.calendar.today = ()=>{
-    Calendar.instance.today();
-    Actions.update.date();
-  }
   Actions.open.menu = ()=>{
     if(Nav.state.menu){
       Nav.actions.closeMenu();

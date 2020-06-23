@@ -12,7 +12,7 @@ export default function (){
     header: { left: '', center: '', right: '' },
     columnHeaderText: function(date) {
       let short = window.innerWidth > 640;
-      date = CALENDAR.formatDate(date,{
+      date = Instance.formatDate(date,{
         locale:'es',
         weekday:  short ? 'short' : 'narrow'
       });
@@ -20,14 +20,45 @@ export default function (){
       return date;
     }
   }
-  const Elements = {
-    calendar: $('#calendar')
+  const Elements = calendar: $('#calendar')
+  const Instance = new Calendar(Element[0],Options);
+  const Actions = {}
+  Actions.updateDate = (format)=>{
+    if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
+    format = Instance.formatDate(Instance.getDate(),format);
+    format = format.slice(0,1).toUpperCase()+format.slice(1);
+    // Nav.elements.date.html(format);
+    // Use an observable to notify  Nav
   }
-  const CALENDAR = new Calendar(Elements.calendar[0],Options);
+  Actions.render = ()=>{
+    Actions.update.date();
+    // la barra de navegación mide 64px en altura por eso se la resta.
+    let height = window.innerHeight - 64;
+    Instance.setOption('contentHeight',height);
+    Instance.render();
+  }
+  Actions.next = ()=>{
+    Instance.next();
+    Actions.updateDate();
+  }
+  Actions.prev = ()=>{
+    Instance.prev();
+    Actions.updateDate();
+  }
+  Actions.today = ()=>{
+    Instance.today();
+    Actions.updateDate();
+  }
+  Actions.open = ()=>{
+    Element.addClass('active');
+  }
+  Actions.close = ()=>{
+    Element.removeClass('active');
+  }
 
   return {
-    instance: CALENDAR,
-    open: ()=>{ Elements.calendar.addClass('active'); },
-    close: ()=>{Elements.calendar.removeClass('active'); }
+    instance: Instance,
+    element: Element,
+    actions: Actions
   }
 }
