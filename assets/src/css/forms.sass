@@ -17,99 +17,98 @@ textarea:active,
   #{$input}:-webkit-autofill:hover,
   #{$input}:-webkit-autofill:focus,
   #{$input}:-webkit-autofill:active,
-    -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important;
+    -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
 
-form
-  input,
-  select,
-  option,
-  textarea
-    background: transparent;
+input,
+select,
+option,
+textarea
+  background: #ffffff;
 
-  label
-    bottom: 0px;
-    transition: all .25s,;
+label
+  bottom: 0px;
+  transition: all .25s,;
 
-  .helper
-    font-size: 11px;
-    color: transparent;
+.helper
+  font-size: 11px;
+  color: transparent;
 
-  .helper.active
-    color: #808080;
+.helper.active
+  color: #808080;
 
-  input,
-  select,
-  textarea
-    color: black;
-    border-bottom: 2px solid #C8C8C8;
-    background-color: #FAFAFA;
-    transition: border-bottom-color .5s, color .5s;
+input,
+select,
+textarea
+  color: black;
+  border-bottom: 2px solid #C8C8C8;
+  background-color: #ffffff;
+  transition: border-bottom-color .5s, color .5s;
 
+//
+// .input.error + .helper,
+// .select.error + .helper,
+// .textarea.error + .helper
+//   color: red;
+//
+// .input.active,
+// .select.active,
+// .input.notEmtpy,
+// .select.notEmtpy,
+// .textarea.notEmtpy,
+//     color: black;
+//     label
+//       font-size: 11px;
+//       bottom: calc(100% - 11px);
+//     @each $input in ['input','select','textarea']
+//       #{$input}
+//         z-index: 11;
 
-  .input.error + .helper,
-  .select.error + .helper,
-  .textarea.error + .helper
-    color: red;
-
-  .input.active,
-  .select.active,
-  .input.notEmtpy,
-  .select.notEmtpy,
-  .textarea.notEmtpy,
-      color: black;
-      label
-        font-size: 11px;
-        bottom: calc(100% - 11px);
-      @each $input in ['input','select','textarea']
-        #{$input}
-          z-index: 11;
-
-
-  .textarea:hover,
-  .textarea.notEmtpy,
-    label
-      bottom: 60%;
-
-  input:focus,
-  select:focus,
-  textarea:focus,
-    color: black;
-    border-bottom-color: #888888;
-    label
-      z-index: 20;
-
-  .input.disabled,
-  .textarea.disabled,
-  .select.disabled
-    border-bottom-color: #BEBEBE;
-    background-color: #D3D3D3;
-    color: #808080;
-    label
-      color: #808080;
-
-form[name="login"]
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  .footer
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-form[name="verify"]
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  .footer
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-.permisions
-  input,
-  select,
-  textarea
-    border-bottom: 2px solid #ffffff;
+//
+// .textarea:hover,
+// .textarea.notEmtpy,
+//   label
+//     bottom: 60%;
+//
+// input:focus,
+// select:focus,
+// textarea:focus,
+//   color: black;
+//   border-bottom-color: #888888;
+//   label
+//     z-index: 20;
+//
+// .input.disabled,
+// .textarea.disabled,
+// .select.disabled
+//   border-bottom-color: #BEBEBE;
+//   background-color: #D3D3D3;
+//   color: #808080;
+//   label
+//     color: #808080;
+//
+// form[name="login"]
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   .footer
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+// form[name="verify"]
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   .footer
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+//
+// .permisions
+//   input,
+//   select,
+//   textarea
+//     border-bottom: 2px solid #ffffff;

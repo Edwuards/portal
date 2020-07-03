@@ -43,7 +43,7 @@ class App extends CI_Controller {
 
 	public function dashboard()
 	{
-		if(!$this->session->verified){ redirect('app/login'); }
+		// if(!$this->session->verified){ redirect('app/login'); }
 
 		$scripts = [
 			'js'=>['jquery',($this->session->role > 1 ? 'user2' : 'user1')],

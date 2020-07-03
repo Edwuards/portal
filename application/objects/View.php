@@ -24,9 +24,9 @@ class View {
 			'title'=> $html['title']
 		];
 
-		$this->CI->load->view('header',$header);
+		$this->CI->load->view('app/header',$header);
 		foreach ($html['views'] as $view => $data) { $this->CI->load->view($view,$data); }
-		$this->CI->load->view('footer');
+		$this->CI->load->view('app/footer');
 	}
 
 	private function loadAssets($assets){

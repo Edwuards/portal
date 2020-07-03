@@ -58,133 +58,44 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important; }
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important; }
 
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important; }
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important; }
 
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
 textarea:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #FAFAFA inset !important; }
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important; }
 
-form input,
-form select,
-form option,
-form textarea {
-  background: transparent; }
+input,
+select,
+option,
+textarea {
+  background: #ffffff; }
 
-form label {
+label {
   bottom: 0px;
   transition: all 0.25s; }
 
-form .helper {
+.helper {
   font-size: 11px;
   color: transparent; }
 
-form .helper.active {
+.helper.active {
   color: #808080; }
 
-form input,
-form select,
-form textarea {
+input,
+select,
+textarea {
   color: black;
   border-bottom: 2px solid #C8C8C8;
-  background-color: #FAFAFA;
+  background-color: #ffffff;
   transition: border-bottom-color .5s, color .5s; }
-
-form .input.error + .helper,
-form .select.error + .helper,
-form .textarea.error + .helper {
-  color: red; }
-
-form .input.active,
-form .select.active,
-form .input.notEmtpy,
-form .select.notEmtpy,
-form .textarea.notEmtpy {
-  color: black; }
-  form .input.active label,
-  form .select.active label,
-  form .input.notEmtpy label,
-  form .select.notEmtpy label,
-  form .textarea.notEmtpy label {
-    font-size: 11px;
-    bottom: calc(100% - 11px); }
-  form .input.active input,
-  form .select.active input,
-  form .input.notEmtpy input,
-  form .select.notEmtpy input,
-  form .textarea.notEmtpy input {
-    z-index: 11; }
-  form .input.active select,
-  form .select.active select,
-  form .input.notEmtpy select,
-  form .select.notEmtpy select,
-  form .textarea.notEmtpy select {
-    z-index: 11; }
-  form .input.active textarea,
-  form .select.active textarea,
-  form .input.notEmtpy textarea,
-  form .select.notEmtpy textarea,
-  form .textarea.notEmtpy textarea {
-    z-index: 11; }
-
-form .textarea:hover label,
-form .textarea.notEmtpy label {
-  bottom: 60%; }
-
-form input:focus,
-form select:focus,
-form textarea:focus {
-  color: black;
-  border-bottom-color: #888888; }
-  form input:focus label,
-  form select:focus label,
-  form textarea:focus label {
-    z-index: 20; }
-
-form .input.disabled,
-form .textarea.disabled,
-form .select.disabled {
-  border-bottom-color: #BEBEBE;
-  background-color: #D3D3D3;
-  color: #808080; }
-  form .input.disabled label,
-  form .textarea.disabled label,
-  form .select.disabled label {
-    color: #808080; }
-
-form[name="login"] {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; }
-  form[name="login"] .footer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; }
-
-form[name="verify"] {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; }
-  form[name="verify"] .footer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; }
-
-.permisions input,
-.permisions select,
-.permisions textarea {
-  border-bottom: 2px solid #ffffff; }
 
 .modal-cont {
   overflow: hidden;

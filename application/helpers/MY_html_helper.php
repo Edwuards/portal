@@ -49,7 +49,7 @@
       'css'=> [
         'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
         'input'=> isset($data['css']['input']) ? $data['css']['input'] : 'text-center',
-        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : 'w-24 mx-1',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
       ],
       'label'=> isset($data['label']) ? $data['label'] : '',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
@@ -66,9 +66,9 @@
     $ci=& get_instance();
     $overWrite = [
       'css'=> [
-        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : 'h-8',
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
         'input'=> isset($data['css']['input']) ? $data['css']['input'] : 'text-center',
-        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : 'w-16',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
       ],
       'label'=> isset($data['label']) ? $data['label'] : '',
       'attrs'=> isset($data['attrs']) ? $data['attrs'] : []

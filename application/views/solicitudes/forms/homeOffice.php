@@ -1,8 +1,8 @@
 <?php
 
 $html = [
-  'date_start' => DateInput(['attrs'=>['name'=>'start']]),
-  'date_finish' => DateInput(['attrs'=>['name'=>'finish']]),
+  'date_start' => DateInput(['css'=>['cont'=>'w-1/2'],'attrs'=>['name'=>'start']]),
+  'date_finish' => DateInput(['css'=>['cont'=>'w-1/2'],'attrs'=>['name'=>'finish']]),
   'description' => TextAreaInput([
     'attrs'=>[
       'name'=>'description',

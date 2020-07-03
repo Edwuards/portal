@@ -1,7 +1,7 @@
 <div data-nav="calendar" class="flex justify-end items-center w-full ">
   <div class="flex items-center w-full">
     <div class="h-8 mx-4 hidden sm:block">
-      <img src="https://avisame.figment.com.mx/assets/img/logo.png" class="h-full">
+      <!-- <img src="https://avisame.figment.com.mx/assets/img/logo.png" class="h-full"> -->
     </div>
     <button class="w-5 h-5 mx-2 hidden sm:block" type="button" name="prev" class="mx-2">
       <i class="fas text-md fa-chevron-left"></i>

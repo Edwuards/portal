@@ -1,7 +1,7 @@
-<div class="<?php echo $css['cont']; ?> mb-2">
-  <div class="<?php echo $css['input-cont']; ?> select relative ">
+<div class="<?php echo $css['cont']; ?>">
+  <div class="<?php echo $css['input-cont']; ?> flex flex-col">
     <label class="text-sm text-gray-600"  ><?php echo $label ?></label>
-    <select <?php echo attrsToSting($attrs); ?> class="w-full h-8 px-2 pb-1  bottom-0 text-mf">
+    <select <?php echo attrsToSting($attrs); ?> class="<?php echo $css['input'] ?> h-10 px-2 text-md">
       <?php  echo $options; ?>
     </select>
   </div>
