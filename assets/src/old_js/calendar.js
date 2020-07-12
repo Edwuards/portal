@@ -2,7 +2,7 @@ import { Calendar as CalendarCore } from '@fullcalendar/core';
 import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-export function Calendar(){
+export default function (){
   const Options = {
     eventLimit: 3,
     plugins: [ dayGridPlugin ],
@@ -20,8 +20,8 @@ export function Calendar(){
       return date;
     }
   }
-  const Element =  $('#calendar');
-  const Instance = new CalendarCore(Element[0],Options);
+  const Elements = calendar: $('#calendar')
+  const Instance = new Calendar(Element[0],Options);
   const Actions = {}
   Actions.updateDate = (format)=>{
     if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
@@ -31,7 +31,7 @@ export function Calendar(){
     // Use an observable to notify  Nav
   }
   Actions.render = ()=>{
-    Actions.updateDate();
+    Actions.update.date();
     // la barra de navegación mide 64px en altura por eso se la resta.
     let height = window.innerHeight - 64;
     Instance.setOption('contentHeight',height);

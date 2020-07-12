@@ -5,7 +5,7 @@
       ['name'=>string,'icon'=>string,'text'=>string ],
     ]
   */
-
+  $html = '';
   $render = function($button){
     return '
     <button class="flex items-center mb-4 ml-2 pl-2 items-center '.
@@ -26,11 +26,11 @@
 
     <div class="flex w-full mb-2 px-2 items-center">
       <div class="avatar w-10 h-10 overflow-hidden rounded-full">
-        <img class="w-full h-full" src="<?php echo $this->session->avatar; ?>" alt="">
+        <img class="w-full h-full" src="" alt="">
       </div>
       <div class="ml-4">
-        <p class="text-sm font-hairline"><?php echo $this->session->name; ?></p>
-        <p class="text-sm font-hairline"><?php echo $this->session->position; ?> </p>
+        <p class="text-sm font-hairline"></p>
+        <p class="text-sm font-hairline"></p>
       </div>
     </div>
     <div class="w-full mt-6" >

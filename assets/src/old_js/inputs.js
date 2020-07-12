@@ -3,6 +3,65 @@ import { Observer } from './helpers.js';
 import flatpickr from 'flatpickr';
 import  Spanish  from 'flatpickr/dist/l10n/es.js';
 
+function Finder(container){
+  const found = {
+    buttons: { name: {}, all: [] },
+    inputs: { type: {}, all: [] }
+  };
+
+  container.find('[data-type]').each(function(){
+    let el = $(this),
+    type = el.attr('data-type'),
+    name = el.attr('name'),
+    group = el.attr('data-group');
+
+    if(type !== 'button'){
+      if(!found.inputs.type[type]){ found.inputs.type[type] = {}; }
+      if(group){
+        if(!found.inputs.type[type][group]){ found.inputs.type[type][group] = {}; }
+        found.inputs.type[type][group][name] = el;
+      }
+      else{
+        found.inputs.type[type][name] = el;
+      }
+    }
+    else{
+      found.buttons.name[name] = new Button(el);
+      found.button.all.push(found.buttons.name[name]);
+    }
+
+    for(let type in found.inputs.type){
+      for (let input in found.inputs.type[type]) {
+        let name = input;
+        if(type == 'date'){
+          input = found.inputs.type.date[input];
+          found.inputs.type.date[name] = new DateInput(input);
+        }
+        else if(type == 'time'){
+          input = found.inputs.type.time[input];
+          found.inputs.type.time[name] = new TimeInput(input);
+        }
+        else if(type == 'textarea' || type == 'text' || type == 'number'){
+          input = found.inputs.type[type][input];
+          found.inputs.type[type][name] = new Input(input);
+        }
+        else if(type == 'select'){
+          input = found.inputs.type[type][input];
+          found.inputs.type[type][name] = new SelectInput(input);
+        }
+        else if(type == 'image'){
+          input = found.inputs.type.image[input];
+          found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
+        }
+        found.inputs.all.push(found.inputs.type[type][name]);
+      }
+    }
+
+
+  });
+
+  return found;
+}
 
 function EventHandler(element,events){
   const INSTANCE = this;
@@ -346,11 +405,14 @@ function TimeInput(INPUT){
 
 }
 
-export {
-  TimeInput,
-  DateInput,
-  SelectInput,
-  ImageInput,
-  Button,
-  Input
+
+const Types = {
+  'time':TimeInput,
+  'date':DateInput,
+  'select':SelectInput,
+  'image':ImageInput,
+  'button':Button,
+  'input':Input
 }
+
+export { finder: Finder, types: Types }

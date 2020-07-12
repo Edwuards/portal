@@ -17,39 +17,17 @@ class App extends CI_Controller {
 		else{ redirect('app/dashboard',301); }
 	}
 
-	public function login()
-	{
-		if($this->session->verified){ redirect('app/dashboard'); }
 
-		$scripts = [
-			'js'=>['jquery','login'],
-			'css'=>['base','index']
-		];
-		$views = ['users/login'=>''];
-		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Login']);
-	}
 
-	public function logout()
-	{
-		$method = $this->input->method();
-		if($method != 'post')
-		{
-			redirect('app/dashboard');
-		}
-		else{
-			$this->session->sess_destroy();
-		}
-	}
-
-	public function dashboard()
+	public function dashboard($dashboard)
 	{
 		// if(!$this->session->verified){ redirect('app/login'); }
-
+		$dashboard = 'dashboard/'.$dashboard;
 		$scripts = [
-			'js'=>['jquery',($this->session->role > 1 ? 'user2' : 'user1')],
+			'js'=>['jquery','employee'],
 			'css'=>['base','index']
 		];
-		$views = ['content'=>['work'=>$this->work_areas()]];
+		$views = [ $dashboard => [] ];
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
@@ -87,27 +65,8 @@ class App extends CI_Controller {
 
 	}
 
-	public function test(){
-		$fecha = new DateTime('now', new DateTimeZone('America/Mexico_City'));
-		print_r($fecha->format('Y-m-d H:i:s'));
-	}
 
 
-	private function work_areas()
-	{
-		$this->load->database();
-		$areas = $this->db->select('id,title')
-		->from('work_areas')
-		->get()->result_array();
-
-
-		$positions = $this->db->select('id,title,area')
-		->from('work_positions')
-		->get()->result_array();
-
-		return ['areas'=>$areas,'positions'=>$positions];
-
-	}
 
 
 
