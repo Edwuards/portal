@@ -1,5 +1,6 @@
 import { Calendar as CalendarCore } from '@fullcalendar/core';
-import { Observer } from './helpers.js';
+import { Observer } from '../helpers';
+import { Permissions } from './permissions';
 import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
@@ -20,11 +21,12 @@ export function Calendar(){
       if(short){ date = date.split('.')[0]; }
       return date;
     }
-  }
+  };
   const Element =  $('#calendar');
   const Instance = new CalendarCore(Element[0],Options);
-  const Actions = {}
+  const Actions = {};
   const Events = new Observer(['updateDate']);
+  const permissions = new Permissions();
 
   Actions.updateDate = (format)=>{
     if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
@@ -59,7 +61,11 @@ export function Calendar(){
   }
   Actions.register = Events.register;
 
+  permissions.on();
+  Actions.render();
+
   return {
+    permissions,
     instance: Instance,
     element: Element,
     actions: Actions

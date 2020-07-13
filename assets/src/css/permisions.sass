@@ -1,35 +1,35 @@
-.permision
+.permission
   right: 40px;
 
-.permision:nth-child(1)
+.permission:nth-child(1)
   bottom: 105px;
   transition: bottom .45s;
 
 @for $i from 4 through 2
-  .permision:nth-child(#{$i})
+  .permission:nth-child(#{$i})
     bottom: 105px + (60px * ($i - 1));
     transition: bottom .45s ;
 
-.permision.hide
+.permission.hide
   bottom: 45px;
   p
     display: none;
 
-.permisions-cont
+.permissions-cont
   position: fixed;
   width: 100px;
   height: 100px;
   transition: all .45s;
 
-.permisions-cont.active
+.permissions-cont.active
   width: 100vh;
   height: 100vh;
   background-color: white;
 
 @media (min-width: 640px)
-  .permisions-cont
+  .permissions-cont
     position: absolute;
 
-  .permisions-cont.active
+  .permissions-cont.active
     width: 200px;
     height: 350px;
