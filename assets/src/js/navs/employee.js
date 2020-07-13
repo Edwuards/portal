@@ -10,7 +10,7 @@ export function EmployeeNavigationBars(dependencies){
     let { calendar } = dependencies;
     Bars.calendar = Calendar(calendar);
   }
-  Bars.calendar.on()
-  return Navigation(Bars,Bars.calendar);
+
+  return new Navigation(Bars,Bars.calendar);
 
 }

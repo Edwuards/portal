@@ -1,4 +1,5 @@
 import { Calendar as CalendarCore } from '@fullcalendar/core';
+import { Observer } from './helpers.js';
 import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
@@ -23,12 +24,13 @@ export function Calendar(){
   const Element =  $('#calendar');
   const Instance = new CalendarCore(Element[0],Options);
   const Actions = {}
+  const Events = new Observer(['updateDate']);
+
   Actions.updateDate = (format)=>{
     if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
     format = Instance.formatDate(Instance.getDate(),format);
     format = format.slice(0,1).toUpperCase()+format.slice(1);
-    // Nav.elements.date.html(format);
-    // Use an observable to notify  Nav
+    Events.notify('updateDate',[format]);
   }
   Actions.render = ()=>{
     Actions.updateDate();
@@ -55,6 +57,7 @@ export function Calendar(){
   Actions.close = ()=>{
     Element.removeClass('active');
   }
+  Actions.register = Events.register;
 
   return {
     instance: Instance,
