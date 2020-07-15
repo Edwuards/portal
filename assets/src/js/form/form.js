@@ -87,12 +87,12 @@ export function Form(data){
     },
     'send': {
       configurable: true,
-      set:(send)=>{
+      set:(fn)=>{
         Object.defineProperty(instance,'send',{
           configurable: false,
           writable: false,
           value:function(){
-            send(send.apply(instance,arguments));
+            send(fn.apply(instance,arguments));
           }
         });
       }

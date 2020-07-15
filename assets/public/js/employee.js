@@ -11597,16 +11597,18 @@
     elements.container = $('#modal-cont');
     elements.modal = elements.container.find('#modal');
     elements.header = elements.modal.find('.header');
-    elements.title = elements.modal.find('.title');
+    elements.title = elements.header.find('.title');
+    elements.type = elements.header.find('.type');
 
     const { buttons } = Finder(elements.header);
 
     const methods = {
       'open': {
         writable: false,
-        value: (title)=>{
+        value: (title,type)=>{
           buttons.name.close.on();
           elements.title.html(title);
+          elements.type.addClass(type);
           elements.container.addClass('active');
           elements.container.on('click',(e)=>{
             if($(e.target).hasClass('modal-cont')){
@@ -11659,6 +11661,19 @@
       props.alive = false;
       events.notify('off',[true]);
     };
+    const send = (message)=>{
+      events.notify('send',[message]);
+      if(!message.error){
+        $.ajax({
+          url: `${window.location.origin}/${props.url}`,
+          method: props.method,
+          data: props.json ? JSON.stringify(message.data) : message.data,
+          async: props.async,
+          success: (response)=>{ events.notify('response',[response]); },
+          error: (response)=>{ events.notify('error',[response]); }
+        });
+      }
+    };
     const { inputs, buttons } = Finder(props.element);
 
     const methods = {
@@ -11704,12 +11719,12 @@
       },
       'send': {
         configurable: true,
-        set:(send)=>{
+        set:(fn)=>{
           Object.defineProperty(instance,'send',{
             configurable: false,
             writable: false,
             value:function(){
-              send(send.apply(instance,arguments));
+              send(fn.apply(instance,arguments));
             }
           });
         }
@@ -11749,21 +11764,23 @@
   }
 
   function Vacation(){
-    const Vacation = new Form({
+    const form = new Form({
       title: 'Vacación',
       name: 'vacation',
       url: 'permisions/create',
     });
 
 
-    Vacation.init = function(){
+    form.color = 'bg-teal-600';
+    
+    form.init = function(){
       this.buttons.name.send.events.on('click',this.send);
     };
 
-    Vacation.on = function(date){
+    form.on = function(date){
     };
 
-    Vacation.send = function(){
+    form.send = function(){
       let data = {};
       data.date_start = this.inputs.type.date.start.value+' 10:00:00';
       data.date_finish = this.inputs.type.date.finish.value+' 10:00:00';
@@ -11772,7 +11789,7 @@
       return { error: false, data }
     };
 
-    return Vacation
+    return form
 
   }
 
@@ -11786,10 +11803,43 @@
 
     const modal = new Modal();
 
-    const vacation = Vacation();
+    const forms = {};
+    forms.all = [ Vacation() ];
+    forms.open = (name)=>{
+      let form = forms.all.find(form => name == form.name );
+      return function(){
+        state.currentForm = form;
+        buttons.name.toggle.element.trigger('click');
+        modal.open(form.title,form.color);
+        form.on();
+        form.element.removeClass('hidden');
+      }
+    };
+    forms.close = function(){
+      let form = state.currentForm;
+      modal.close();
+      form.off();
+      form.element.addClass('hidden');
+    };
+
+    forms.init = (form)=>{
+      form.events.on('send',function(message){
+        if(!message.error){ modal.buttons.name.close.element.trigger('click'); }
+      });
+    };
+
+    const toggle = function(){
+      elements.container[ state.open ? 'removeClass' : 'addClass' ]('active');
+      elements.permissions[ state.open ? 'addClass' : 'removeClass' ]('hide');
+      this.element.children('i')
+      .removeClass( state.open ? 'fa-times' : 'fa-bullhorn')
+      .addClass( state.open ? 'fa-bullhorn': 'fa-times');
+      state.open = !state.open;
+    };
 
     const state = {
       open: false,
+      currentForm: undefined
     };
 
     const methods = {
@@ -11810,20 +11860,13 @@
 
     Object.defineProperties(this,methods);
 
-    buttons.name.toggle.events.on('click',function(){
-      elements.container[ state.open ? 'removeClass' : 'addClass' ]('active');
-      elements.permissions[ state.open ? 'addClass' : 'removeClass' ]('hide');
-      this.element.children('i')
-      .removeClass( state.open ? 'fa-times' : 'fa-bullhorn')
-      .addClass( state.open ? 'fa-bullhorn': 'fa-times');
-      state.open = !state.open;
-    });
+    forms.all.forEach(forms.init);
 
-    buttons.name.vacation.events.on('click',function(){
-      modal.open('test');
-      vacation.on();
-      vacation.element.removeClass('hidden');
-    });
+    buttons.name.toggle.events.on('click',toggle);
+
+    modal.buttons.name.close.events.on('click',forms.close);
+
+    buttons.name.vacation.events.on('click',forms.open('vacation'));
 
   }
 
