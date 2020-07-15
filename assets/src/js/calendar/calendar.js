@@ -35,11 +35,11 @@ export function Calendar(){
     Events.notify('updateDate',[format]);
   }
   Actions.render = ()=>{
-    Actions.updateDate();
     // la barra de navegación mide 64px en altura por eso se la resta.
     let height = window.innerHeight - 64;
     Instance.setOption('contentHeight',height);
     Instance.render();
+    Actions.updateDate();
   }
   Actions.next = ()=>{
     Instance.next();

@@ -18,7 +18,7 @@ $html = [
 
 ?>
 
-<form name="homeOffice" class="permisions" >
+<form name="homeOffice" class="hidden" >
   <div class="body">
 
     <div class="flex items-center mb-6">

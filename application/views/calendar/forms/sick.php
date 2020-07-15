@@ -36,7 +36,7 @@ $html = [
 
 ?>
 
-<form name="sick" class="permisions" >
+<form name="sick" class="hidden" >
   <div class="body">
 
     <div class="flex items-center mb-6">

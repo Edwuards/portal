@@ -12,7 +12,7 @@ $html = [
 
 ?>
 
-<form name="vacation" class="permisions" >
+<form name="vacation" class="hidden" >
   <div class="body">
 
     <div class="flex items-center mb-6">

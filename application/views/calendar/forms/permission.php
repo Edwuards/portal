@@ -30,7 +30,7 @@ $html = [
 
 ?>
 
-<form name="permision" class="permisions" >
+<form name="permision" class="hidden" >
   <div class="body">
 
     <div class="flex items-center mb-6">

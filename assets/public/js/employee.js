@@ -11212,35 +11212,38 @@
         found.buttons.all.push(found.buttons.name[name]);
       }
 
-      for(let type in found.inputs.type){
-        for (let input in found.inputs.type[type]) {
-          let name = input;
-          if(type == 'date'){
-            input = found.inputs.type.date[input];
-            found.inputs.type.date[name] = new DateInput(input);
-          }
-          else if(type == 'time'){
-            input = found.inputs.type.time[input];
-            found.inputs.type.time[name] = new TimeInput(input);
-          }
-          else if(type == 'textarea' || type == 'text' || type == 'number'){
-            input = found.inputs.type[type][input];
-            found.inputs.type[type][name] = new Input(input);
-          }
-          else if(type == 'select'){
-            input = found.inputs.type[type][input];
-            found.inputs.type[type][name] = new SelectInput(input);
-          }
-          else if(type == 'image'){
-            input = found.inputs.type.image[input];
-            found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
-          }
-          found.inputs.all.push(found.inputs.type[type][name]);
-        }
-      }
+
 
 
     });
+
+    for(let type in found.inputs.type){
+      for (let input in found.inputs.type[type]) {
+        let name = input;
+        if(type == 'date'){
+          input = found.inputs.type.date[input];
+          found.inputs.type.date[name] = new DateInput(input);
+        }
+        else if(type == 'time'){
+          input = found.inputs.type.time[input];
+          found.inputs.type.time[name] = new TimeInput(input);
+        }
+        else if(type == 'textarea' || type == 'text' || type == 'number'){
+          input = found.inputs.type[type][input];
+          found.inputs.type[type][name] = new Input(input);
+        }
+        else if(type == 'select'){
+          input = found.inputs.type[type][input];
+          found.inputs.type[type][name] = new SelectInput(input);
+        }
+        else if(type == 'image'){
+          input = found.inputs.type.image[input];
+          found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
+        }
+        found.inputs.all.push(found.inputs.type[type][name]);
+      }
+    }
+
 
     return found;
   }
@@ -11546,6 +11549,8 @@
 
     Object.defineProperties(this,METHODS);
 
+    this.events.on('click',this.close);
+
   }
 
   function TimeInput(INPUT){
@@ -11584,19 +11589,210 @@
 
     Object.defineProperties(this,METHODS);
 
+    this.events.on('click',this.close);
+  }
+
+  function Modal(){
+    const elements = {};
+    elements.container = $('#modal-cont');
+    elements.modal = elements.container.find('#modal');
+    elements.header = elements.modal.find('.header');
+    elements.title = elements.modal.find('.title');
+
+    const { buttons } = Finder(elements.header);
+
+    const methods = {
+      'open': {
+        writable: false,
+        value: (title)=>{
+          buttons.name.close.on();
+          elements.title.html(title);
+          elements.container.addClass('active');
+          elements.container.on('click',(e)=>{
+            if($(e.target).hasClass('modal-cont')){
+              buttons.name.close.element.trigger('click');
+            }
+          });
+        }
+      },
+      'close': {
+        writable: false,
+        value: ()=>{
+          elements.container.off('click').removeClass('active');
+          buttons.name.close.off();
+        }
+      },
+      'buttons': {
+        get: ()=>{ return buttons }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+  }
+
+  function Form(data){
+    const instance = this;
+    const events = new Observer(['on','off','send','response','error']);
+    const props = {
+      element:$(`form[name="${data.name}"]`),
+      alive:false,
+      title: data.title,
+      name:data.name,
+      url: data.url,
+      async: data.async ? data.async : true,
+      method: data.method ? data.method : 'POST',
+      json: data.json ? data.json : false
+    };
+    const on = ()=>{
+      inputs.all.forEach((input)=>{ input.on(); });
+      buttons.all.forEach((btn)=>{ btn.on(); });
+      if(typeof props.init == 'function' ){ props.init.call(instance); props.init = true; }
+      props.alive = true;
+      events.notify('on',[true]);
+      return props.element
+    };
+    const off = ()=>{
+      props.element[0].reset();
+      inputs.all.forEach((input)=>{ input.off(); });
+      buttons.all.forEach((btn)=>{ btn.off(); });
+      props.alive = false;
+      events.notify('off',[true]);
+    };
+    const { inputs, buttons } = Finder(props.element);
+
+    const methods = {
+      'element': {
+        get:()=>{ return props.element }
+      },
+      'name':{
+        get:()=>{ return props.name; }
+      },
+      'alive':{
+        get:()=>{ return props.alive; }
+      },
+      'title':{
+        get:()=>{ return props.title; }
+      },
+      'on': {
+        configurable: true,
+        get:()=>{ return on; },
+        set:(fn)=>{
+          Object.defineProperty(instance,'on',{
+            configurable: false,
+            writable: false,
+            value:function(){
+              on();
+              fn.apply(instance,arguments);
+            }
+          });
+        }
+      },
+      'off': {
+        configurable: true,
+        get:()=>{ return off; },
+        set:(fn)=>{
+          Object.defineProperty(instance,'off',{
+            configurable: false,
+            writable: false,
+            value:()=>{
+              off();
+              fn.call(instance);
+            }
+          });
+        }
+      },
+      'send': {
+        configurable: true,
+        set:(send)=>{
+          Object.defineProperty(instance,'send',{
+            configurable: false,
+            writable: false,
+            value:function(){
+              send(send.apply(instance,arguments));
+            }
+          });
+        }
+      },
+      'init': {
+        configurable: true,
+        set:(init)=>{
+          props.init = init;
+          Object.defineProperty(instance,'init',{
+            writable: false,
+            value:true,
+          });
+        }
+      },
+      'buttons':{
+        get: ()=>{ return buttons }
+      },
+      'inputs':{
+        get: ()=>{ return inputs }
+      },
+      'events':{
+        writable: false,
+        value: {
+          on: events.register,
+          off: events.unregister
+        }
+      },
+      'disable': {
+        writable: false,
+        value: (toggle)=>{
+          inputs.all.forEach((input)=>{ input.disable(toggle); });
+        }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+  }
+
+  function Vacation(){
+    const Vacation = new Form({
+      title: 'Vacación',
+      name: 'vacation',
+      url: 'permisions/create',
+    });
+
+
+    Vacation.init = function(){
+      this.buttons.name.send.events.on('click',this.send);
+    };
+
+    Vacation.on = function(date){
+    };
+
+    Vacation.send = function(){
+      let data = {};
+      data.date_start = this.inputs.type.date.start.value+' 10:00:00';
+      data.date_finish = this.inputs.type.date.finish.value+' 10:00:00';
+      data.notice = 2;
+
+      return { error: false, data }
+    };
+
+    return Vacation
+
   }
 
   function Permissions(){
-    const Elements = {
+    const elements = {
       container: $('#permissions'),
       permissions: $('.permission')
     };
 
-    const { buttons } = Finder(Elements.container);
+    const { buttons } = Finder(elements.container);
 
-    let state = false;
+    const modal = new Modal();
 
-    const Methods = {
+    const vacation = Vacation();
+
+    const state = {
+      open: false,
+    };
+
+    const methods = {
       'on':{
         writable: false,
         value: ()=>{
@@ -11607,21 +11803,28 @@
         writable: false,
         value: ()=>{
           buttons.all.forEach((btn)=>{ btn.off(); });
-          if(state){ buttons.name.toggle.element.trigger('click'); }
+          if(state.open){ buttons.name.toggle.element.trigger('click'); }
         }
       }
     };
 
-    Object.defineProperties(this,Methods);
+    Object.defineProperties(this,methods);
 
     buttons.name.toggle.events.on('click',function(){
-      Elements.container[ state ? 'removeClass' : 'addClass' ]('active');
-      Elements.permissions[ state ? 'addClass' : 'removeClass' ]('hide');
+      elements.container[ state.open ? 'removeClass' : 'addClass' ]('active');
+      elements.permissions[ state.open ? 'addClass' : 'removeClass' ]('hide');
       this.element.children('i')
-      .removeClass( state ? 'fa-times' : 'fa-bullhorn')
-      .addClass( state ? 'fa-bullhorn': 'fa-times');
-      state = !state;
+      .removeClass( state.open ? 'fa-times' : 'fa-bullhorn')
+      .addClass( state.open ? 'fa-bullhorn': 'fa-times');
+      state.open = !state.open;
     });
+
+    buttons.name.vacation.events.on('click',function(){
+      modal.open('test');
+      vacation.on();
+      vacation.element.removeClass('hidden');
+    });
+
   }
 
   var es$1 = createCommonjsModule(function (module, exports) {
@@ -13335,11 +13538,11 @@
       Events.notify('updateDate',[format]);
     };
     Actions.render = ()=>{
-      Actions.updateDate();
       // la barra de navegación mide 64px en altura por eso se la resta.
       let height = window.innerHeight - 64;
       Instance.setOption('contentHeight',height);
       Instance.render();
+      Actions.updateDate();
     };
     Actions.next = ()=>{
       Instance.next();
@@ -13440,6 +13643,7 @@
     const Nav = new NavBar('calendar');
     const DateTitle = Nav.element.find('[data=date]');
 
+
     calendar.actions.register('updateDate',function(stringDate){ DateTitle.html(stringDate); });
 
     Nav.buttons.name.prev.events.on('click',calendar.actions.prev);
@@ -13447,6 +13651,9 @@
     Nav.buttons.name.next.events.on('click',calendar.actions.next);
 
     Nav.buttons.name.today.events.on('click',calendar.actions.today);
+
+    calendar.actions.updateDate();
+
 
     return Nav
   }

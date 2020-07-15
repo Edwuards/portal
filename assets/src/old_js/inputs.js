@@ -3,6 +3,10 @@ import { Observer } from './helpers.js';
 import flatpickr from 'flatpickr';
 import  Spanish  from 'flatpickr/dist/l10n/es.js';
 
+const Helpers = {
+  setDate:(input,date)
+}
+
 function Finder(container){
   const found = {
     buttons: { name: {}, all: [] },

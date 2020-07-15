@@ -1,16 +1,24 @@
 import { Finder } from '../form/inputs';
+import { Modal } from './modal';
+import { Vacation } from './forms/vacation';
 
 export function Permissions(){
-  const Elements = {
+  const elements = {
     container: $('#permissions'),
     permissions: $('.permission')
   };
 
-  const { buttons } = Finder(Elements.container);
+  const { buttons } = Finder(elements.container);
 
-  let state = false;
+  const modal = new Modal();
 
-  const Methods = {
+  const vacation = Vacation();
+
+  const state = {
+    open: false,
+  };
+
+  const methods = {
     'on':{
       writable: false,
       value: ()=>{
@@ -21,19 +29,26 @@ export function Permissions(){
       writable: false,
       value: ()=>{
         buttons.all.forEach((btn)=>{ btn.off(); });
-        if(state){ buttons.name.toggle.element.trigger('click'); }
+        if(state.open){ buttons.name.toggle.element.trigger('click'); }
       }
     }
   }
 
-  Object.defineProperties(this,Methods);
+  Object.defineProperties(this,methods);
 
   buttons.name.toggle.events.on('click',function(){
-    Elements.container[ state ? 'removeClass' : 'addClass' ]('active');
-    Elements.permissions[ state ? 'addClass' : 'removeClass' ]('hide');
+    elements.container[ state.open ? 'removeClass' : 'addClass' ]('active');
+    elements.permissions[ state.open ? 'addClass' : 'removeClass' ]('hide');
     this.element.children('i')
-    .removeClass( state ? 'fa-times' : 'fa-bullhorn')
-    .addClass( state ? 'fa-bullhorn': 'fa-times');
-    state = !state;
+    .removeClass( state.open ? 'fa-times' : 'fa-bullhorn')
+    .addClass( state.open ? 'fa-bullhorn': 'fa-times');
+    state.open = !state.open;
   });
+
+  buttons.name.vacation.events.on('click',function(){
+    modal.open('test');
+    vacation.on();
+    vacation.element.removeClass('hidden');
+  });
+
 }

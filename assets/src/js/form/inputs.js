@@ -3,6 +3,35 @@ import { Observer } from '../helpers.js';
 import flatpickr from 'flatpickr';
 import  Spanish  from 'flatpickr/dist/l10n/es.js';
 
+const Helper = {
+  setDate: (inputs,date)=>{
+    if(inputs.date){
+      for (let input in inputs.date){
+        inputs.date[input].picker.setDate(date);
+      }
+    }
+    if(inputs.time){
+      for (let input in inputs.time){
+        inputs.time[input].picker.setDate(date);
+      }
+    }
+  },
+  pickerUnfocus: (inputs)=>{
+    if(inputs.date){
+      for (let input in inputs.date){
+        inputs.date[input].events.on('click',function(){ this.close(); });
+      }
+    }
+    if(inputs.time){
+      for (let input in inputs.time){
+        inputs.time[input].events.on('click',function(){ this.close(); });
+      }
+    }
+  }
+}
+
+
+
 function Finder(container){
   const found = {
     buttons: { name: {}, all: [] },
@@ -30,35 +59,38 @@ function Finder(container){
       found.buttons.all.push(found.buttons.name[name]);
     }
 
-    for(let type in found.inputs.type){
-      for (let input in found.inputs.type[type]) {
-        let name = input;
-        if(type == 'date'){
-          input = found.inputs.type.date[input];
-          found.inputs.type.date[name] = new DateInput(input);
-        }
-        else if(type == 'time'){
-          input = found.inputs.type.time[input];
-          found.inputs.type.time[name] = new TimeInput(input);
-        }
-        else if(type == 'textarea' || type == 'text' || type == 'number'){
-          input = found.inputs.type[type][input];
-          found.inputs.type[type][name] = new Input(input);
-        }
-        else if(type == 'select'){
-          input = found.inputs.type[type][input];
-          found.inputs.type[type][name] = new SelectInput(input);
-        }
-        else if(type == 'image'){
-          input = found.inputs.type.image[input];
-          found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
-        }
-        found.inputs.all.push(found.inputs.type[type][name]);
-      }
-    }
+
 
 
   });
+
+  for(let type in found.inputs.type){
+    for (let input in found.inputs.type[type]) {
+      let name = input;
+      if(type == 'date'){
+        input = found.inputs.type.date[input];
+        found.inputs.type.date[name] = new DateInput(input);
+      }
+      else if(type == 'time'){
+        input = found.inputs.type.time[input];
+        found.inputs.type.time[name] = new TimeInput(input);
+      }
+      else if(type == 'textarea' || type == 'text' || type == 'number'){
+        input = found.inputs.type[type][input];
+        found.inputs.type[type][name] = new Input(input);
+      }
+      else if(type == 'select'){
+        input = found.inputs.type[type][input];
+        found.inputs.type[type][name] = new SelectInput(input);
+      }
+      else if(type == 'image'){
+        input = found.inputs.type.image[input];
+        found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
+      }
+      found.inputs.all.push(found.inputs.type[type][name]);
+    }
+  }
+
 
   return found;
 }
@@ -365,6 +397,8 @@ function DateInput(INPUT){
 
   Object.defineProperties(this,METHODS);
 
+  this.events.on('click',this.close);
+
 }
 
 function TimeInput(INPUT){
@@ -403,6 +437,7 @@ function TimeInput(INPUT){
 
   Object.defineProperties(this,METHODS);
 
+  this.events.on('click',this.close);
 }
 
 
