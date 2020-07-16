@@ -357,6 +357,7 @@ function DateInput(INPUT){
     locale: Spanish,
     dateFormat: 'j M Y',
     defaultDate: new Date(Date.now()),
+    disableMobile: true
   });
 
   PICKER.config.onClose.push(function(){
@@ -408,6 +409,7 @@ function TimeInput(INPUT){
     locale: Spanish,
     dateFormat: 'h:i K',
     defaultDate: '10:00',
+    disableMobile: true
   });
 
   PICKER.config.onClose.push(function(){

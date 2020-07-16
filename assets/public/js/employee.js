@@ -11510,6 +11510,7 @@
       locale: Spanish,
       dateFormat: 'j M Y',
       defaultDate: new Date(Date.now()),
+      disableMobile: true
     });
 
     PICKER.config.onClose.push(function(){
@@ -11560,6 +11561,7 @@
       locale: Spanish,
       dateFormat: 'h:i K',
       defaultDate: '10:00',
+      disableMobile: true
     });
 
     PICKER.config.onClose.push(function(){
@@ -11594,8 +11596,8 @@
 
   function Modal(){
     const elements = {};
-    elements.container = $('#modal-cont');
-    elements.modal = elements.container.find('#modal');
+    elements.container = $('[data-modal="permissions"]');
+    elements.modal = elements.container.find('.modal');
     elements.header = elements.modal.find('.header');
     elements.title = elements.header.find('.title');
     elements.type = elements.header.find('.type');
@@ -11778,6 +11780,9 @@
     };
 
     form.on = function(date){
+      let inputs = this.inputs.type;
+      date = (date  == undefined ? new Date(Date.now()) : date );
+      for(let i in inputs.date){ inputs.date[i].picker.setDate(date); }
     };
 
     form.send = function(){
@@ -11807,7 +11812,10 @@
       this.buttons.name.send.events.on('click',this.send);
     };
 
-    form.open = function(date) {
+    form.on = function(date) {
+      let inputs = this.inputs.type;
+      date = (date  == undefined ? new Date(Date.now()) : date );
+      for(let i in inputs.date){ inputs.date[i].picker.setDate(date); }
     };
 
     form.send = function(){
@@ -11839,7 +11847,11 @@
       this.buttons.name.send.events.on('click',this.send);
     };
 
-    form.open = function(date) {
+    form.on = function(date) {
+      let inputs = this.inputs.type;
+      date = (date  == undefined ? new Date(Date.now()) : date );
+      for(let i in inputs.date){ inputs.date[i].picker.setDate(date); }
+
     };
 
     form.send = function(){
@@ -11870,7 +11882,11 @@
       this.buttons.name.send.events.on('click',this.send);
     };
 
-    form.open = function(date){
+    form.on = function(date){
+      let inputs = this.inputs.type;
+      date = (date  == undefined ? new Date(Date.now()) : date );
+      for(let i in inputs.date){ inputs.date[i].picker.setDate(date); }
+      for(let i in inputs.time){ inputs.time[i].picker.setDate(date); }
     };
 
     form.send = function(){

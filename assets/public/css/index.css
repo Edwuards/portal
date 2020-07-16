@@ -101,17 +101,24 @@ textarea {
   overflow: hidden;
   z-index: 0;
   opacity: 0;
+  top: 100%;
   transition: opacity 0.5s; }
   .modal-cont .modal {
-    width: 500px;
     box-shadow: 0px 16px 41px 0px #7a7a7a; }
-    .modal-cont .modal .body {
-      height: calc(100% - 64px);
+    .modal-cont .modal > .body {
+      height: calc(100% - 80px);
       overflow: hidden; }
 
 .modal-cont.active {
   z-index: 50;
-  opacity: 1; }
+  opacity: 1;
+  top: 0; }
+
+[data-modal="permissions"] form > .body {
+  height: calc(100% - 105px); }
+
+[data-modal="permissions"] form input {
+  border-bottom-color: transparent; }
 
 #dataTable {
   top: 100%;

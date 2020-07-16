@@ -7,14 +7,14 @@
   }
 
 ?>
-<div id="modal-cont" class="modal-cont flex w-screen h-full justify-center items-center absolute top-0 z-50">
-  <div id="modal" class="modal bg-white overflow-hidden rounded">
-    <div class="header flex justify-center items-center text-gray-700 p-4">
-      <div class="w-full flex items-center border-b-2 border-gray-400 pb-2 mt-2 mr-4">
+<div data-modal="permissions" class="modal-cont flex w-screen h-full justify-center items-center fixed top-0 sm:absolute">
+  <div class="modal bg-white overflow-hidden rounded w-screen h-full sm:w-5/12 sm:h-auto">
+    <div class="header flex justify-center items-center text-gray-700 m-4 border-b-2 border-gray-400 ">
+      <div class="w-full flex items-center pb-2 mr-4">
         <span class="type w-2 h-2 abosolute mx-2 rounded-full "></span>
-        <p class="title"></p>
+        <p class="title text-lg sm:text-md"></p>
       </div>
-      <button data-type="button" class="flex w-8 h-8 justify-center items-center" name="close">
+      <button data-type="button" class="flex w-8 h-8 justify-center items-center pb-2" name="close">
        <i class="fas fa-times"></i>
       </button>
     </div>

@@ -2,8 +2,8 @@ import { Finder } from '../form/inputs';
 
 export function Modal(){
   const elements = {};
-  elements.container = $('#modal-cont');
-  elements.modal = elements.container.find('#modal');
+  elements.container = $('[data-modal="permissions"]');
+  elements.modal = elements.container.find('.modal');
   elements.header = elements.modal.find('.header');
   elements.title = elements.header.find('.title');
   elements.type = elements.header.find('.type');

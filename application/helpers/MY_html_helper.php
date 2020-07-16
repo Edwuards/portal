@@ -198,8 +198,8 @@
   function FormFooter($buttons){
     $html = '';
     foreach ($buttons as $btn) { $html .= $btn.' '; };
-    return '<div class="footer w-full mt-6">
-              <div data="error" class="text-red-600 text-sm my-6 text-center" >
+    return '<div class="footer w-full pt-6">
+              <div data="error" class="h-10 text-red-600 text-md py-2 text-center" >
               </div>
               <div class="flex"> '.$html.'</div>
             </div>';

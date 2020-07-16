@@ -10,4 +10,7 @@
     <i class="text-md fas fa-bars"></i>
   </button>
   <?php echo $html ?>
+  <button data-type="button" class="w-10 h-10 mx-2 sm:mx-4" type="button" name="notifications" class="mx-2">
+    <i class="text-md fas fa-bell"></i>
+  </button>
 </nav>

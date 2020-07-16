@@ -14,8 +14,10 @@ export function HomeOffice(){
     this.buttons.name.send.events.on('click',this.send);
   }
 
-  form.open = function(date) {
+  form.on = function(date) {
+    let inputs = this.inputs.type;
     date = (date  == undefined ? new Date(Date.now()) : date );
+    for(let i in inputs.date){ inputs.date[i].picker.setDate(date); }
   }
 
   form.send = function(){
