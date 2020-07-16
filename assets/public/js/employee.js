@@ -11764,15 +11764,15 @@
   }
 
   function Vacation(){
+
     const form = new Form({
       title: 'Vacación',
       name: 'vacation',
       url: 'permisions/create',
     });
 
-
     form.color = 'bg-teal-600';
-    
+
     form.init = function(){
       this.buttons.name.send.events.on('click',this.send);
     };
@@ -11793,6 +11793,101 @@
 
   }
 
+  function HomeOffice(){
+
+    const form = new Form({
+      title: 'Home Office',
+      name: 'homeOffice',
+      url: 'permisions/create',
+    });
+
+    form.color = 'bg-indigo-600';
+
+    form.init = function(){
+      this.buttons.name.send.events.on('click',this.send);
+    };
+
+    form.open = function(date) {
+    };
+
+    form.send = function(){
+      let inputs = this.inputs.type;
+      let data = {};
+      data.date_start = inputs.date.start.value + ' 10:00:00';
+      data.date_finish = inputs.date.finish.value + ' 10:00:00';
+      data.comments = inputs.textarea.description.value;
+      data.notice = 4;
+
+      return { error: false, data }
+    };
+
+    return form
+
+  }
+
+  function Sick(){
+
+    const form = new Form({
+      title: 'Enfermedad',
+      name: 'sick',
+      url: 'permisions/create',
+    });
+
+    form.color = 'bg-blue-600';
+
+    form.init = function(){
+      this.buttons.name.send.events.on('click',this.send);
+    };
+
+    form.open = function(date) {
+    };
+
+    form.send = function(){
+      let inputs = this.inputs.type;
+      let data = {};
+      data.date_start = inputs.date.start.value+' 10:00:00';
+      data.date_finish = inputs.date.finish.value+' 10:00:00';
+      data.comments = inputs.textarea.description.value;
+      data.notice = 3;
+
+      return { error: false, data }
+    };
+
+    return form
+  }
+
+  function Permission(){
+
+    const form = new Form({
+      title: 'Permiso',
+      name: 'permission',
+      url: 'permisions/create',
+    });
+
+    form.color = 'bg-green-600';
+
+    form.init = function(){
+      this.buttons.name.send.events.on('click',this.send);
+    };
+
+    form.open = function(date){
+    };
+
+    form.send = function(){
+      let inputs = this.inputs.type;
+      let data = {};
+      data.date_start = inputs.date.start.value+' '+inputs.time.start.value;
+      data.date_finish = inputs.date.finish.value+' '+inputs.time.finish.value;
+      data.comments = inputs.textarea.description.value;
+      data.notice = 1;
+
+      return { error: false, data }
+    };
+
+    return form
+
+  }
+
   function Permissions(){
     const elements = {
       container: $('#permissions'),
@@ -11804,7 +11899,7 @@
     const modal = new Modal();
 
     const forms = {};
-    forms.all = [ Vacation() ];
+    forms.all = [ Vacation(), HomeOffice(), Sick(), Permission() ];
     forms.open = (name)=>{
       let form = forms.all.find(form => name == form.name );
       return function(){
@@ -11839,7 +11934,7 @@
 
     const state = {
       open: false,
-      currentForm: undefined
+      currentForm: false
     };
 
     const methods = {
@@ -11854,6 +11949,7 @@
         value: ()=>{
           buttons.all.forEach((btn)=>{ btn.off(); });
           if(state.open){ buttons.name.toggle.element.trigger('click'); }
+          if(state.currentForm){ modal.buttons.name.close.element.trigger('click'); }
         }
       }
     };
@@ -11867,6 +11963,12 @@
     modal.buttons.name.close.events.on('click',forms.close);
 
     buttons.name.vacation.events.on('click',forms.open('vacation'));
+
+    buttons.name.sick.events.on('click',forms.open('sick'));
+
+    buttons.name.homeOffice.events.on('click',forms.open('homeOffice'));
+
+    buttons.name.permission.events.on('click',forms.open('permission'));
 
   }
 

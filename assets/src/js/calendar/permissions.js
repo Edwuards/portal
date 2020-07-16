@@ -1,6 +1,9 @@
 import { Finder } from '../form/inputs';
 import { Modal } from './modal';
 import { Vacation } from './forms/vacation';
+import { HomeOffice } from './forms/homeOffice';
+import { Sick } from './forms/sick';
+import { Permission } from './forms/permission';
 
 export function Permissions(){
   const elements = {
@@ -13,7 +16,7 @@ export function Permissions(){
   const modal = new Modal();
 
   const forms = {};
-  forms.all = [ Vacation() ];
+  forms.all = [ Vacation(), HomeOffice(), Sick(), Permission() ];
   forms.open = (name)=>{
     let form = forms.all.find(form => name == form.name );
     return function(){
@@ -48,7 +51,7 @@ export function Permissions(){
 
   const state = {
     open: false,
-    currentForm: undefined
+    currentForm: false
   };
 
   const methods = {
@@ -63,6 +66,7 @@ export function Permissions(){
       value: ()=>{
         buttons.all.forEach((btn)=>{ btn.off(); });
         if(state.open){ buttons.name.toggle.element.trigger('click'); }
+        if(state.currentForm){ modal.buttons.name.close.element.trigger('click'); }
       }
     }
   }
@@ -76,5 +80,11 @@ export function Permissions(){
   modal.buttons.name.close.events.on('click',forms.close);
 
   buttons.name.vacation.events.on('click',forms.open('vacation'));
+
+  buttons.name.sick.events.on('click',forms.open('sick'));
+
+  buttons.name.homeOffice.events.on('click',forms.open('homeOffice'));
+
+  buttons.name.permission.events.on('click',forms.open('permission'));
 
 }

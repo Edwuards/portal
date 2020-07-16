@@ -5,7 +5,7 @@ $colors = [
 $buttons = [
   'css'=>'flex h-10 w-10 relative ml-2 mr-1 justify-center items-center rounded-full',
   'elements'=>[
-    ['title'=>'Permiso','name'=>'permision','icon'=>'fas fa-clipboard-list'],
+    ['title'=>'Permiso','name'=>'permission','icon'=>'fas fa-clipboard-list'],
     ['title'=>'Vacación','name'=>'vacation','icon'=>'fas fa-plane-departure'],
     ['title'=>'Enfermedad','name'=>'sick','icon'=>'fas fa-notes-medical'],
     ['title'=>'Home Office','name'=>'homeOffice','icon'=>'fas fa-laptop-house']
