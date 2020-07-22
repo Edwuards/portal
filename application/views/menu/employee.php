@@ -6,7 +6,7 @@
     ['name'=>'logout','icon'=>'fas fa-power-off','text'=>'Cerrar Sesión']
   ];
 
-  $html = $this->load->view('menu/base',['buttons'=>$buttons],true);
+  $html = $this->load->view('menu/menu',['buttons'=>$buttons],true);
 
   echo $html;
 

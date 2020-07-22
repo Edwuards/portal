@@ -71,4 +71,29 @@ function Observer(events){
 
 }
 
-export { Observer }
+function ToggleObjects(list,current){
+  const map = {};
+  let active = undefined;
+
+  const Methods = {
+    'active': {
+      get: ()=>{ return active }
+    },
+    'change': {
+      enumerable: true,
+      writable: false,
+      value: (name)=>{
+        active.off();
+        active = map[name];
+        active.on();
+      }
+    }
+  }
+
+  Object.defineProperties(this,Methods);
+  list.forEach((obj)=>{ map[obj.name] = obj; });
+  active = map[current];
+}
+
+
+export { Observer, ToggleObjects }

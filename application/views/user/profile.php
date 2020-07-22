@@ -3,14 +3,14 @@ $options = [
   'areas'=>'',
   'positions'=>''
 ];
-
-foreach ($work['positions'] as $position) {
-  $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-}
-foreach ($work['areas'] as $area) {
-  $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-}
-
+//
+// foreach ($work['positions'] as $position) {
+//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
+// }
+// foreach ($work['areas'] as $area) {
+//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
+// }
+//
 
 $html = [
   'image'=> ImageInput([
@@ -80,7 +80,7 @@ $html = [
 
 ?>
 
-<div data-users="profile" class="w-full h-full bg-white absolute z-0 top-0 ">
+<div data-content="profile" class="absolute w-full h-full bg-white hidden">
 
   <div class="body w-full h-full relative bg-white">
     <section class="flex flex-wrap justify-center w-full h-full relative overflow-y-scroll p-6">

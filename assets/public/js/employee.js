@@ -8502,6 +8502,30 @@
 
   }
 
+  function ToggleObjects(list,current){
+    const map = {};
+    let active = undefined;
+
+    const Methods = {
+      'active': {
+        get: ()=>{ return active }
+      },
+      'change': {
+        enumerable: true,
+        writable: false,
+        value: (name)=>{
+          active.off();
+          active = map[name];
+          active.on();
+        }
+      }
+    };
+
+    Object.defineProperties(this,Methods);
+    list.forEach((obj)=>{ map[obj.name] = obj; });
+    active = map[current];
+  }
+
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
   function unwrapExports (x) {
@@ -13669,7 +13693,7 @@
   });
 
   function Calendar$1(){
-    const Options = {
+    const options = {
       eventLimit: 3,
       plugins: [ main ],
       defaultView: 'dayGridMonth',
@@ -13678,7 +13702,7 @@
       header: { left: '', center: '', right: '' },
       columnHeaderText: function(date) {
         let short = window.innerWidth > 640;
-        date = Instance.formatDate(date,{
+        date = instance.formatDate(date,{
           locale:'es',
           weekday:  short ? 'short' : 'narrow'
         });
@@ -13686,91 +13710,80 @@
         return date;
       }
     };
-    const Element =  $('#calendar');
-    const Instance = new Calendar(Element[0],Options);
-    const Actions = {};
-    const Events = new Observer(['updateDate']);
+    const element =  $('#calendar');
+    const instance = new Calendar(element[0],options);
+    const events = new Observer(['updateDate']);
     const permissions = new Permissions();
 
-    Actions.updateDate = (format)=>{
-      if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-      format = Instance.formatDate(Instance.getDate(),format);
-      format = format.slice(0,1).toUpperCase()+format.slice(1);
-      Events.notify('updateDate',[format]);
-    };
-    Actions.render = ()=>{
-      // la barra de navegación mide 64px en altura por eso se la resta.
-      let height = window.innerHeight - 64;
-      Instance.setOption('contentHeight',height);
-      Instance.render();
-      Actions.updateDate();
-    };
-    Actions.next = ()=>{
-      Instance.next();
-      Actions.updateDate();
-    };
-    Actions.prev = ()=>{
-      Instance.prev();
-      Actions.updateDate();
-    };
-    Actions.today = ()=>{
-      Instance.today();
-      Actions.updateDate();
-    };
-    Actions.open = ()=>{
-      Element.addClass('active');
-    };
-    Actions.close = ()=>{
-      Element.removeClass('active');
-    };
-    Actions.register = Events.register;
-
-    permissions.on();
-    Actions.render();
-
-    return {
-      permissions,
-      instance: Instance,
-      element: Element,
-      actions: Actions
-    }
-  }
-
-  function Navigation(Bars,current){
-    let Current = current;
-
-    const Methods = {
-      'current': {
-        get: ()=>{ return current.name }
-      },
-      'change': {
-        enumerable: true,
+    const methods = {
+      'updateDate': {
         writable: false,
-        value: (name)=>{
-          Current.off();
-          for (let bar in Bars) {
-            if(Bars[bar].name == name){
-              Bars[bar].on();
-              Current = Bars[bar];
-            }
-          }
+        value: (format)=>{
+          if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
+          format = instance.formatDate(instance.getDate(),format);
+          format = format.slice(0,1).toUpperCase()+format.slice(1);
+          events.notify('updateDate',[format]);
         }
+      },
+      'render': {
+        writable: false,
+        value: ()=>{
+          // la barra de navegación mide 64px en altura por eso se la resta.
+          let height = window.innerHeight - 64;
+          instance.setOption('contentHeight',height);
+          instance.render();
+          this.updateDate();
+        }
+      },
+      'next': {
+        writable: false,
+        value: ()=>{
+          instance.next();
+          this.updateDate();
+        }
+      },
+      'prev': {
+        writable: false,
+        value: ()=>{
+          instance.prev();
+          this.updateDate();
+        }
+      },
+      'today': {
+        writable: false,
+        value: ()=>{
+          instance.today();
+          this.updateDate();
+        }
+      },
+      'register': {
+        get: ()=>{ return events.register; }
+      },
+      'permissions': {
+        get: ()=>{ return permissions }
       }
     };
 
-    Current.on();
-    Object.defineProperties(this,Methods);
+    Object.defineProperties(this,methods);
+
+    this.render();
+
   }
 
   function NavBar(name){
-    const Element = $(`[data-navbar="${name}"]`);
+    const element = $(`[data-navbar="${name}"]`);
 
-    const { buttons, inputs } = Finder(Element);
+    const { buttons, inputs } = Finder(element);
 
+    const toggle = (state)=>{
+      element[state ? 'removeClass' : 'addClass']('hidden');
+      buttons.all.forEach((btn)=>{ btn[state ? 'on' : 'off'](); });
+      inputs.all.forEach((input)=>{ input[state ? 'on' : 'off'](); });
+    };
 
     const Methods = {
       'element': {
-        get:()=>{ return Element }
+        get:()=>{ return element }
       },
       'name': {
         get: ()=>{ return name }
@@ -13782,18 +13795,12 @@
         get: ()=>{ return inputs }
       },
       'on':{
-        value: function(){
-          Element.removeClass('hide');
-          buttons.all.forEach((btn)=>{ btn.on(); });
-          inputs.all.forEach((input)=>{ input.on(); });
-        }
+        writable: false,
+        value: ()=>{ toggle(true); }
       },
       'off':{
-        value: function(){
-          Element.addClass('hide');
-          buttons.all.forEach((btn)=>{ btn.off(); });
-          inputs.all.forEach((input)=>{ input.off(); });
-        }
+        writable: false,
+        value: ()=>{ toggle(false); }
       }
     };
 
@@ -13801,41 +13808,190 @@
   }
 
   function Calendar$2(calendar){
-    const Nav = new NavBar('calendar');
-    const DateTitle = Nav.element.find('[data=date]');
+    NavBar.call(this,'calendar');
+    const DateTitle = this.element.find('[data=date]');
 
+    calendar.register('updateDate',function(stringDate){ DateTitle.html(stringDate); });
 
-    calendar.actions.register('updateDate',function(stringDate){ DateTitle.html(stringDate); });
+    this.buttons.name.prev.events.on('click',calendar.prev);
 
-    Nav.buttons.name.prev.events.on('click',calendar.actions.prev);
+    this.buttons.name.next.events.on('click',calendar.next);
 
-    Nav.buttons.name.next.events.on('click',calendar.actions.next);
+    this.buttons.name.today.events.on('click',calendar.today);
 
-    Nav.buttons.name.today.events.on('click',calendar.actions.today);
+    calendar.updateDate();
 
-    calendar.actions.updateDate();
-
-
-    return Nav
   }
 
-  function EmployeeNavigationBars(dependencies){
-    const Bars = {
-      calendar: undefined
-    };
+  function Profile(calendar){
+    NavBar.call(this,'profile');
+  }
+
+  function Navigation(dependencies){
+    const bars = [];
 
     {
       let { calendar } = dependencies;
-      Bars.calendar = Calendar$2(calendar);
+      bars.push(new Calendar$2(calendar));
+      bars.push(new Profile());
     }
 
-    return new Navigation(Bars,Bars.calendar);
+    ToggleObjects.call(this,bars,'calendar');
+
+    this.active.on();
+
+  }
+
+  function Content(name){
+    const self = this;
+    const container = $(`[data-content="${name}"]`);
+    const display = (state)=>{ container[ state ? 'removeClass' : 'addClass' ]('hidden'); };
+    const methods = {
+      'name':{
+        get:()=>{ return name; }
+      },
+      'on':{
+        configurable: true,
+        set: (fn)=>{
+          Object.defineProperty(self,'on',{
+            configurable: false,
+            value: ()=>{
+              display(true);
+              fn();
+            }
+          });
+        }
+      },
+      'off':{
+        configurable: true,
+        set: (fn)=>{
+          Object.defineProperty(self,'off',{
+            configurable: false,
+            value: ()=>{
+              display(false);
+              fn();
+            }
+          });
+        }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+  }
+
+  function Calendar$3(calendar){
+    Content.call(this,'calendar');
+    this.on = ()=>{
+      calendar.permissions.on();
+    };
+
+    this.off = ()=>{
+      calendar.permissions.off();
+    };
+  }
+
+  function Profile$1(){
+    Content.call(this,'profile');
+    this.on = ()=>{
+      console.log('profile on');
+    };
+
+    this.off = ()=>{
+      console.log('profile off');
+    };
+  }
+
+  function Context(dependencies){
+    const context = [];
+
+    {
+      let { calendar } = dependencies;
+      context.push(new Calendar$3(calendar));
+      context.push(new Profile$1());
+    }
+
+    ToggleObjects.call(this,context,'calendar');
+
+    this.active.on();
+  }
+
+  function Component$1(inject,current){
+    const {navigation: Navigation, context:Context } = inject;
+    const elements = {
+      content: $('#content'),
+      container: $('#menu'),
+      menu: $('[data-menu="toggle"]')
+    };
+
+    const state = {
+      open: false,
+      context: current.context,
+      navigation: current.navigation
+    };
+
+    const { buttons } = Finder(elements.container);
+
+    const toggle = ()=>{
+      buttons.all.forEach((btn)=>{ btn[ 'on' ](); });
+      elements.content.toggleClass('open');
+    };
+
+    const buttonClicked = (btn)=>{
+      btn.events.on('click',function(){
+        buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); });
+        this.element.addClass('border-l-2');
+      });
+    };
+
+    const methods = {
+      'buttons': {
+        get: ()=>{ return buttons }
+      },
+      'changeContext':{
+        writable:false,
+        value: (change)=>{
+          let close = false;
+          let {context,navbar} = change;
+          if(state.context !== context){
+            state.context = context;
+            close = true;
+            Context.change(context);
+          }
+          if(state.navbar !== navbar){
+            state.navbar = navbar;
+            close = true;
+            Navigation.change(navbar);
+          }
+
+          if(close){ elements.menu.trigger('click'); }
+        }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+    elements.menu.on('click',toggle);
+
+    buttons.all.forEach(buttonClicked);
+
+  }
+
+  function Menu(inject){
+    const menu = this;
+    Component$1.call(this,inject,{context:'calendar',navbar:'calendar'});
+
+    this.buttons.name.calendar.events.on('click',function(){ menu.changeContext({context: 'calendar', navbar: 'calendar'}); });
+
+    this.buttons.name.profile.events.on('click',function(){ menu.changeContext({context: 'profile', navbar: 'profile'}); });
+
 
   }
 
   $$1(document).ready(()=>{
-    const calendar = Calendar$1();
-    const navigation = EmployeeNavigationBars({calendar});
+    const calendar = new Calendar$1();
+    const navigation = new Navigation({calendar});
+    const context = new Context({calendar});
+    const menu = new Menu({context,navigation});
   });
 
 }($));

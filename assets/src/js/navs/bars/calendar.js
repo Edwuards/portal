@@ -1,20 +1,17 @@
 import { NavBar } from './navbar';
 
 export function Calendar(calendar){
-  const Nav = new NavBar('calendar');
-  const DateTitle = Nav.element.find('[data=date]');
+  NavBar.call(this,'calendar');
+  const DateTitle = this.element.find('[data=date]');
 
+  calendar.register('updateDate',function(stringDate){ DateTitle.html(stringDate); });
 
-  calendar.actions.register('updateDate',function(stringDate){ DateTitle.html(stringDate); });
+  this.buttons.name.prev.events.on('click',calendar.prev);
 
-  Nav.buttons.name.prev.events.on('click',calendar.actions.prev);
+  this.buttons.name.next.events.on('click',calendar.next);
 
-  Nav.buttons.name.next.events.on('click',calendar.actions.next);
+  this.buttons.name.today.events.on('click',calendar.today);
 
-  Nav.buttons.name.today.events.on('click',calendar.actions.today);
+  calendar.updateDate();
 
-  calendar.actions.updateDate();
-
-
-  return Nav
 }

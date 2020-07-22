@@ -1,14 +1,19 @@
 import { Finder } from '../../form/inputs';
 
 export function NavBar(name){
-  const Element = $(`[data-navbar="${name}"]`);
+  const element = $(`[data-navbar="${name}"]`);
 
-  const { buttons, inputs } = Finder(Element);
+  const { buttons, inputs } = Finder(element);
 
+  const toggle = (state)=>{
+    element[state ? 'removeClass' : 'addClass']('hidden');
+    buttons.all.forEach((btn)=>{ btn[state ? 'on' : 'off'](); });
+    inputs.all.forEach((input)=>{ input[state ? 'on' : 'off'](); });
+  }
 
   const Methods = {
     'element': {
-      get:()=>{ return Element }
+      get:()=>{ return element }
     },
     'name': {
       get: ()=>{ return name }
@@ -20,18 +25,12 @@ export function NavBar(name){
       get: ()=>{ return inputs }
     },
     'on':{
-      value: function(){
-        Element.removeClass('hide');
-        buttons.all.forEach((btn)=>{ btn.on(); });
-        inputs.all.forEach((input)=>{ input.on(); });
-      }
+      writable: false,
+      value: ()=>{ toggle(true); }
     },
     'off':{
-      value: function(){
-        Element.addClass('hide');
-        buttons.all.forEach((btn)=>{ btn.off(); });
-        inputs.all.forEach((input)=>{ input.off(); });
-      }
+      writable: false,
+      value: ()=>{ toggle(false); }
     }
   }
 

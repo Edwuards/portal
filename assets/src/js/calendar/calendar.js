@@ -5,7 +5,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
 export function Calendar(){
-  const Options = {
+  const options = {
     eventLimit: 3,
     plugins: [ dayGridPlugin ],
     defaultView: 'dayGridMonth',
@@ -14,7 +14,7 @@ export function Calendar(){
     header: { left: '', center: '', right: '' },
     columnHeaderText: function(date) {
       let short = window.innerWidth > 640;
-      date = Instance.formatDate(date,{
+      date = instance.formatDate(date,{
         locale:'es',
         weekday:  short ? 'short' : 'narrow'
       });
@@ -22,52 +22,62 @@ export function Calendar(){
       return date;
     }
   };
-  const Element =  $('#calendar');
-  const Instance = new CalendarCore(Element[0],Options);
-  const Actions = {};
-  const Events = new Observer(['updateDate']);
+  const element =  $('#calendar');
+  const instance = new CalendarCore(element[0],options);
+  const events = new Observer(['updateDate']);
   const permissions = new Permissions();
 
-  Actions.updateDate = (format)=>{
-    if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
-    format = Instance.formatDate(Instance.getDate(),format);
-    format = format.slice(0,1).toUpperCase()+format.slice(1);
-    Events.notify('updateDate',[format]);
+  const methods = {
+    'updateDate': {
+      writable: false,
+      value: (format)=>{
+        if(format == undefined){ format = { month: 'long', year: 'numeric'}; }
+        format = instance.formatDate(instance.getDate(),format);
+        format = format.slice(0,1).toUpperCase()+format.slice(1);
+        events.notify('updateDate',[format]);
+      }
+    },
+    'render': {
+      writable: false,
+      value: ()=>{
+        // la barra de navegación mide 64px en altura por eso se la resta.
+        let height = window.innerHeight - 64;
+        instance.setOption('contentHeight',height);
+        instance.render();
+        this.updateDate();
+      }
+    },
+    'next': {
+      writable: false,
+      value: ()=>{
+        instance.next();
+        this.updateDate();
+      }
+    },
+    'prev': {
+      writable: false,
+      value: ()=>{
+        instance.prev();
+        this.updateDate();
+      }
+    },
+    'today': {
+      writable: false,
+      value: ()=>{
+        instance.today();
+        this.updateDate();
+      }
+    },
+    'register': {
+      get: ()=>{ return events.register; }
+    },
+    'permissions': {
+      get: ()=>{ return permissions }
+    }
   }
-  Actions.render = ()=>{
-    // la barra de navegación mide 64px en altura por eso se la resta.
-    let height = window.innerHeight - 64;
-    Instance.setOption('contentHeight',height);
-    Instance.render();
-    Actions.updateDate();
-  }
-  Actions.next = ()=>{
-    Instance.next();
-    Actions.updateDate();
-  }
-  Actions.prev = ()=>{
-    Instance.prev();
-    Actions.updateDate();
-  }
-  Actions.today = ()=>{
-    Instance.today();
-    Actions.updateDate();
-  }
-  Actions.open = ()=>{
-    Element.addClass('active');
-  }
-  Actions.close = ()=>{
-    Element.removeClass('active');
-  }
-  Actions.register = Events.register;
 
-  permissions.on();
-  Actions.render();
+  Object.defineProperties(this,methods);
 
-  return {
-    permissions,
-    instance: Instance,
-    element: Element,
-    actions: Actions
-  }
+  this.render();
+
 }

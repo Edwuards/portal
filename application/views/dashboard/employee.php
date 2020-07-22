@@ -2,7 +2,10 @@
 <section id="content" class="flex flex-no-wrap overflow-hidden z-10">
   <?php $this->load->view('menu/employee'); ?>
   <div class="body w-screen relative">
-    <?php $this->load->view('calendar/view'); ?>
+    <?php
+      $this->load->view('calendar/calendar');
+      $this->load->view('user/profile');
+    ?>
   </div>
 </section>
 

@@ -1,16 +1,18 @@
-import { Navigation } from './navigation';
+import { ToggleObjects } from '../helpers';
 import { Calendar } from './bars/calendar';
+import { Profile } from './bars/profile';
 
-export function EmployeeNavigationBars(dependencies){
-  const Bars = {
-    calendar: undefined
-  };
+export function Navigation(dependencies){
+  const bars = [];
 
   {
     let { calendar } = dependencies;
-    Bars.calendar = Calendar(calendar);
+    bars.push(new Calendar(calendar));
+    bars.push(new Profile());
   }
 
-  return new Navigation(Bars,Bars.calendar);
+  ToggleObjects.call(this,bars,'calendar');
+
+  this.active.on();
 
 }
