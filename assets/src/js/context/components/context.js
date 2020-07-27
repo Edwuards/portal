@@ -1,4 +1,4 @@
-export function Content(name){
+export function Context(name){
   const self = this;
   const container = $(`[data-content="${name}"]`);
   const display = (state)=>{ container[ state ? 'removeClass' : 'addClass' ]('hidden'); }

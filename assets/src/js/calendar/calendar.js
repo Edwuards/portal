@@ -77,7 +77,5 @@ export function Calendar(){
   }
 
   Object.defineProperties(this,methods);
-
-  this.render();
-
+  
 }

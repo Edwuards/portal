@@ -1,17 +1,20 @@
 import { ToggleObjects } from '../helpers';
-import { Calendar } from './content/calendar';
-import { Profile } from './content/profile';
+import { Calendar } from './components/calendar';
+import { Profile } from './components/profile';
+import { Navigation } from '../navs/employee';
+import { Menu } from '../menu/employee';
 
-export function Context(dependencies){
-  const context = [];
+export function App({calendar}){
+  const menu = new Menu();
+  const navigation = new Navigation();
+  const app = this;
+  ToggleObjects.call(this,[
+    new Calendar({calendar,navigation}),
+    new Profile({navigation})
+  ]);
 
-  {
-    let { calendar } = dependencies;
-    context.push(new Calendar(calendar));
-    context.push(new Profile());
-  }
 
-  ToggleObjects.call(this,context,'calendar');
 
-  this.active.on();
+
+
 }

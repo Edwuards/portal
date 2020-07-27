@@ -1,7 +1,6 @@
 import { Finder } from '../form/inputs';
 
-export function Component(inject,current){
-  const {navigation: Navigation, context:Context } = inject;
+export function Component(){
 
   const elements = {
     content: $('#content'),
@@ -11,8 +10,6 @@ export function Component(inject,current){
 
   const state = {
     open: false,
-    context: current.context,
-    navigation: current.navigation
   }
 
   const { buttons } = Finder(elements.container);
@@ -32,25 +29,6 @@ export function Component(inject,current){
   const methods = {
     'buttons': {
       get: ()=>{ return buttons }
-    },
-    'changeContext':{
-      writable:false,
-      value: (change)=>{
-        let close = false;
-        let {context,navbar} = change;
-        if(state.context !== context){
-          state.context = context;
-          close = true;
-          Context.change(context);
-        }
-        if(state.navbar !== navbar){
-          state.navbar = navbar;
-          close = true;
-          Navigation.change(navbar);
-        }
-
-        if(close){ elements.menu.trigger('click'); }
-      }
     }
   }
 

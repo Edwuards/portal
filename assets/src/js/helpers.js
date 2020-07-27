@@ -71,7 +71,7 @@ function Observer(events){
 
 }
 
-function ToggleObjects(list,current){
+function ToggleObjects(list){
   const map = {};
   let active = undefined;
 
@@ -79,21 +79,27 @@ function ToggleObjects(list,current){
     'active': {
       get: ()=>{ return active }
     },
-    'change': {
-      enumerable: true,
-      writable: false,
-      value: (name)=>{
-        active.off();
-        active = map[name];
-        active.on();
+    'get':{
+      get: ()=>{ return map }
+    },
+    'set': {
+      set: (name)=>{
+        if(active && active.name !== name){
+          active.off();
+          active = map[name];
+          active.on();
+        }
+
+        if(!active){
+          active = map[name];
+          active.on();
+        }
       }
     }
   }
 
   Object.defineProperties(this,Methods);
   list.forEach((obj)=>{ map[obj.name] = obj; });
-  active = map[current];
 }
-
 
 export { Observer, ToggleObjects }

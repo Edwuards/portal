@@ -18,10 +18,13 @@ foreach ($buttons['elements'] as $button) {
   $html .= '
   <div class=" my-2 flex items-center justify-end absolute right-0 bottom-0 permission hide">
     <p class="text-sm mr-2 text-gray-700 font-bold w-24 text-right">'.$button['title'].'</p>
+    <a class="flex" href="/app/dashboard/employee/calendar/solicit/'.$button['name'].'" >
     <button data-type="button" type="button" name="'.$button['name'].'" class="form '.$buttons['css'].' '.$colors[$i].'">
       <i class="text-md text-white '.$button['icon'].'"></i>
     </button>
-  </div>';
+    </a>
+  </div>
+  ';
   $i++;
 }
 
