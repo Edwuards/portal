@@ -1,10 +1,9 @@
 import { Calendar as CalendarCore } from '@fullcalendar/core';
 import { Observer } from '../helpers';
-import { Permissions } from './permissions';
 import esLocale from '@fullcalendar/core/locales/es';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-export function Calendar(){
+export function Calendar(selector){
   const options = {
     eventLimit: 3,
     plugins: [ dayGridPlugin ],
@@ -22,10 +21,9 @@ export function Calendar(){
       return date;
     }
   };
-  const element =  $('#calendar');
+  const element =  $(`[data-calendar="${selector}"]`);
   const instance = new CalendarCore(element[0],options);
   const events = new Observer(['updateDate']);
-  const permissions = new Permissions();
 
   const methods = {
     'updateDate': {
@@ -71,11 +69,8 @@ export function Calendar(){
     'register': {
       get: ()=>{ return events.register; }
     },
-    'permissions': {
-      get: ()=>{ return permissions }
-    }
   }
 
   Object.defineProperties(this,methods);
-  
+
 }

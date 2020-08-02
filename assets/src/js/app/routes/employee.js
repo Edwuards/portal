@@ -2,12 +2,12 @@ import page from 'page';
 
 export function Routes(app){
   const { calendar } = app.get;
-  const base = '/app/dashboard/employee';
+  const base = '/app/dashboard/';
   const routes = {
-    '/calendar': function(ctx,next){
+    'calendar': function(ctx,next){
       app.set = 'calendar';
     },
-    '/calendar/solicit/:name': calendar.solicit
+    'calendar/solicit/:name': calendar.solicit
   }
 
   page.base(base);
@@ -16,5 +16,5 @@ export function Routes(app){
     page(route,routes[route]);
   }
 
-  page('/calendar');
+  page('calendar');
 }

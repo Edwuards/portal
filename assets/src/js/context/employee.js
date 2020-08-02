@@ -3,18 +3,15 @@ import { Calendar } from './components/calendar';
 import { Profile } from './components/profile';
 import { Navigation } from '../navs/employee';
 import { Menu } from '../menu/employee';
+import { Router } from './router';
 
-export function App({calendar}){
+export function App(){
+  const router = new Router();
   const menu = new Menu();
   const navigation = new Navigation();
-  const app = this;
-  ToggleObjects.call(this,[
-    new Calendar({calendar,navigation}),
-    new Profile({navigation})
-  ]);
 
+  new Calendar({navigation,router})
+  new Profile({navigation,router})
 
-
-
-
+  router.instance.show(window.location.pathname);
 }

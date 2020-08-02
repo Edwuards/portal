@@ -10,14 +10,13 @@ export function Modal(){
 
   const { buttons } = Finder(elements.header);
 
+  const state = { type: undefined };
+
   const methods = {
-    'open': {
+    'on': {
       writable: false,
-      value: (title,type)=>{
+      value: ()=>{
         buttons.name.close.on();
-        elements.title.html(title);
-        elements.type.addClass(type);
-        elements.container.addClass('active');
         elements.container.on('click',(e)=>{
           if($(e.target).hasClass('modal-cont')){
             buttons.name.close.element.trigger('click');
@@ -25,18 +24,38 @@ export function Modal(){
         });
       }
     },
+    'off': {
+      writbale: false,
+      value: ()=>{
+        buttons.name.close.off();
+        elements.container.off('click');
+      }
+    },
+    'open': {
+      writable: false,
+      value: (title,type)=>{
+        state.type = type;
+        elements.title.html(title);
+        elements.type.addClass(type);
+        elements.container.addClass('active');
+      }
+    },
+    'alive': {
+      get: ()=>{ return ALIVE }
+    },
+    'buttons':{
+      get: ()=>{ return buttons }
+    },
     'close': {
       writable: false,
       value: ()=>{
-        elements.container.off('click').removeClass('active');
-        buttons.name.close.off();
+        elements.type.removeClass(state.type);
+        elements.container.removeClass('active');
       }
-    },
-    'buttons': {
-      get: ()=>{ return buttons }
     }
   };
 
   Object.defineProperties(this,methods);
+
 
 }

@@ -20,10 +20,10 @@ class App extends CI_Controller {
 
 
 
-	public function dashboard($dashboard)
+	public function dashboard()
 	{
 		// if(!$this->session->verified){ redirect('app/login'); }
-		$dashboard = 'dashboard/'.$dashboard;
+		$dashboard = 'dashboard/employee';
 		$scripts = [
 			'js'=>['jquery','employee'],
 			'css'=>['base','index']

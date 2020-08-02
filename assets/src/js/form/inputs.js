@@ -113,6 +113,7 @@ function EventHandler(element,events){
       }
     },
     off: (type)=>{
+      if(type == 'click.d'){ debugger; }
       PROPS.events[type] = false;
       INSTANCE.element.off(type);
     }
