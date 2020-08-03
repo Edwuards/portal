@@ -1,15 +1,29 @@
 import { Context } from './context';
 
-export function Profile({navigation}){
+export function Profile({navigation,router,state}){
   Context.call(this,'profile');
   const nav = navigation.get.profile;
 
-  this.on = ()=>{
-    navigation.set = 'profile';
-    console.log('profile on');
+  const routes = {
+    '/profile/*': function(ctx,next){
+      if(!(state.get == 'profile')){ state.set = 'profile'; }
+      next();
+    },
+    '/profile/': function(){
+    }
+
   }
 
-  this.off = ()=>{
-    console.log('profile off');
+
+  this.on = function(){
+    navigation.set = 'profile';
   }
+
+  this.off = function(){
+  }
+
+  state.register({state:'profile', on:this.on, off:this.off});
+
+  router.add(routes);
+
 }

@@ -1,4 +1,4 @@
-<div data-navbar="calendar" class="flex justify-end items-center w-full">
+<div data-navbar="calendar" class="flex justify-end items-center w-full hidden">
   <div class="flex items-center w-full">
     <div class="h-8 mx-4 hidden sm:block">
       <!-- <img src="https://avisame.figment.com.mx/assets/img/logo.png" class="h-full"> -->

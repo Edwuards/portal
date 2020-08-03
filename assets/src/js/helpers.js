@@ -102,4 +102,40 @@ function ToggleObjects(list){
   list.forEach((obj)=>{ map[obj.name] = obj; });
 }
 
-export { Observer, ToggleObjects }
+function State(){
+  const registered = {};
+  const current = {
+    state: undefined,
+    value: undefined
+  };
+
+  const methods = {
+    'register': {
+      writable: false,
+      value: ({state,on,off})=>{
+        if(!registered[state]){
+          registered[state] = {on,off}
+        }
+      },
+    },
+    'set': {
+      set: (state)=>{
+        if(registered[state]){
+          if(current.state){ current.value.off(); }
+          current.state = state;
+          current.value = registered[state];
+          current.value.on();
+        }
+      }
+    },
+    'get': {
+      get: ()=>{ return current.state }
+    }
+  }
+
+  Object.defineProperties(this,methods);
+
+}
+
+
+export { Observer, ToggleObjects, State }

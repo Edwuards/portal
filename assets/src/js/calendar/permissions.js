@@ -68,7 +68,7 @@ export function Permissions({router}){
       writable: false,
       value: ()=>{
         modal.off();
-        form.close();
+        forms.close();
         options.close();
         buttons.all.forEach((btn)=>{ btn.off(); });
       }
@@ -83,7 +83,7 @@ export function Permissions({router}){
     'routes': {
       writable: false,
       value: {
-        '/solicit/:permission': function(ctx){
+        '/calendar/solicit/:permission': function(ctx){
           const { permission } = ctx.params;
           options.close();
           forms.open(permission);
@@ -98,6 +98,6 @@ export function Permissions({router}){
 
   buttons.name.toggle.events.on('click',options.toggle);
 
-  modal.buttons.name.close.events.on('click',function(){ router.instance('/index'); })
+  modal.buttons.name.close.events.on('click',function(){ router.instance('/calendar'); })
 
 }

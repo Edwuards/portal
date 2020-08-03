@@ -1,11 +1,11 @@
 import { Finder } from '../form/inputs';
 
-export function Component(){
+export function Component(router){
 
   const elements = {
     content: $('#content'),
     container: $('#menu'),
-    menu: $('[data-menu="toggle"]')
+    toggle: $('[data-menu="toggle"]')
   }
 
   const state = {
@@ -19,11 +19,18 @@ export function Component(){
     elements.content.toggleClass('open');
   }
 
-  const buttonClicked = (btn)=>{
-    btn.events.on('click',function(){
-      buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); })
-      this.element.addClass('border-l-2');
-    });
+  const init = ()=>{
+    let current = window.location.pathname.split('/app/dashboard/')[1].split('/')[0];
+    return (btn)=>{
+      let route = btn.element.attr('data-route');
+      if(route == current){ btn.element.addClass('border-l-2'); }
+      btn.events.on('click',function(){
+        buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); })
+        this.element.addClass('border-l-2');
+        router.instance(`/${route}/`);
+        toggle();
+      });
+    }
   }
 
   const methods = {
@@ -34,8 +41,9 @@ export function Component(){
 
   Object.defineProperties(this,methods);
 
-  elements.menu.on('click',toggle);
+  elements.toggle.on('click',toggle);
 
-  buttons.all.forEach(buttonClicked);
+  buttons.all.forEach(init());
+
 
 }

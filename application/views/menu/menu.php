@@ -8,14 +8,13 @@
   $html = '';
   $render = function($button){
     return '
-    <a class="flex" href="/app/dashboard/employee/'.$button['name'].'">
-      <button class="flex items-center mb-4 ml-2 pl-2 items-center '.
-      ($button['name'] == 'calendar' ?  'border-l-2' : '')
-      .' border-red-600" type="button" data-type="button" name="'.$button['name'].'">
+      <button class="flex items-center mb-4 ml-2 pl-2 items-center border-red-600" '.
+      'type="button" data-type="button" '.
+      'data-route="'.$button['route'].'" '.
+      'name="'.$button['name'].'" >
         <i class="text-md '.$button['icon'].'"></i>
         <p class="ml-2">'.$button['text'].'</p>
       </button>
-    </a>
     ';
   };
 

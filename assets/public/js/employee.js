@@ -403,6 +403,41 @@
     list.forEach((obj)=>{ map[obj.name] = obj; });
   }
 
+  function State(){
+    const registered = {};
+    const current = {
+      state: undefined,
+      value: undefined
+    };
+
+    const methods = {
+      'register': {
+        writable: false,
+        value: ({state,on,off})=>{
+          if(!registered[state]){
+            registered[state] = {on,off};
+          }
+        },
+      },
+      'set': {
+        set: (state)=>{
+          if(registered[state]){
+            if(current.state){ current.value.off(); }
+            current.state = state;
+            current.value = registered[state];
+            current.value.on();
+          }
+        }
+      },
+      'get': {
+        get: ()=>{ return current.state }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+  }
+
   function Context(name){
     const self = this;
     const container = $(`[data-content="${name}"]`);
@@ -3925,7 +3960,7 @@
         writable: false,
         value: ()=>{
           modal.off();
-          form.close();
+          forms.close();
           options.close();
           buttons.all.forEach((btn)=>{ btn.off(); });
         }
@@ -3940,7 +3975,7 @@
       'routes': {
         writable: false,
         value: {
-          '/solicit/:permission': function(ctx){
+          '/calendar/solicit/:permission': function(ctx){
             const { permission } = ctx.params;
             options.close();
             forms.open(permission);
@@ -3955,7 +3990,7 @@
 
     buttons.name.toggle.events.on('click',options.toggle);
 
-    modal.buttons.name.close.events.on('click',function(){ router.instance('/index'); });
+    modal.buttons.name.close.events.on('click',function(){ router.instance('/calendar'); });
 
   }
 
@@ -13841,34 +13876,35 @@
 
   }
 
-  function Component$1({navigation,router}){
+  function Component$1({navigation,router,state}){
     Context.call(this,'calendar');
     const nav = navigation.get.calendar;
     const calendar = new Calendar$1('main');
     const permissions = new Permissions({router});
-    const self = this;
-    let ALIVE = false;
 
 
-    router.instance.base('/app/dashboard/calendar');
     const routes = {
-      '/*': function(ctx,next){
-        if(!ALIVE){ self.on(); }
+      '/calendar/*': function(ctx,next){
+        if(!(state.get == 'calendar')){ state.set = 'calendar'; }
         next();
       },
-      '/index': permissions.index,
+      '/calendar/': permissions.index,
     };
 
     this.on = function(){
-      ALIVE = true;
       navigation.set = 'calendar';
       permissions.on();
     };
 
     this.off = function(){
-      ALIVE = false;
       permissions.off();
     };
+
+    state.register({
+      state: 'calendar',
+      on: this.on,
+      off: this.off
+    });
 
     router.add(routes);
 
@@ -13885,18 +13921,32 @@
     calendar.render();
   }
 
-  function Profile({navigation}){
+  function Profile({navigation,router,state}){
     Context.call(this,'profile');
     const nav = navigation.get.profile;
 
-    this.on = ()=>{
-      navigation.set = 'profile';
-      console.log('profile on');
+    const routes = {
+      '/profile/*': function(ctx,next){
+        if(!(state.get == 'profile')){ state.set = 'profile'; }
+        next();
+      },
+      '/profile/': function(){
+      }
+
     };
 
-    this.off = ()=>{
-      console.log('profile off');
+
+    this.on = function(){
+      navigation.set = 'profile';
     };
+
+    this.off = function(){
+    };
+
+    state.register({state:'profile', on:this.on, off:this.off});
+
+    router.add(routes);
+
   }
 
   function NavBar(name){
@@ -13960,12 +14010,12 @@
 
   }
 
-  function Component$2(){
+  function Component$2(router){
 
     const elements = {
       content: $('#content'),
       container: $('#menu'),
-      menu: $('[data-menu="toggle"]')
+      toggle: $('[data-menu="toggle"]')
     };
 
     const { buttons } = Finder(elements.container);
@@ -13975,11 +14025,18 @@
       elements.content.toggleClass('open');
     };
 
-    const buttonClicked = (btn)=>{
-      btn.events.on('click',function(){
-        buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); });
-        this.element.addClass('border-l-2');
-      });
+    const init = ()=>{
+      let current = window.location.pathname.split('/app/dashboard/')[1].split('/')[0];
+      return (btn)=>{
+        let route = btn.element.attr('data-route');
+        if(route == current){ btn.element.addClass('border-l-2'); }
+        btn.events.on('click',function(){
+          buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); });
+          this.element.addClass('border-l-2');
+          router.instance(`/${route}/`);
+          toggle();
+        });
+      }
     };
 
     const methods = {
@@ -13990,14 +14047,15 @@
 
     Object.defineProperties(this,methods);
 
-    elements.menu.on('click',toggle);
+    elements.toggle.on('click',toggle);
 
-    buttons.all.forEach(buttonClicked);
+    buttons.all.forEach(init());
+
 
   }
 
-  function Menu(){
-    Component$2.call(this);
+  function Menu({router}){
+    Component$2.call(this,router);
 
   }
 
@@ -15237,14 +15295,17 @@
   }
 
   function App(){
+    const state = new State();
     const router = new Router();
-    const menu = new Menu();
     const navigation = new Navigation();
+    router.instance.base('/app/dashboard');
 
-    new Component$1({navigation,router});
-    new Profile({navigation,router});
+    new Menu({router});
+    new Component$1({navigation,router,state});
+    new Profile({navigation,router,state});
 
-    router.instance.show(window.location.pathname);
+    console.log();
+    router.instance(window.location.pathname);
   }
 
   $$1(document).ready(App);
