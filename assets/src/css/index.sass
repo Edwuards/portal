@@ -1,7 +1,6 @@
 @import 'permisions';
 @import 'forms';
 @import 'modal';
-@import 'dataTable';
 
 .fc-toolbar.fc-header-toolbar
   display: none;
@@ -57,51 +56,9 @@ button[name="toggle"]
   height: 50px;
   width: 50px;
 
-[data-avisos].active
-  z-index: 20;
-[data-avisos]
-  z-index: 0;
-  > .body
-    height: calc(100% - 48px);
-
-    .card
-      height: 150px;
-      .message
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        opacity: 0;
-        z-index: 0;
-        transition: opacity .5s;
-    .card.approved,
-    .card.declined
-      .message
-        opacity: 1;
-        z-index: 11;
-    .card.approved
-      .message
-        background-color: #38a169;
-    .card.declined
-      .message
-        background-color: #e53e3e;
-
-[data-users="list"].active
-  z-index: 20;
-[data-users="list"]
-  > .body
-    height: calc(100% - 48px);
-
-    .card.delete
-      > div
-        border: 2px solid red;
-
-[data-users="create"]
-  > .body
-    height: calc(100% - 48px);
-
-[data-users="profile"].active
-  z-index: 20;
-
 [data-content].active
   z-index: 20;
+
+[data-content="solicitudes"]
+  .solicitud
+    height: 160px;

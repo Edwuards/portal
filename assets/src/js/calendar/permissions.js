@@ -41,7 +41,7 @@ export function Permissions({router}){
     form.events.on('send',function(message){
       if(!message.error){ modal.buttons.name.close.element.trigger('click'); }
     });
-    buttons.name[name].events.on('click',function(){ router.instance(`/solicit/${name}`); });
+    buttons.name[name].events.on('click',function(){ router.instance(`/calendar/solicit/${name}`); });
   }
 
   options.state = false;

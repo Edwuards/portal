@@ -31,7 +31,6 @@ function Observer(events){
     exist: (event)=>{ return this.event.keys().indexOf(event) != -1 }
   }
 
-
   this.notify = (event,update)=>{
     let test = Rules.is.defined(event,Events);
     if(!test.passed){ throw test.error; }
@@ -137,5 +136,43 @@ function State(){
 
 }
 
+function View(name){
+  const self = this;
+  const container = $(`[data-content="${name}"]`);
+  const display = (state)=>{ container[ state ? 'removeClass' : 'addClass' ]('hidden'); }
+  const methods = {
+    'element': { get: ()=>{ return container } },
+    'name':{
+      get:()=>{ return name; }
+    },
+    'on':{
+      configurable: true,
+      set: (fn)=>{
+        Object.defineProperty(self,'on',{
+          configurable: false,
+          value: ()=>{
+            display(true);
+            fn();
+          }
+        });
+      }
+    },
+    'off':{
+      configurable: true,
+      set: (fn)=>{
+        Object.defineProperty(self,'off',{
+          configurable: false,
+          value: ()=>{
+            display(false);
+            fn();
+          }
+        });
+      }
+    }
+  };
 
-export { Observer, ToggleObjects, State }
+  Object.defineProperties(this,methods);
+
+}
+
+export { Observer, ToggleObjects, State ,View}

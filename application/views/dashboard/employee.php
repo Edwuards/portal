@@ -5,6 +5,7 @@
     <?php
       $this->load->view('calendar/calendar');
       $this->load->view('user/profile');
+      $this->load->view('solicitudes/solicitudes');
     ?>
   </div>
 </section>

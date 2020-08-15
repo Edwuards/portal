@@ -9,7 +9,11 @@ const paths = {
     frameworks: {src:'./src/css/base.css',dest:'./src/css/bundle/'},
     bundle: {src:'./src/css/bundle.css',dest:'./public/css/'},
     index: {src:'./src/css/index.sass',dest:'./public/css/'},
-   }
+  },
+  templates: {
+    src: './src/js/views/**/*.html',
+    dest: './src/js/templates'
+  }
 }
 
 sass.compiler = require('node-sass')
@@ -34,6 +38,7 @@ function styles(){
   .pipe(sass().on('error',sass.logError))
   .pipe(gulp.dest(paths.styles.index.dest))
 }
+
 
 exports.css = css;
 exports.styles = styles;

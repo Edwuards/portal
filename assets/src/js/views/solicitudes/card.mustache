@@ -1,0 +1,48 @@
+  <div class="header inline-flex h-16 pt-2 px-4">
+    <div class="w-56">
+      <div class="w-full flex items-center">
+        <span class="type w-2 h-2 abosolute rounded-full {{color}}"></span>
+        <p class="text-md text-gray-700 mx-2">{{type}}</p>
+      </div>
+      <div class="w-full">
+        <p class="text-sm text-gray-600 pr-2">{{name}}</p>
+      </div>
+    </div>
+    <div class="w-24 flex justify-end">
+      <div class="w-12 h-12 overflow-hidden rounded-full">
+        <img class="w-full" src="{{avatar}}" alt="">
+      </div>
+    </div>
+  </div>
+
+  <div class="body px-4 ">
+    <div class="flex h-10 items-center">
+      <div class="mr-2">
+        <i class="far fa-calendar-alt"></i>
+      </div>
+      <div class="flex text-gray-700">
+        <p class="text-sm" >{{start}}</p>
+        <span class="text-sm mx-2">-</span>
+        <p class="text-sm">{{end}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer pb-2 px-4">
+    <div class="flex justify-between items-center h-10">
+      <button data-type="button" type="button" name="view" class="flex text-gray-500 items-center">
+        <div class="mr-2">
+          <i class="far fa-eye"></i>
+        </div>
+        <p class="text-sm">Ver más</p>
+      </button>
+      <div class="flex text-white">
+        <button data-type="button" type="button" name="approve" class="flex items-center w-16 bg-green-600 rounded p-1 mr-2">
+          <p class="text-sm text-center w-full">aprobar</p>
+        </button>
+        <button data-type="button" type="button" name="deny" class="flex items-center w-16 bg-red-600 rounded p-1">
+          <p class="text-sm text-center w-full">negar</p>
+        </button>
+      </div>
+    </div>
+  </div>

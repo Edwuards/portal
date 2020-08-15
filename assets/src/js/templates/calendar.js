@@ -1,0 +1,3 @@
+import Hogan from '/var/www/avisame/assets/node_modules/hogan.js/lib/hogan.js' 
+const container = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"\">");t.b("\n" + i);t.b("  ");t.b(t.v(t.f("message",c,p,0)));t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\"\">");t.b("\n" + i);t.b("  You fucking cunt ");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
+export {container} 
