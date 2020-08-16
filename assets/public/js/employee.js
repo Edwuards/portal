@@ -14849,7 +14849,7 @@
           status,
           user: {
             avatar: 'assets/public/img/placeholder.jpeg',
-            firstname: 'Cesar',
+            firstname: 'Cesar '+type,
             lastname: 'Perex'
           },
           type: (!status ? 'denied' : (status == 1 ? 'approved' : (status == 2 ? 'pending' : 'validating' ) ) ),
@@ -14933,6 +14933,8 @@
     const body = this.element.children('.body');
     const solicitudes = new Solicitudes({router});
     const select = nav.inputs.type.select;
+    const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); };
+
 
     const routes = {
       '/solicitudes/*': function(ctx,next){
@@ -14955,7 +14957,8 @@
     solicitudes.start();
 
     select.state.events.on('change',function(){
-      
+      let path = urlSegments(); path[1] = this.value;
+      router.instance(`/solicitudes/${path.join('/')}`);
     });
 
     state.register({state:'solicitudes', on:this.on, off:this.off});
@@ -15048,12 +15051,13 @@
     const init = ()=>{
       let current = window.location.pathname.split('/app/dashboard/')[1].split('/')[0];
       return (btn)=>{
+        debugger;
         let route = btn.element.attr('data-route');
-        if(route == current){ btn.element.addClass('border-l-2'); }
+        if(route.split('/')[0] == current){ btn.element.addClass('border-l-2'); }
         btn.events.on('click',function(){
           buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); });
           this.element.addClass('border-l-2');
-          router.instance(`/${route}/`);
+          router.instance(`/${route}`);
           toggle();
         });
       }

@@ -1,9 +1,9 @@
 <?php
   $states = [
-    ['value'=>1,'title'=>'Aprobados'],
-    ['value'=>2,'title'=>'Pendiente'],
-    ['value'=>3,'title'=>'En Validación'],
-    ['value'=>0,'title'=>'Rechazados']
+    ['value'=>'approved','title'=>'Aprobados'],
+    ['value'=>'pending','title'=>'Pendiente'],
+    ['value'=>'validating','title'=>'En Validación'],
+    ['value'=>'denied','title'=>'Rechazados']
   ];
 
   $views = [

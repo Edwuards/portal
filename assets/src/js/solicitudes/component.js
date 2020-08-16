@@ -7,7 +7,8 @@ function Component({navigation,router,state}){
   const body = this.element.children('.body');
   const solicitudes = new Solicitudes({router});
   const select = nav.inputs.type.select;
-  const url = { view: '', status: ''};
+  const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); }
+
 
   const routes = {
     '/solicitudes/*': function(ctx,next){
@@ -30,7 +31,8 @@ function Component({navigation,router,state}){
   solicitudes.start();
 
   select.state.events.on('change',function(){
-    url.status = this.value;
+    let path = urlSegments(); path[1] = this.value;
+    router.instance(`/solicitudes/${path.join('/')}`);
   })
 
   state.register({state:'solicitudes', on:this.on, off:this.off});

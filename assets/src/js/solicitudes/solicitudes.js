@@ -13,7 +13,7 @@ const dataMock = (obj,notify)=>{
         status,
         user: {
           avatar: 'assets/public/img/placeholder.jpeg',
-          firstname: 'Cesar',
+          firstname: 'Cesar '+type,
           lastname: 'Perex'
         },
         type: (!status ? 'denied' : (status == 1 ? 'approved' : (status == 2 ? 'pending' : 'validating' ) ) ),

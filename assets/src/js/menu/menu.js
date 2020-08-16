@@ -23,11 +23,11 @@ export function Component(router){
     let current = window.location.pathname.split('/app/dashboard/')[1].split('/')[0];
     return (btn)=>{
       let route = btn.element.attr('data-route');
-      if(route == current){ btn.element.addClass('border-l-2'); }
+      if(route.split('/')[0] == current){ btn.element.addClass('border-l-2'); }
       btn.events.on('click',function(){
         buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); })
         this.element.addClass('border-l-2');
-        router.instance(`/${route}/`);
+        router.instance(`/${route}`);
         toggle();
       });
     }
