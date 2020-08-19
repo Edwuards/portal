@@ -2,9 +2,7 @@
   $html = '';
   $buttons = [
     ['i'=>'fas fa-user-plus','name'=>'create','text'=>'Agregar','css'=>'text-green-600'],
-    ['i'=>'fas fa-user-plus','name'=>'delete','text'=>'Eliminar','css'=>'text-red-600'],
-    ['i'=>'fas fa-user-plus','name'=>'cancel','text'=>'Cancelar','css'=>'text-gray-600 hidden'],
-    ['i'=>'fas fa-user-plus','name'=>'confirm','text'=>'Confirmar','css'=>'text-red-600 hidden']
+    ['i'=>'fas fa-user-times','name'=>'delete','text'=>'Eliminar','css'=>'text-red-600'],
   ];
 
   foreach ($buttons as $button) {
@@ -18,7 +16,7 @@
 
 </div>
 
-<div data-nav="users" class="flex items-center w-full hidden">
+<div data-navbar="users" class="flex items-center w-full hidden">
 
   <p class="text-sm sm:text-xl mx-6">Usuarios</p>
   <div class="flex"> <?php echo $html; ?> </div>

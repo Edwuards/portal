@@ -4,7 +4,7 @@
     'menu'=>'employee',
     'content'=>[
       'calendar/calendar'=>[],
-      'user/profile'=>[],
+      'users/profile'=>[],
       'solicitudes/solicitudes'=>[]
     ]
   ];
