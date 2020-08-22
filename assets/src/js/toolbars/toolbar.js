@@ -1,6 +1,6 @@
-import { Finder } from '../../form/inputs';
+import { Finder } from '../form/inputs';
 
-export function NavBar(name){
+export function ToolBar(name){
   const element = $(`[data-navbar="${name}"]`);
 
   const { buttons, inputs } = Finder(element);

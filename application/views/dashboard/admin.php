@@ -3,14 +3,14 @@
     'nav'=>'admin',
     'menu'=>'admin',
     'content'=>[
-      'calendar/calendar'=>[],
-      'users/users'=>[],
-      'users/profile'=>[],
-      'solicitudes/solicitudes'=>[]
+      'calendar'=>[],
+      'profile'=>[],
+      'users'=>[],
+      'solicitudes'=>[]
     ]
   ];
 
-  $dashboard = $this->load->view('dashboard/dashboard',$dashboard,true);
+  $dashboard = $this->load->view('dashboard/template',$dashboard,true);
 
   echo $dashboard;
 ?>

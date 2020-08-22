@@ -1,6 +1,8 @@
 import { Finder } from '../form/inputs';
+import Router from 'page';
 
-export function Component(router){
+export default function(){
+  const menu = {};
 
   const elements = {
     content: $('#content'),
@@ -27,7 +29,7 @@ export function Component(router){
       btn.events.on('click',function(){
         buttons.all.forEach((btn)=>{ btn.element.removeClass('border-l-2'); })
         this.element.addClass('border-l-2');
-        router.instance(`/${route}`);
+        Router(`/${route}`);
         toggle();
       });
     }
@@ -39,11 +41,12 @@ export function Component(router){
     }
   }
 
-  Object.defineProperties(this,methods);
+  Object.defineProperties(menu,methods);
 
   elements.toggle.on('click',toggle);
 
   buttons.all.forEach(init());
 
+  return menu;
 
 }

@@ -27,7 +27,7 @@ const dataMock = (obj,notify)=>{
 }
 
 
-export function Solicitudes({router}){
+export function Solicitudes(){
   const events = new Observer(['add']);
   const solicitudes = {};
   const statusMap = {

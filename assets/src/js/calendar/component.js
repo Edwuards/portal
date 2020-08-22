@@ -1,51 +1,37 @@
 import { View } from '../helpers';
 import { Permissions } from './permissions';
 import { Calendar } from './calendar';
+import ToolBar from '../toolbars/calendar';
 
-function Component({navigation,router,state}){
-  View.call(this,'calendar');
-  const nav = navigation.get.calendar;
+export default function(){
+  const view = new View({ name:'calendar',toolbar: ToolBar() });
   const calendar = new Calendar('main');
-  const permissions = new Permissions({router});
-
+  const permissions = new Permissions();
 
   const routes = {
     '/calendar/*': function(ctx,next){
-      if(!(state.get == 'calendar')){ state.set = 'calendar'; }
+      if(!(this.state == 'calendar')){ this.state = 'calendar'; }
       next();
     },
     '/calendar/': permissions.index,
   }
 
-  const self = this;
-  this.on = function(){
-    navigation.set = 'calendar';
-    permissions.on();
-  }
+  view.on = function(){ permissions.on(); }
 
-  this.off = function(){
-    permissions.off();
-  }
+  view.off = function(){ permissions.off(); }
 
-  state.register({
-    state: 'calendar',
-    on: this.on,
-    off: this.off
-  });
+  view.routes = [ routes, permissions.routes ]
 
-  router.add(routes)
+  view.toolbar.buttons.name.prev.events.on('click',calendar.prev);
 
-  router.add(permissions.routes);
+  view.toolbar.buttons.name.next.events.on('click',calendar.next);
 
-  nav.buttons.name.prev.events.on('click',calendar.prev);
+  view.toolbar.buttons.name.today.events.on('click',calendar.today);
 
-  nav.buttons.name.next.events.on('click',calendar.next);
-
-  nav.buttons.name.today.events.on('click',calendar.today);
-
-  calendar.register('updateDate',nav.date)
+  calendar.events.on('updateDate',view.toolbar.setDate);
 
   calendar.render();
-}
 
-export { Component as Calendar }
+
+  return view
+}

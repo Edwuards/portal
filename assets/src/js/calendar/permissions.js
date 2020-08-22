@@ -1,3 +1,4 @@
+import Router from 'page';
 import { Finder } from '../form/inputs';
 import { Modal } from './modal';
 import { Vacation } from './forms/vacation';
@@ -5,7 +6,7 @@ import { HomeOffice } from './forms/homeOffice';
 import { Sick } from './forms/sick';
 import { Permission } from './forms/permission';
 
-export function Permissions({router}){
+export function Permissions(){
   const elements = {
     container: $('#permissions'),
     permissions: $('.permission')
@@ -41,7 +42,7 @@ export function Permissions({router}){
     form.events.on('send',function(message){
       if(!message.error){ modal.buttons.name.close.element.trigger('click'); }
     });
-    buttons.name[name].events.on('click',function(){ router.instance(`/calendar/solicit/${name}`); });
+    buttons.name[name].events.on('click',function(){ Router(`/calendar/solicit/${name}`); });
   }
 
   options.state = false;
@@ -98,6 +99,6 @@ export function Permissions({router}){
 
   buttons.name.toggle.events.on('click',options.toggle);
 
-  modal.buttons.name.close.events.on('click',function(){ router.instance('/calendar'); })
 
+  modal.buttons.name.close.events.on('click',function(){ Router('/calendar'); })
 }

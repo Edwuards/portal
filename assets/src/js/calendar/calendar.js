@@ -66,8 +66,12 @@ export function Calendar(selector){
         this.updateDate();
       }
     },
-    'register': {
-      get: ()=>{ return events.register; }
+    'events': {
+      writable: false,
+      value: {
+        'on': events.register,
+        'off': events.unregister
+      }
     },
   }
 

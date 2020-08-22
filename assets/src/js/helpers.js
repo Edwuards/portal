@@ -70,37 +70,6 @@ function Observer(events){
 
 }
 
-function ToggleObjects(list){
-  const map = {};
-  let active = undefined;
-
-  const Methods = {
-    'active': {
-      get: ()=>{ return active }
-    },
-    'get':{
-      get: ()=>{ return map }
-    },
-    'set': {
-      set: (name)=>{
-        if(active && active.name !== name){
-          active.off();
-          active = map[name];
-          active.on();
-        }
-
-        if(!active){
-          active = map[name];
-          active.on();
-        }
-      }
-    }
-  }
-
-  Object.defineProperties(this,Methods);
-  list.forEach((obj)=>{ map[obj.name] = obj; });
-}
-
 function State(){
   const registered = {};
   const current = {
@@ -112,12 +81,10 @@ function State(){
     'register': {
       writable: false,
       value: ({state,on,off})=>{
-        if(!registered[state]){
-          registered[state] = {on,off}
-        }
+        if(!registered[state]){ registered[state] = {on,off}; }
       },
     },
-    'set': {
+    'state': {
       set: (state)=>{
         if(registered[state]){
           if(current.state){ current.value.off(); }
@@ -125,49 +92,44 @@ function State(){
           current.value = registered[state];
           current.value.on();
         }
-      }
-    },
-    'get': {
+      },
       get: ()=>{ return current.state }
-    }
+    },
   }
 
   Object.defineProperties(this,methods);
 
 }
 
-function View(name){
+function View({name,toolbar}){
   const self = this;
-  const container = $(`[data-content="${name}"]`);
-  const display = (state)=>{ container[ state ? 'removeClass' : 'addClass' ]('hidden'); }
+  const element = $(`[data-content="${name}"]`);
+  const display = (state)=>{ element[ state ? 'removeClass' : 'addClass' ]('hidden'); }
+  const on = ()=>{ display(true); toolbar.on(); }
+  const off = ()=>{ display(false); toolbar.off(); }
+  const redefine = (prop,action)=>{
+    return (fn)=>{
+      Object.defineProperty(self,prop,{
+        configurable: false,
+        value: ()=>{ action(); fn(); }
+      });
+    }
+
+  };
+
   const methods = {
-    'element': { get: ()=>{ return container } },
-    'name':{
-      get:()=>{ return name; }
-    },
+    'element': { get: ()=>{ return element } },
+    'name':{ get: ()=>{ return name; } },
+    'toolbar': { get: ()=>{ return toolbar } },
     'on':{
       configurable: true,
-      set: (fn)=>{
-        Object.defineProperty(self,'on',{
-          configurable: false,
-          value: ()=>{
-            display(true);
-            fn();
-          }
-        });
-      }
+      get: ()=>{ return on },
+      set: redefine('on',on)
     },
     'off':{
       configurable: true,
-      set: (fn)=>{
-        Object.defineProperty(self,'off',{
-          configurable: false,
-          value: ()=>{
-            display(false);
-            fn();
-          }
-        });
-      }
+      get: ()=>{ return off },
+      set: redefine('off',off)
     }
   };
 
@@ -175,4 +137,4 @@ function View(name){
 
 }
 
-export { Observer, ToggleObjects, State ,View}
+export { Observer, State ,View }

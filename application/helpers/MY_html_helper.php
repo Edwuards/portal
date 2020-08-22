@@ -22,7 +22,7 @@
     $overWrite['type'] = 'text';
     $overWrite['attrs']['data-type'] = 'text';
 
-    return $ci->load->view('forms/inputs/input',$overWrite,true);
+    return $ci->load->view('inputs/input',$overWrite,true);
   }
 
   function NumberInput($data){
@@ -40,7 +40,7 @@
     $overWrite['type'] = 'number';
     $overWrite['attrs']['data-type'] = 'number';
 
-    return $ci->load->view('forms/inputs/input',$overWrite,true);
+    return $ci->load->view('inputs/input',$overWrite,true);
   }
 
   function DateInput($data){
@@ -59,7 +59,7 @@
     $overWrite['attrs']['data-type'] = 'date';
     $overWrite['css']['input-cont'] .= ' date';
 
-    return $ci->load->view('forms/inputs/input',$overWrite,true);
+    return $ci->load->view('inputs/input',$overWrite,true);
   }
 
   function TimeInput($data){
@@ -79,7 +79,7 @@
     $overWrite['type'] = 'text';
     $overWrite['attrs']['data-type'] = 'time';
 
-    return $ci->load->view('forms/inputs/input',$overWrite,true);
+    return $ci->load->view('inputs/input',$overWrite,true);
   }
 
   function PasswordInput($data){
@@ -97,7 +97,7 @@
     $overWrite['attrs']['data-type'] = 'text';
     $overWrite['type'] = 'password';
 
-    return $ci->load->view('forms/inputs/input',$overWrite,true);
+    return $ci->load->view('inputs/input',$overWrite,true);
   }
 
   function SelectInput($data){
@@ -115,7 +115,7 @@
 
     $overWrite['attrs']['data-type'] = isset($data['attrs']['data-type']) ? $data['attrs']['data-type'] : 'select';
 
-    return $ci->load->view('forms/inputs/select',$overWrite,true);
+    return $ci->load->view('inputs/select',$overWrite,true);
   }
 
   function TextAreaInput($data){
@@ -131,7 +131,7 @@
     ];
     $overWrite['attrs']['data-type'] = 'textarea';
 
-    return $ci->load->view('forms/inputs/textarea',$overWrite,true);
+    return $ci->load->view('inputs/textarea',$overWrite,true);
   }
 
   function ImageInput($data){
@@ -153,7 +153,7 @@
     $overWrite['attrs']['button']['data-type'] = 'image';
     $overWrite['attrs']['input']['data-type'] = 'image';
 
-    return $ci->load->view('forms/inputs/image',$overWrite,true);
+    return $ci->load->view('inputs/image',$overWrite,true);
 
   }
 

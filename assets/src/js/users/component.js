@@ -1,8 +1,8 @@
 import { View } from '../helpers';
+import ToolBar from '../toolbars/users';
 
-function Component({navigation,router,state}){
-  View.call(this,'users');
-  const nav = navigation.get.solicitudes;
+export default function(){
+  const view = new View({name:'users',toolbar: ToolBar() });
 
   const routes = {
     '/users/*': function(ctx,next){
@@ -15,17 +15,8 @@ function Component({navigation,router,state}){
 
   }
 
-  this.on = function(){
-    navigation.set = 'users';
-  }
+  view.routes = [routes]
 
-  this.off = function(){
-  }
-
-  state.register({state:'users', on:this.on, off:this.off});
-
-  router.add(routes);
+  return view;
 
 }
-
-export { Component as Users }

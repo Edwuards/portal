@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { State } from '../helpers';
 import { Calendar } from '../calendar/component';
-import { Profile } from '../users/profile';
+import { Profile } from '../profile/component';
 import { Solicitudes } from '../solicitudes/component';
 import { Navigation } from '../navs/employee';
 import { Menu } from '../menu/employee';

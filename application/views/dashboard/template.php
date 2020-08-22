@@ -5,7 +5,7 @@
   $body = '';
 
   foreach ($content as $view => $data) {
-    $body .= $this->load->view($view,$data,true);
+    $body .= $this->load->view($view.'/content',$data,true);
   }
 
 ?>
