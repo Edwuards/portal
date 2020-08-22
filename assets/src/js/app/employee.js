@@ -1,24 +1,30 @@
 import $ from 'jquery';
 import { State } from '../helpers';
-import { Calendar } from '../calendar/component';
-import { Profile } from '../profile/component';
-import { Solicitudes } from '../solicitudes/component';
-import { Navigation } from '../navs/employee';
-import { Menu } from '../menu/employee';
-import { Router } from '../router';
+import Calendar from '../calendar/component';
+import Profile from '../profile/component';
+import Solicitudes from '../solicitudes/component';
+import Users from '../users/component';
+import Menu from '../menu/component';
+import Router from 'page';
 
 function App(){
-  const state = new State();
-  const router = new Router();
-  const navigation = new Navigation();
-  router.instance.base('/app/dashboard');
+  const app = new State();
+  const menu = Menu();
+  const views = [
+    Calendar(),
+    Profile(),
+    Solicitudes(),
+  ];
 
-  new Menu({router});
-  new Calendar({navigation,router,state});
-  new Profile({navigation,router,state});
-  new Solicitudes({navigation,router,state});
+  Router({window: window });
+  Router.base('/app/dashboard');
 
-  router.instance(window.location.pathname);
+  views.forEach((view) => {
+    app.register({state: view.name, on: view.on, off: view.off});
+    view.routes.forEach((routes)=>{ for (let route in routes) { Router(route,routes[route].bind(app)); } });
+  });
+
+  Router(window.location.pathname);
 }
 
 

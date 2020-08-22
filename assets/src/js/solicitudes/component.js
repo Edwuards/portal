@@ -1,6 +1,6 @@
 import { View } from '../helpers';
 import { Solicitudes } from './solicitudes';
-import Toolbar from '../toolbars/solicitudes';
+import ToolBar from '../toolbars/solicitudes';
 
 export default function (){
   const view = new View({ name:'solicitudes',toolbar: ToolBar() });

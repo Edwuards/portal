@@ -19,15 +19,12 @@ $html = [
     'attrs'=>[
       'input'=>[
         'data-group'=>'avatar',
-        'name'=>'file'
       ],
       'button'=>[
         'data-group'=>'avatar',
-        'name'=>'upload',
       ],
       'img'=>[
         'data-group'=>'avatar',
-        'name'=>'preview',
         'src'=>"https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png"
       ]
     ]

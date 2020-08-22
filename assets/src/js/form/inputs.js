@@ -3,38 +3,21 @@ import { Observer } from '../helpers.js';
 import flatpickr from 'flatpickr';
 import  Spanish  from 'flatpickr/dist/l10n/es.js';
 
-const Helper = {
-  setDate: (inputs,date)=>{
-    if(inputs.date){
-      for (let input in inputs.date){
-        inputs.date[input].picker.setDate(date);
-      }
-    }
-    if(inputs.time){
-      for (let input in inputs.time){
-        inputs.time[input].picker.setDate(date);
-      }
-    }
-  },
-  pickerUnfocus: (inputs)=>{
-    if(inputs.date){
-      for (let input in inputs.date){
-        inputs.date[input].events.on('click',function(){ this.close(); });
-      }
-    }
-    if(inputs.time){
-      for (let input in inputs.time){
-        inputs.time[input].events.on('click',function(){ this.close(); });
-      }
-    }
-  }
-}
-
-
+const Types = {
+  'time':TimeInput,
+  'date':DateInput,
+  'select':SelectInput,
+  'image':ImageInput,
+  'button':Button,
+  'input':Input,
+  'number':Input,
+  'text':Input,
+  'textarea':Input,
+};
 
 function Finder(container){
   const found = {
-    buttons: { name: {}, all: [] },
+    buttons: { name: {}, group: {}, all: [] },
     inputs: { type: {}, all: [] }
   };
 
@@ -55,7 +38,15 @@ function Finder(container){
       }
     }
     else{
-      found.buttons.name[name] = new Button(el);
+
+      if(group){
+        if(!found.buttons.group[group]){ buttons.group[group] = {}; }
+        found.button.group[group][name] = new Button(el);
+      }
+      else{
+        found.buttons.name[name] = new Button(el);
+      }
+
       found.buttons.all.push(found.buttons.name[name]);
     }
 
@@ -67,143 +58,124 @@ function Finder(container){
   for(let type in found.inputs.type){
     for (let input in found.inputs.type[type]) {
       let name = input;
-      if(type == 'date'){
-        input = found.inputs.type.date[input];
-        found.inputs.type.date[name] = new DateInput(input);
-      }
-      else if(type == 'time'){
-        input = found.inputs.type.time[input];
-        found.inputs.type.time[name] = new TimeInput(input);
-      }
-      else if(type == 'textarea' || type == 'text' || type == 'number'){
-        input = found.inputs.type[type][input];
-        found.inputs.type[type][name] = new Input(input);
-      }
-      else if(type == 'select'){
-        input = found.inputs.type[type][input];
-        found.inputs.type[type][name] = new SelectInput(input);
-      }
-      else if(type == 'image'){
-        input = found.inputs.type.image[input];
-        found.inputs.type.image[name] = new ImageInput(input.file,input.upload,input.preview);
-      }
+      input = found.inputs.type[type][input];
+      found.inputs.type[type][name] = new Types[type](input);
       found.inputs.all.push(found.inputs.type[type][name]);
     }
   }
 
-
   return found;
 }
 
-function EventHandler(element,events){
-  const INSTANCE = this;
-  const OBSERVER = new Observer(events ? events : []);
-  const EVENTS = {
+function EventHandler(element){
+  const instance = this;
+  const observer = new Observer();
+  const events = {
     on: (type)=>{
-      if(PROPS.alive && !PROPS.events[type]){
-        PROPS.events[type] = true;
+      if(props.alive && !props.events[type]){
+        props.events[type] = true;
         let register = (type)=>{
           return function(){
-            INSTANCE.element.off(type);
-            OBSERVER.notify(type,[arguments]);
-            INSTANCE.element.on(type,register(type));
+            instance.element.off(type);
+            observer.notify(type,[arguments]);
+            instance.element.on(type,register(type));
           }
         };
-        INSTANCE.element.on(type,register(type));
+        instance.element.on(type,register(type));
       }
     },
     off: (type)=>{
       if(type == 'click.d'){ debugger; }
-      PROPS.events[type] = false;
-      INSTANCE.element.off(type);
+      props.events[type] = false;
+      instance.element.off(type);
     }
   };
 
-  const PROPS = {
+  const props = {
     events: {},
     alive: false,
     element: element
   };
-  const METHODS = {
+  const methods = {
     'element': {
-      get: ()=>{ return PROPS.element; }
+      get: ()=>{ return props.element; }
     },
     'on':{
       configurable: true,
       writable: false,
       value: ()=>{
-        PROPS.alive = true;
-        OBSERVER.event.keys().forEach(EVENTS.on);
+        props.alive = true;
+        observer.event.keys().forEach(events.on);
       }
     },
     'off':{
       configurable: true,
       writable: false,
       value: ()=>{
-        PROPS.alive = false;
-        OBSERVER.event.keys().forEach(EVENTS.off);
+        props.alive = false;
+        observer.event.keys().forEach(events.off);
       }
     },
     'events':{
       writable: false,
       value: {
         on: (type,fn)=>{
-          if(!OBSERVER.event.exist(type)){ OBSERVER.event.create(type); }
-          let index = OBSERVER.register(type,fn.bind(INSTANCE));
-          EVENTS.on(type);
+          if(!observer.event.exist(type)){ observer.event.create(type); }
+          let index = observer.register(type,fn.bind(instance));
+          events.on(type);
           return index;
         },
         off: (type,id)=>{
-          let registered = OBSERVER.event.get(type);
+          let registered = observer.event.get(type);
           if(id == undefined){
-            registered.forEach((id)=>{ OBSERVER.unregister(type,id); });
+            registered.forEach((id)=>{ observer.unregister(type,id); });
           }
           else{
-            OBSERVER.unregister(type,id);
+            observer.unregister(type,id);
           }
         }
       }
     }
   };
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 }
 
-function Button(BUTTON){
-  EventHandler.call(this,BUTTON);
+function Button(button){
+  EventHandler.call(this,button);
 }
 
-function Input(INPUT){
+function Input(input){
 
-  let jquery = INPUT instanceof window.$;
+  let jquery = input instanceof window.$;
   let test = Rules.is.instanceOfAny(
-    (jquery ? INPUT[0] : INPUT),
+    (jquery ? input[0] : input),
     [HTMLInputElement,HTMLSelectElement,HTMLTextAreaElement]
   );
 
   if(!test.passed){ throw test.error; }
-  EventHandler.call(this,INPUT)
+  EventHandler.call(this,input)
 
-  const TEST = {
+  const tests = {
     rules: [],
     map: {},
     addRule: (rule)=>{
-      TEST.map[rule.name] = TEST.rules.push([rule.test,rule.args]) - 1;
+      tests.map[rule.name] = tests.rules.push([rule.tests,rule.args]) - 1;
     },
     removeRule: (name)=>{
-      let index = TEST.map[name];
+      let index = tests.map[name];
       if(index !== undefined){
-        TEST.rules  = TEST.rules.reduce((a,c,i)=>{
+        tests.rules  = tests.rules.reduce((a,c,i)=>{
           if(i !== index){ a.push(c); }
           return a;
         },[]);
       }
     },
     run: ()=>{
-      let rules = TEST.rules.map((check)=>{
+      let rules = tests.rules.map((check)=>{
         let copy = [check[0],[]];
         if(Array.isArray(check[1])){ copy[1] = copy[1].concat(check[1]); }
-        copy[1].unshift(INSTANCE.value);
+        copy[1].unshift(instance.value);
         return copy;
       });
 
@@ -211,15 +183,15 @@ function Input(INPUT){
     }
   };
 
-  const INSTANCE = this;
+  const instance = this;
 
-  const PROPS = {};
+  const props = {};
 
-  const METHODS = {
+  const methods = {
     'parent':{
       get: ()=>{
-        if(!PROPS.parent){ PROPS.parent = INPUT.parent(); }
-        return PROPS.parent;
+        if(!props.parent){ props.parent = input.parent(); }
+        return props.parent;
       }
     },
     'disable':{
@@ -232,9 +204,9 @@ function Input(INPUT){
     'rules': {
       writable: false,
       value: {
-        add: TEST.addRule,
-        remove: TEST.removeRule,
-        test: TEST.run
+        add: tests.addRule,
+        remove: tests.removeRule,
+        tests: tests.run
       }
     },
     'value': {
@@ -247,13 +219,13 @@ function Input(INPUT){
     }
   };
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 }
 
-function SelectInput(INPUT){
-  Input.call(this,INPUT);
+function SelectInput(input){
+  Input.call(this,input);
 
-  const OPTIONS = {
+  const options = {
     add: (option)=>{
       let el = $(document.createElement('option'));
       el.text(option.text).val(option.value);
@@ -270,7 +242,7 @@ function SelectInput(INPUT){
     find: (value)=>{ return this.element.find(`[value="${value}"]`); }
   };
 
-  const METHODS = {
+  const methods = {
     'value':{
       set: (value)=>{
         this.element.val(value);
@@ -282,94 +254,94 @@ function SelectInput(INPUT){
     },
     'options':{
       writable: false,
-      value: OPTIONS
+      value: options
     }
   };
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 }
 
-function ImageInput(INPUT,BUTTON,IMG){
-  Input.call(this,INPUT);
-  BUTTON = new Button(BUTTON);
-  const INSTANCE = this;
-  const ON = INSTANCE.on;
-  const OFF = INSTANCE.off;
-  const PROPS = {
-    img: IMG,
+function ImageInput({file,upload,preview}){
+  Input.call(this,file);
+  upload = new Button(upload);
+  const instance = this;
+  const on = instance.on;
+  const off = instance.off;
+  const props = {
+    img: preview,
     reader: new FileReader(),
     file: undefined,
     data: undefined,
     changed: false,
   };
-  const METHODS = {
+  const methods = {
     'changed': {
-      get: ()=>{ return PROPS.changed; }
+      get: ()=>{ return props.changed; }
     },
     'value': {
-      get:()=>{ return PROPS.file }
+      get:()=>{ return props.file }
     },
     'src':{
-      get: ()=>{ return PROPS.data; },
-      set: (value)=>{ PROPS.img.attr('src',value); }
+      get: ()=>{ return props.data; },
+      set: (value)=>{ props.img.attr('src',value); }
     },
     'on': {
       configurable: true,
       writable: false,
       value: function(){
-        ON.call(this);
-        BUTTON.on();
+        on.call(this);
+        upload.on();
       }
     },
     'off': {
       configurable: true,
       writable: false,
       value: function(){
-        OFF.call(this);
-        BUTTON.off();
-        IMG.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
+        off.call(this);
+        upload.off();
+        preview.attr('src','https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png');
       }
     }
   };
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 
-  PROPS.reader.onload = (e)=>{
-    PROPS.img.attr('src',e.target.result);
-    PROPS.data = e.target.result;
-    INSTANCE.element.trigger('imgReady');
+  props.reader.onload = (e)=>{
+    props.img.attr('src',e.target.result);
+    props.data = e.target.result;
+    instance.element.trigger('imgReady');
   };
 
-  BUTTON.events.on('click',function(){
-    INSTANCE.element.val('');
-    INSTANCE.element.trigger('click');
+  upload.events.on('click',function(){
+    instance.element.val('');
+    instance.element.trigger('click');
   });
 
   this.events.on('change',function(){
-    PROPS.changed = true;
-    PROPS.file = this.element[0].files[0];
-    PROPS.reader.readAsDataURL(PROPS.file);
+    props.changed = true;
+    props.file = this.element[0].files[0];
+    props.reader.readAsDataURL(props.file);
   });
 
 }
 
-function DateInput(INPUT){
-  const PICKER = flatpickr(INPUT,{
+function DateInput(input){
+  const picker = flatpickr(input,{
     locale: Spanish,
     dateFormat: 'j M Y',
     defaultDate: new Date(Date.now()),
     disableMobile: true
   });
 
-  PICKER.config.onClose.push(function(){
+  picker.config.onClose.push(function(){
     $(document).off('click.exitPicker');
   })
 
-  Input.call(this,INPUT);
+  Input.call(this,input);
 
-  const METHODS = {
+  const methods = {
     'picker':{
-      get:()=>{ return PICKER; }
+      get:()=>{ return picker; }
     },
     'close': {
       writable: false,
@@ -387,24 +359,24 @@ function DateInput(INPUT){
             }
             e = e.parentElement;
           }
-          if(!found){ PICKER.close(); $(document).off('click.exitPicker'); }
+          if(!found){ picker.close(); $(document).off('click.exitPicker'); }
         });
       }
     },
     'value':{
-      set: (date)=>{ PICKER.setDate(date); },
-      get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'Y-m-d'); }
+      set: (date)=>{ picker.setDate(date); },
+      get:()=>{ return picker.formatDate(picker.selectedDates[0],'Y-m-d'); }
     }
   }
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 
   this.events.on('click',this.close);
 
 }
 
-function TimeInput(INPUT){
-  const PICKER = flatpickr(INPUT,{
+function TimeInput(input){
+  const picker = flatpickr(input,{
     enableTime: true,
     noCalendar: true,
     locale: Spanish,
@@ -413,44 +385,35 @@ function TimeInput(INPUT){
     disableMobile: true
   });
 
-  PICKER.config.onClose.push(function(){
+  picker.config.onClose.push(function(){
     $(document).off('click.exitPicker');
   });
 
-  Input.call(this,INPUT);
+  Input.call(this,input);
 
-  const METHODS = {
+  const methods = {
     'picker':{
-      get:()=>{ return PICKER; }
+      get:()=>{ return picker; }
     },
     'close': {
       writable: false,
       value: ()=>{
         $(document).on('click.exitPicker',function(e){
           let close = e.target.classList.toString().indexOf('flatpickr') == -1;
-          if(close){ PICKER.close(); $(document).off('click.exitPicker'); }
+          if(close){ picker.close(); $(document).off('click.exitPicker'); }
         });
       }
     },
     'value':{
-      set:(value)=>{ PICKER.setDate(date); },
-      get:()=>{ return PICKER.formatDate(PICKER.selectedDates[0],'H:i:s'); }
+      set:(value)=>{ picker.setDate(date); },
+      get:()=>{ return picker.formatDate(picker.selectedDates[0],'H:i:s'); }
     }
   }
 
-  Object.defineProperties(this,METHODS);
+  Object.defineProperties(this,methods);
 
   this.events.on('click',this.close);
 }
 
-
-const Types = {
-  'time':TimeInput,
-  'date':DateInput,
-  'select':SelectInput,
-  'image':ImageInput,
-  'button':Button,
-  'input':Input
-};
 
 export { Finder, Types }

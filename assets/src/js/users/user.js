@@ -3,12 +3,13 @@ export function User(data){
     firstname,
     lastname,
     email,
-    birthday,
     avatar,
+    area,
     position
   } = data;
 
   const methods = {
+    'id': { get: ()=>{ return id } },
     'firstname': {
       get: ()=>{ return firstname; }
     },
@@ -26,6 +27,11 @@ export function User(data){
     },
     'position': {
       get: ()=>{ return position; }
+    },
+    'area': {
+      get: ()=>{ return area; }
     }
   }
+
+  Object.defineProperties(this,methods);
 }

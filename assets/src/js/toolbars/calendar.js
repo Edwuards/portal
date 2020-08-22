@@ -3,7 +3,7 @@ import { ToolBar } from './toolbar';
 
 export default function(){
   const toolbar = new ToolBar('calendar');
-  const dateTitle = this.element.find('[data=date]');
+  const dateTitle = toolbar.element.find('[data=date]');
   const methods = {
     'setDate': { value: function(value){ dateTitle.html(value); } }
   };
