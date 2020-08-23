@@ -1,7 +1,7 @@
 import { MySolicitud,TeamSolicitud,UsersSolicitud } from './solicitud';
 import { Observer } from '../helpers';
 
-const dataMock = (obj,notify)=>{
+const dataMock = (obj,body)=>{
 
   for (let i = 0; i < 3; i++) {
     let type = (i ? (i == 1 ? 'team' : 'users') : 'mine');
@@ -21,14 +21,13 @@ const dataMock = (obj,notify)=>{
         end: '10 Aug 2020',
         color: 'bg-blue-600'
       }
-      notify('add',[ obj[type][status][obj[type][status].push(new fn(data)) - 1].card.element ]);
+       body.append(obj[type][status][obj[type][status].push(new fn(data)) - 1].card.element);
     }
   }
 }
 
 
-export function Solicitudes(){
-  const events = new Observer(['add']);
+export function Solicitudes(body){
   const solicitudes = {};
   const statusMap = {
     'denied':0,
@@ -41,18 +40,8 @@ export function Solicitudes(){
     status: undefined
   };
 
+  dataMock(solicitudes,body);
   const methods = {
-    'start': {
-      writable: false,
-      value: ()=>{ dataMock(solicitudes,events.notify); }
-    },
-    'events': {
-      writable: false,
-      value: {
-        on: events.register,
-        off: events.unregister
-      }
-    },
     'view': {
       writable: false,
       value: (ctx)=>{

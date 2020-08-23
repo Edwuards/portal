@@ -10,7 +10,7 @@ export default function(){
 
   const routes = {
     '/calendar/*': function(ctx,next){
-      if(!(this.state == 'calendar')){ this.state = 'calendar'; }
+      if(!(this.state.value == 'calendar')){ this.state.value = 'calendar'; }
       next();
     },
     '/calendar/': permissions.index,

@@ -9,6 +9,7 @@ export function Card(data){
   element
   .addClass('w-56 m-4 bg-white py-4')
   .append(card.render({
+    avatar: user.avatar,
     name: user.fullname,
     area: user.area,
     position: user.position

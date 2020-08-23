@@ -38,16 +38,16 @@ function Finder(container){
       }
     }
     else{
-
+      el = new Button(el);
       if(group){
-        if(!found.buttons.group[group]){ buttons.group[group] = {}; }
-        found.button.group[group][name] = new Button(el);
+        if(!found.buttons.group[group]){ found.buttons.group[group] = {}; }
+        found.buttons.group[group][name] = el;
       }
       else{
-        found.buttons.name[name] = new Button(el);
+        found.buttons.name[name] = el;
       }
 
-      found.buttons.all.push(found.buttons.name[name]);
+      found.buttons.all.push(el);
     }
 
 

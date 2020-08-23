@@ -6,7 +6,7 @@ export default function(){
 
   const routes = {
     '/profile/*': function(ctx,next){
-      if(!(this.state == 'profile')){ this.state = 'profile'; }
+      if(!(this.state.value == 'profile')){ this.state.value = 'profile'; }
       next();
     },
     '/profile/': function(){

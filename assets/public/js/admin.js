@@ -385,7 +385,7 @@
           if(!registered[state]){ registered[state] = {on,off}; }
         },
       },
-      'state': {
+      'value': {
         set: (state)=>{
           if(registered[state]){
             if(current.state){ current.value.off(); }
@@ -404,6 +404,7 @@
 
   function View({name,toolbar}){
     const self = this;
+    const state = new State();
     const element = $(`[data-content="${name}"]`);
     const display = (state)=>{ element[ state ? 'removeClass' : 'addClass' ]('hidden'); };
     const on = ()=>{ display(true); toolbar.on(); };
@@ -419,6 +420,10 @@
     };
 
     const methods = {
+      'state': {
+        writable: false,
+        value: state
+      },
       'element': { get: ()=>{ return element } },
       'name':{ get: ()=>{ return name; } },
       'toolbar': { get: ()=>{ return toolbar } },
@@ -4371,16 +4376,16 @@
         }
       }
       else {
-
+        el = new Button(el);
         if(group){
-          if(!found.buttons.group[group]){ buttons.group[group] = {}; }
-          found.button.group[group][name] = new Button(el);
+          if(!found.buttons.group[group]){ found.buttons.group[group] = {}; }
+          found.buttons.group[group][name] = el;
         }
         else {
-          found.buttons.name[name] = new Button(el);
+          found.buttons.name[name] = el;
         }
 
-        found.buttons.all.push(found.buttons.name[name]);
+        found.buttons.all.push(el);
       }
 
 
@@ -15061,7 +15066,7 @@
 
   function ToolBar(name){
     const element = $(`[data-navbar="${name}"]`);
-
+    const state = new State();
     const { buttons, inputs } = Finder(element);
 
     const toggle = (state)=>{
@@ -15082,6 +15087,19 @@
       },
       'inputs':{
         get: ()=>{ return inputs }
+      },
+      'state': {
+        writable: false,
+        value: state
+      },
+      'reset': {
+        writable: false,
+        value: ()=>{
+          buttons.all.forEach((btn)=>{
+            btn.off();
+            btn.element.addClass('hidden');
+          });
+        }
       },
       'on':{
         writable: false,
@@ -15115,7 +15133,7 @@
 
     const routes = {
       '/calendar/*': function(ctx,next){
-        if(!(this.state == 'calendar')){ this.state = 'calendar'; }
+        if(!(this.state.value == 'calendar')){ this.state.value = 'calendar'; }
         next();
       },
       '/calendar/': permissions.index,
@@ -15148,7 +15166,7 @@
 
     const routes = {
       '/profile/*': function(ctx,next){
-        if(!(this.state == 'profile')){ this.state = 'profile'; }
+        if(!(this.state.value == 'profile')){ this.state.value = 'profile'; }
         next();
       },
       '/profile/': function(){
@@ -16049,7 +16067,7 @@
     Solicitud.call(this,solicitud,Modes['users']);
   }
 
-  const dataMock = (obj,notify)=>{
+  const dataMock = (obj,body)=>{
 
     for (let i = 0; i < 3; i++) {
       let type = (i ? (i == 1 ? 'team' : 'users') : 'mine');
@@ -16069,14 +16087,13 @@
           end: '10 Aug 2020',
           color: 'bg-blue-600'
         };
-        notify('add',[ obj[type][status][obj[type][status].push(new fn(data)) - 1].card.element ]);
+         body.append(obj[type][status][obj[type][status].push(new fn(data)) - 1].card.element);
       }
     }
   };
 
 
-  function Solicitudes(){
-    const events = new Observer(['add']);
+  function Solicitudes(body){
     const solicitudes = {};
     const statusMap = {
       'denied':0,
@@ -16089,18 +16106,8 @@
       status: undefined
     };
 
+    dataMock(solicitudes,body);
     const methods = {
-      'start': {
-        writable: false,
-        value: ()=>{ dataMock(solicitudes,events.notify); }
-      },
-      'events': {
-        writable: false,
-        value: {
-          on: events.register,
-          off: events.unregister
-        }
-      },
       'view': {
         writable: false,
         value: (ctx)=>{
@@ -16144,23 +16151,19 @@
   function Solicitudes$1 (){
     const view = new View({ name:'solicitudes',toolbar: ToolBar$3() });
     const body = view.element.children('.body');
-    const solicitudes = new Solicitudes();
+    const solicitudes = new Solicitudes(body);
     const select = view.toolbar.inputs.type.select;
     const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); };
 
     const routes = {
       '/solicitudes/*': function(ctx,next){
-        if(!(this.state == 'solicitudes')){ this.state = 'solicitudes'; }
+        if(!(this.state.value == 'solicitudes')){ this.state.value = 'solicitudes'; }
         next();
       },
       '/solicitudes/:view/:status': solicitudes.view
     };
 
     view.routes = [routes];
-
-    solicitudes.events.on('add',function(card){ body.append(card); });
-
-    solicitudes.start();
 
     select.state.events.on('change',function(){
       let path = urlSegments(); path[1] = this.value;
@@ -16171,10 +16174,36 @@
 
   }
 
-  function ToolBar$4(){ return new ToolBar('users'); }
+  function ToolBar$4(){
+    const toolbar = new ToolBar('users');
+    const buttons = toolbar.buttons;
+    const toggle = (btns,state)=>{
+      for (let btn in btns) {
+        btn = btns[btn];
+        btn[state ? 'on' : 'off']();
+        btn.element[state ? 'removeClass' : 'addClass']('hidden');
+      }
+    };
+
+    toolbar.state.register({
+      state:'users',
+      on:()=>{ toggle(buttons.group.users,true); },
+      off: ()=>{ toggle(buttons.group.users,false); }
+    });
+
+    toolbar.state.register({
+      state:'profile',
+      on:()=>{ toggle(buttons.group.profile,true); },
+      off: ()=>{ toggle(buttons.group.profile,false); }
+    });
+
+    return toolbar;
+
+  }
 
   function User(data){
     let {
+      id,
       firstname,
       lastname,
       email,
@@ -16220,6 +16249,7 @@
     element
     .addClass('w-56 m-4 bg-white py-4')
     .append(card$1.render({
+      avatar: user.avatar,
       name: user.fullname,
       area: user.area,
       position: user.position
@@ -16258,7 +16288,7 @@
         firstname: 'Cesar Edwuards',
         lastname: 'Perez Robles',
         email: 'ejemplo@figment.com.mx',
-        avatar: '/assets/img/placeholder.jpeg',
+        avatar: '/assets/public/img/placeholder.jpeg',
         area: 'Diseño',
         position: 'Diseñador Gráfico'
       });
@@ -16283,6 +16313,12 @@
 
 
     const methods = {
+      'find': {
+        writable: false,
+        value: (id)=>{
+          return users.find((card)=>{ return card.user.id == id; });
+        }
+      },
       'on':{
         writable: false,
         value: ()=>{
@@ -16304,29 +16340,79 @@
     return list
   }
 
+  function Profile$1(){
+    const profile = {};
+    const element = $('[data-users="profile"]');
+    const { inputs } = Finder(element);
+
+    const methods = {
+      'read': {
+        writable: false,
+        value: (user)=>{
+          // Set user data
+          inputs.all.forEach((input)=>{ input.disable(true); });
+        }
+      },
+      'edit': {
+        writable: false,
+        value: ()=>{
+          inputs.all.forEach((input)=>{ input.disable(false); });
+        }
+      },
+      'on': {
+        writable: false,
+        value: ()=>{
+          element.removeClass('hidden');
+          inputs.all.forEach((input)=>{ input.on(); });
+        }
+      },
+      'off': {
+        writable: false,
+        value: ()=>{
+          element.addClass('hidden');
+          inputs.all.forEach((input)=>{ input.off(); });
+
+        }
+      }
+    };
+
+    Object.defineProperties(profile,methods);
+
+    return profile
+  }
+
   function Users(){
     const view = new View({name:'users',toolbar: ToolBar$4() });
     const users = List();
-    const component = new State();
+    const profile = Profile$1();
 
     const routes = {
       '/users/*': function(ctx,next){
-        if(!(this.state == 'users')){ this.state = 'users'; }
+        if(!(this.state.value == 'users')){ this.state.value = 'users'; }
         next();
       },
       '/users/view/all': function(){
-        component.state = 'users';
-
+        view.state.value = 'users';
       },
       '/users/view/profile/:id': function(){
-
+        view.state.value = 'profile';
       },
 
     };
 
     view.routes = [routes];
 
-    component.register({state:'users',on:users.on,off:users.off});
+    view.state.register({
+      state: 'users',
+      on: ()=>{ users.on(); view.toolbar.state.value = 'users'; },
+      off: ()=>{ users.off(); },
+    });
+
+    view.state.register({
+      state: 'profile',
+      on: ()=>{ profile.on(); view.toolbar.state.value = 'profile'; },
+      off: ()=>{ profile.off(); },
+    });
 
     return view;
 
@@ -16379,7 +16465,7 @@
   }
 
   function App(){
-    const app = new State();
+    const state = new State();
     const menu = Menu();
     const views = [
       Calendar$2(),
@@ -16391,8 +16477,8 @@
     page_js({window: window });
     page_js.base('/app/dashboard');
     views.forEach((view) => {
-      app.register({state: view.name, on: view.on, off: view.off});
-      view.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind(app)); } });
+      state.register({state: view.name, on: view.on, off: view.off});
+      view.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind({state})); } });
     });
 
     page_js(window.location.pathname);

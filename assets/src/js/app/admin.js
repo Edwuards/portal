@@ -8,7 +8,7 @@ import Menu from '../menu/component';
 import Router from 'page';
 
 function App(){
-  const app = new State();
+  const state = new State();
   const menu = Menu();
   const views = [
     Calendar(),
@@ -20,8 +20,8 @@ function App(){
   Router({window: window });
   Router.base('/app/dashboard');
   views.forEach((view) => {
-    app.register({state: view.name, on: view.on, off: view.off});
-    view.routes.forEach((routes)=>{ for (let route in routes) { Router(route,routes[route].bind(app)); } });
+    state.register({state: view.name, on: view.on, off: view.off});
+    view.routes.forEach((routes)=>{ for (let route in routes) { Router(route,routes[route].bind({state})); } });
   });
 
   Router(window.location.pathname);

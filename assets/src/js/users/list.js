@@ -9,7 +9,7 @@ const Data = (()=>{
       firstname: 'Cesar Edwuards',
       lastname: 'Perez Robles',
       email: 'ejemplo@figment.com.mx',
-      avatar: '/assets/img/placeholder.jpeg',
+      avatar: '/assets/public/img/placeholder.jpeg',
       area: 'Diseño',
       position: 'Diseñador Gráfico'
     });
@@ -34,6 +34,12 @@ export default function(){
 
 
   const methods = {
+    'find': {
+      writable: false,
+      value: (id)=>{
+        return users.find((card)=>{ return card.user.id == id; });
+      }
+    },
     'on':{
       writable: false,
       value: ()=>{

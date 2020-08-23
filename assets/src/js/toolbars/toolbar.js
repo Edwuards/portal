@@ -1,8 +1,10 @@
 import { Finder } from '../form/inputs';
+import { State } from '../helpers';
+
 
 export function ToolBar(name){
   const element = $(`[data-navbar="${name}"]`);
-
+  const state = new State();
   const { buttons, inputs } = Finder(element);
 
   const toggle = (state)=>{
@@ -23,6 +25,19 @@ export function ToolBar(name){
     },
     'inputs':{
       get: ()=>{ return inputs }
+    },
+    'state': {
+      writable: false,
+      value: state
+    },
+    'reset': {
+      writable: false,
+      value: ()=>{
+        buttons.all.forEach((btn)=>{
+          btn.off();
+          btn.element.addClass('hidden');
+        });
+      }
     },
     'on':{
       writable: false,

@@ -4,10 +4,11 @@
   $buttons = [
     ['i'=>'fas fa-user-plus','group'=>'users','name'=>'create','text'=>'Agregar','css'=>'text-green-600'],
     ['i'=>'fas fa-user-times','group'=>'users','name'=>'delete','text'=>'Eliminar','css'=>'text-red-600'],
+    ['i'=>'fas fa-pencil','group'=>'profile','name'=>'edit','text'=>'Editar','css'=>'text-green-600'],
   ];
 
   foreach ($buttons as $button) {
-    $html .= '<button  type="button" '.$group($button['group']).' name="'.$button['name'].'" class="flex items-center p-1 mr-4 '.$button['css'].'">
+    $html .= '<button data-type="button" type="button" '.$group($button['group']).' name="'.$button['name'].'" class="hidden flex items-center p-1 mr-4 '.$button['css'].'">
       <i class="fas '.$button['i'].' mr-2"></i>
       '.$button['text'].'
     </button>';

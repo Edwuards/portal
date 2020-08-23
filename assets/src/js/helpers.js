@@ -84,7 +84,7 @@ function State(){
         if(!registered[state]){ registered[state] = {on,off}; }
       },
     },
-    'state': {
+    'value': {
       set: (state)=>{
         if(registered[state]){
           if(current.state){ current.value.off(); }
@@ -103,6 +103,7 @@ function State(){
 
 function View({name,toolbar}){
   const self = this;
+  const state = new State();
   const element = $(`[data-content="${name}"]`);
   const display = (state)=>{ element[ state ? 'removeClass' : 'addClass' ]('hidden'); }
   const on = ()=>{ display(true); toolbar.on(); }
@@ -118,6 +119,10 @@ function View({name,toolbar}){
   };
 
   const methods = {
+    'state': {
+      writable: false,
+      value: state
+    },
     'element': { get: ()=>{ return element } },
     'name':{ get: ()=>{ return name; } },
     'toolbar': { get: ()=>{ return toolbar } },
