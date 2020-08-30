@@ -1,6 +1,7 @@
 import { View } from '../helpers';
 import { Solicitudes } from './solicitudes';
 import ToolBar from '../toolbars/solicitudes';
+import Router from 'page';
 
 export default function (){
   const view = new View({ name:'solicitudes',toolbar: ToolBar() });
@@ -21,7 +22,7 @@ export default function (){
 
   select.state.events.on('change',function(){
     let path = urlSegments(); path[1] = this.value;
-    router.instance(`/solicitudes/${path.join('/')}`);
+    Router(`/solicitudes/${path.join('/')}`);
   });
 
   return view

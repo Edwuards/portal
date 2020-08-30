@@ -32,9 +32,9 @@ $html = [
   'name' => TextInput([
     'css'=>['cont'=>'mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Nombre',
-    'attrs'=>['name'=>'name'],
+    'attrs'=>['name'=>'firstname'],
   ]),
-  'apellido' => TextInput([
+  'lastname' => TextInput([
     'css'=>['cont'=>'mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Apellido',
     'attrs'=>['name'=>'lastname'],
@@ -42,13 +42,13 @@ $html = [
   'work_position' => SelectInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Puesto',
-    'attrs'=>['name'=>'work_position'],
+    'attrs'=>['name'=>'position'],
     'options'=>$options['positions']
   ]),
   'work_area' => SelectInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Área',
-    'attrs'=>['name'=>'work_area'],
+    'attrs'=>['name'=>'area'],
     'options'=>$options['areas']
   ]),
   'email' => TextInput([
@@ -59,7 +59,7 @@ $html = [
   'birthday' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Cumpleaños',
-    'attrs'=>['name'=>'birthday'],
+    'attrs'=>['name'=>'dob'],
   ]),
   'vacations' => NumberInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
@@ -69,7 +69,7 @@ $html = [
   'work_start' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Fecha de ingreso',
-    'attrs'=>['name'=>'work_start'],
+    'attrs'=>['name'=>'initialized'],
   ]),
 
 ];
@@ -77,7 +77,7 @@ $html = [
 
 ?>
 
-<form name="userProfile" class="bg-white">
+<form name="usersProfile" class="bg-white p-10 shadow-lg">
   <div class="flex flex-col sm:flex-row items-center w-full my-4">
     <?php echo $html['image']; ?>
     <div class="flex flex-col justify-center w-full sm:ml-6">
@@ -85,7 +85,7 @@ $html = [
         <?php echo $html['name']; ?>
       </div>
       <div class="mb-2">
-        <?php echo $html['apellido']; ?>
+        <?php echo $html['lastname']; ?>
       </div>
     </div>
   </div>

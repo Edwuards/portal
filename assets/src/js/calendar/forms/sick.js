@@ -3,14 +3,14 @@ import { Form } from '../../form/form.js';
 export function Sick(){
 
   const form = new Form({
-    title: 'Enfermedad',
     name: 'sick',
     url: 'permisions/create',
   });
 
-  form.color = 'bg-blue-600';
 
   form.init = function(){
+    this.title = 'Enfermedad',
+    this.color = 'bg-blue-600';
     this.buttons.name.send.events.on('click',this.send);
   }
 

@@ -1,4 +1,12 @@
----------MÉTODOS----------
+-----------------------------------
+|	PERFIL DE USUARIO	  |
+-----------------------------------
+Los métodos Read, Edit, Save y Cancel van a ser vinculados a botones que se encuentran en la barra de herramienta. 
+Los métodos On y Off van a ser vinculados al estado del componente Users. 
+
+-----------
+| MÉTODOS |
+-----------
 Nombre: Read
 Descripción: Este método se encarga de inhabilitar los inputs existentes. Los inputs no se podrán modificar.
 Esta función debe aceptar un parámetro USER . Este parámetro va ser usado para cargar los datos correctos a la vista. 
@@ -18,7 +26,9 @@ Nombre: Off
 Descripción: Esta función se encarga de apagar el componente. Al realizar esta operación todos los inputs van a ser apagados y la vista principal
 se tendrá que esconder. Al final esta operación debe cambiar el valor de la variable privada USER a nulo .
 
----------FLUJO DE NAVEGACIÓN----------
+-----------------------
+| FLUJO DE NAVEGACIÓN |
+-----------------------
 El Admin debe hacer clic en el botón de perfil que se encuentra en cada tarjeta de usuario. Esta acción va usar el ROUTER para mandar a llamar
 la función de leer el usuario . La función default var ser leer el perfil. La URl lleva el ID del usuario que se debe cargar a la vista de perfil.
 El Usuario debe ser cargado usando el modulo LIST. debemos regresar el usuario haciendo una búsqueda en el arreglo . El arreglo regresa el usuario 
@@ -30,4 +40,5 @@ Al momento de abrir el perfil de un usuario la barra de herramientas debe cambia
 El Estado debe cambiar a "Profile" . Este estado debe registrar dos funciones : On , Off
 la función On es llamada por el componente de State. Esta operación va a cambiar los botones disponibles . 
 Es decir que va esconder ciertos botones y habilitar otros. Para esto debemos llevar un estado de la barra de herramientas
-El estado de la barra debe ser un mapa que tenga un función
+El estado de la barra va permitir encender y prender los diferentes estados que le asignimos . 
+

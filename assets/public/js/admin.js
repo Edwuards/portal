@@ -4423,7 +4423,6 @@
         }
       },
       off: (type)=>{
-        if(type == 'click.d'){ debugger; }
         props.events[type] = false;
         instance.element.off(type);
       }
@@ -4526,6 +4525,11 @@
     const props = {};
 
     const methods = {
+      'name':{
+        configurable: true,
+        writable: false,
+        value: input.attr('name')
+      },
       'parent':{
         get: ()=>{
           if(!props.parent){ props.parent = input.parent(); }
@@ -4613,10 +4617,17 @@
       changed: false,
     };
     const methods = {
+      'name':{
+        writable: false,
+        value: instance.element.attr('data-group')
+      },
       'changed': {
         get: ()=>{ return props.changed; }
       },
       'value': {
+        set: (value)=>{
+          if(value != ''){ instance.src = value; }
+        },
         get:()=>{ return props.file }
       },
       'src':{
@@ -4818,7 +4829,6 @@
     const props = {
       element:$(`form[name="${data.name}"]`),
       alive:false,
-      title: data.title,
       name:data.name,
       url: data.url,
       async: data.async ? data.async : true,
@@ -4864,9 +4874,6 @@
       },
       'alive':{
         get:()=>{ return props.alive; }
-      },
-      'title':{
-        get:()=>{ return props.title; }
       },
       'on': {
         configurable: true,
@@ -5013,14 +5020,14 @@
   function Sick(){
 
     const form = new Form({
-      title: 'Enfermedad',
       name: 'sick',
       url: 'permisions/create',
     });
 
-    form.color = 'bg-blue-600';
 
     form.init = function(){
+      this.title = 'Enfermedad',
+      this.color = 'bg-blue-600';
       this.buttons.name.send.events.on('click',this.send);
     };
 
@@ -16167,7 +16174,7 @@
 
     select.state.events.on('change',function(){
       let path = urlSegments(); path[1] = this.value;
-      router.instance(`/solicitudes/${path.join('/')}`);
+      page_js(`/solicitudes/${path.join('/')}`);
     });
 
     return view
@@ -16185,16 +16192,33 @@
       }
     };
 
+    toolbar.title = toolbar.element.find('[data="title"]');
+
     toolbar.state.register({
       state:'users',
-      on:()=>{ toggle(buttons.group.users,true); },
+      on:()=>{
+        toolbar.title.text('Usuarios');
+        toggle(buttons.group.users,true);
+      },
       off: ()=>{ toggle(buttons.group.users,false); }
     });
 
     toolbar.state.register({
-      state:'profile',
-      on:()=>{ toggle(buttons.group.profile,true); },
-      off: ()=>{ toggle(buttons.group.profile,false); }
+      state:'read profile',
+      on:()=>{
+        toolbar.title.text('Perfil de Usuario');
+        toggle(buttons.group.readProfile,true);
+      },
+      off: ()=>{ toggle(buttons.group.readProfile,false); }
+    });
+
+    toolbar.state.register({
+      state:'edit profile',
+      on:()=>{
+        toolbar.title.text('Editar Usuario');
+        toggle(buttons.group.editProfile,true);
+      },
+      off: ()=>{ toggle(buttons.group.editProfile,false); }
     });
 
     return toolbar;
@@ -16202,42 +16226,53 @@
   }
 
   function User(data){
-    let {
-      id,
-      firstname,
-      lastname,
-      email,
-      avatar,
-      area,
-      position
-    } = data;
-
-    const methods = {
-      'id': { get: ()=>{ return id } },
-      'firstname': {
-        get: ()=>{ return firstname; }
-      },
-      'lastname': {
-        get: ()=>{ return lastname; }
-      },
-      'fullname': {
-        get: ()=>{ return `${firstname} ${lastname}`; }
-      },
-      'email': {
-        get: ()=>{ return email; }
-      },
-      'avatar': {
-        get: ()=>{ return avatar; }
-      },
-      'position': {
-        get: ()=>{ return position; }
-      },
-      'area': {
-        get: ()=>{ return area; }
-      }
-    };
-
-    Object.defineProperties(this,methods);
+    // let {
+    //   id,
+    //   firstname,
+    //   lastname,
+    //   email,
+    //   avatar,
+    //   area,
+    //   dob,
+    //   position,
+    //   vacation,
+    // } = data;
+    //
+    // const methods = {
+    //   'id': {
+    //     get: ()=>{ return id }
+    //   },
+    //   'firstname': {
+    //     get: ()=>{ return firstname; }
+    //   },
+    //   'lastname': {
+    //     get: ()=>{ return lastname; }
+    //   },
+    //   'fullname': {
+    //     get: ()=>{ return `${firstname} ${lastname}`; }
+    //   },
+    //   'dob': {
+    //     get: ()=>{ return dob; }
+    //   },
+    //   'email': {
+    //     get: ()=>{ return email; }
+    //   },
+    //   'avatar': {
+    //     get: ()=>{ return avatar; }
+    //   },
+    //   'position': {
+    //     get: ()=>{ return position; }
+    //   },
+    //   'area': {
+    //     get: ()=>{ return area; }
+    //   },
+    //   'vacation': {
+    //     get: ()=>{ return area; }
+    //   }
+    // }
+    //
+    // Object.defineProperties(this,methods);
+    return data
   }
 
   const card$1 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"w-full flex justify-center\">");t.b("\n" + i);t.b("  <div class=\"w-24 my-2 mx-4 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\" w-full my-4 px-4 text-center\">");t.b("\n" + i);t.b("  <p class=\"text-sm font-bold my-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs  my-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs my-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\"w-full my-4 px-4 flex justify-center\">");t.b("\n" + i);t.b("  <button class=\"flex justify-center items-center text-sm text-gray-600\" data-type=\"button\" type=\"button\" name=\"profile\">");t.b("\n" + i);t.b("    <i class=\"far fa-eye\"></i>");t.b("\n" + i);t.b("    <p class=\"ml-2\">ver perfil</p>");t.b("\n" + i);t.b("  </button>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
@@ -16341,44 +16376,53 @@
   }
 
   function Profile$1(){
-    const profile = {};
-    const element = $('[data-users="profile"]');
-    const { inputs } = Finder(element);
+    let user = undefined;
+    const form = new Form({
+      name: 'usersProfile',
+      url: 'users/edit'
+    });
+    const loadUser = (()=>{
+      const inputs = {};
+      let elements = form.inputs;
+      [
+        elements.type.image,
+        elements.type.text,
+        elements.type.date,
+        elements.type.select
+      ].forEach((type)=>{
+        for(let input in type){
+          input = type[input];
+          inputs[input.name] = input;
+        }
+      });
 
-    const methods = {
-      'read': {
-        writable: false,
-        value: (user)=>{
-          // Set user data
-          inputs.all.forEach((input)=>{ input.disable(true); });
-        }
-      },
-      'edit': {
-        writable: false,
-        value: ()=>{
-          inputs.all.forEach((input)=>{ input.disable(false); });
-        }
-      },
-      'on': {
-        writable: false,
-        value: ()=>{
-          element.removeClass('hidden');
-          inputs.all.forEach((input)=>{ input.on(); });
-        }
-      },
-      'off': {
-        writable: false,
-        value: ()=>{
-          element.addClass('hidden');
-          inputs.all.forEach((input)=>{ input.off(); });
-
+      return (user)=>{
+        for(let prop in user){
+          if(inputs[prop]){ inputs[prop].value = user[prop]; }
         }
       }
+    })();
+
+    form.container = $('[data-users="profile"]');
+
+    form.on = function(){ this.container.removeClass('hidden'); };
+
+    form.off = function(){ this.container.addClass('hidden'); };
+
+    form.read = function(data){
+      user = data;
+      this.disable(true);
+      loadUser(user);
     };
 
-    Object.defineProperties(profile,methods);
+    form.edit = function(){ this.disable(false); };
 
-    return profile
+    form.cancel = function(){
+      this.disable(true);
+      loadUser(user);
+    };
+
+    return form
   }
 
   function Users(){
@@ -16394,23 +16438,52 @@
       '/users/view/all': function(){
         view.state.value = 'users';
       },
-      '/users/view/profile/:id': function(){
+      '/users/view/profile/:id': function(ctx){
         view.state.value = 'profile';
+        profile.read(users.find(ctx.params.id).user);
       },
 
     };
+
+    {
+      let btns = view.toolbar.buttons.group.readProfile;
+
+      btns.edit.events.on('click',function(){
+        view.toolbar.state.value = 'edit profile';
+        profile.edit();
+      });
+
+      btns.exit.events.on('click',function(){ page_js('/users/view/all'); });
+
+    }
+    {
+      let btns = view.toolbar.buttons.group.editProfile;
+
+      btns.cancel.events.on('click',function(){
+        view.toolbar.state.value = 'read profile';
+        profile.cancel();
+      });
+
+    }
 
     view.routes = [routes];
 
     view.state.register({
       state: 'users',
-      on: ()=>{ users.on(); view.toolbar.state.value = 'users'; },
+      on: ()=>{
+        users.on();
+        view.toolbar.state.value = 'users';
+      },
+
       off: ()=>{ users.off(); },
     });
 
     view.state.register({
       state: 'profile',
-      on: ()=>{ profile.on(); view.toolbar.state.value = 'profile'; },
+      on: ()=>{
+        profile.on();
+        view.toolbar.state.value = 'read profile';
+      },
       off: ()=>{ profile.off(); },
     });
 

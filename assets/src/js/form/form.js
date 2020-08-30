@@ -7,7 +7,6 @@ export function Form(data){
   const props = {
     element:$(`form[name="${data.name}"]`),
     alive:false,
-    title: data.title,
     name:data.name,
     url: data.url,
     async: data.async ? data.async : true,
@@ -53,9 +52,6 @@ export function Form(data){
     },
     'alive':{
       get:()=>{ return props.alive; }
-    },
-    'title':{
-      get:()=>{ return props.title; }
     },
     'on': {
       configurable: true,

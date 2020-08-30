@@ -1,42 +1,51 @@
-import { Finder } from '../form/inputs';
+import { Form } from '../form/form';
 
 export default function(){
-  const profile = {};
-  const element = $('[data-users="profile"]');
-  const { inputs } = Finder(element);
+  let user = undefined;
+  const form = new Form({
+    name: 'usersProfile',
+    url: 'users/edit'
+  });
+  const loadUser = (()=>{
+    const inputs = {};
+    let elements = form.inputs;
+    [
+      elements.type.image,
+      elements.type.text,
+      elements.type.date,
+      elements.type.select
+    ].forEach((type)=>{
+      for(let input in type){
+        input = type[input];
+        inputs[input.name] = input;
+      }
+    });
 
-  const methods = {
-    'read': {
-      writable: false,
-      value: (user)=>{
-        // Set user data
-        inputs.all.forEach((input)=>{ input.disable(true); });
-      }
-    },
-    'edit': {
-      writable: false,
-      value: ()=>{
-        inputs.all.forEach((input)=>{ input.disable(false); });
-      }
-    },
-    'on': {
-      writable: false,
-      value: ()=>{
-        element.removeClass('hidden');
-        inputs.all.forEach((input)=>{ input.on(); })
-      }
-    },
-    'off': {
-      writable: false,
-      value: ()=>{
-        element.addClass('hidden');
-        inputs.all.forEach((input)=>{ input.off(); })
-
+    return (user)=>{
+      for(let prop in user){
+        if(inputs[prop]){ inputs[prop].value = user[prop]; }
       }
     }
+  })();
+
+  form.container = $('[data-users="profile"]');
+
+  form.on = function(){ this.container.removeClass('hidden'); }
+
+  form.off = function(){ this.container.addClass('hidden'); }
+
+  form.read = function(data){
+    user = data;
+    this.disable(true);
+    loadUser(user);
   }
 
-  Object.defineProperties(profile,methods);
+  form.edit = function(){ this.disable(false); }
 
-  return profile
+  form.cancel = function(){
+    this.disable(true);
+    loadUser(user);
+  }
+
+  return form
 }

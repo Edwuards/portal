@@ -85,7 +85,6 @@ function EventHandler(element){
       }
     },
     off: (type)=>{
-      if(type == 'click.d'){ debugger; }
       props.events[type] = false;
       instance.element.off(type);
     }
@@ -188,6 +187,11 @@ function Input(input){
   const props = {};
 
   const methods = {
+    'name':{
+      configurable: true,
+      writable: false,
+      value: input.attr('name')
+    },
     'parent':{
       get: ()=>{
         if(!props.parent){ props.parent = input.parent(); }
@@ -275,10 +279,17 @@ function ImageInput({file,upload,preview}){
     changed: false,
   };
   const methods = {
+    'name':{
+      writable: false,
+      value: instance.element.attr('data-group')
+    },
     'changed': {
       get: ()=>{ return props.changed; }
     },
     'value': {
+      set: (value)=>{
+        if(value != ''){ instance.src = value; }
+      },
       get:()=>{ return props.file }
     },
     'src':{

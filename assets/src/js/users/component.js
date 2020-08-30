@@ -2,6 +2,7 @@ import { View, State } from '../helpers';
 import ToolBar from '../toolbars/users';
 import List from './list';
 import Profile from './profile';
+import Router from 'page';
 
 export default function(){
   const view = new View({name:'users',toolbar: ToolBar() });
@@ -16,9 +17,31 @@ export default function(){
     '/users/view/all': function(){
       view.state.value = 'users';
     },
-    '/users/view/profile/:id': function(){
+    '/users/view/profile/:id': function(ctx){
       view.state.value = 'profile';
+      profile.read(users.find(ctx.params.id).user);
     },
+
+  }
+
+  {
+    let btns = view.toolbar.buttons.group.readProfile;
+
+    btns.edit.events.on('click',function(){
+      view.toolbar.state.value = 'edit profile';
+      profile.edit();
+    });
+
+    btns.exit.events.on('click',function(){ Router('/users/view/all'); });
+
+  }
+  {
+    let btns = view.toolbar.buttons.group.editProfile;
+
+    btns.cancel.events.on('click',function(){
+      view.toolbar.state.value = 'read profile';
+      profile.cancel();
+    });
 
   }
 
@@ -26,13 +49,20 @@ export default function(){
 
   view.state.register({
     state: 'users',
-    on: ()=>{ users.on(); view.toolbar.state.value = 'users'; },
+    on: ()=>{
+      users.on();
+      view.toolbar.state.value = 'users';
+    },
+
     off: ()=>{ users.off(); },
   });
 
   view.state.register({
     state: 'profile',
-    on: ()=>{ profile.on(); view.toolbar.state.value = 'profile'; },
+    on: ()=>{
+      profile.on();
+      view.toolbar.state.value = 'read profile';
+    },
     off: ()=>{ profile.off(); },
   });
 
