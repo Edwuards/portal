@@ -1,69 +1,61 @@
 import { View, State } from '../helpers';
 import ToolBar from '../toolbars/users';
-import List from './list';
-import Profile from './profile';
-import Router from 'page';
-
+import Users from './users';
 export default function(){
   const view = new View({name:'users',toolbar: ToolBar() });
-  const users = List();
-  const profile = Profile();
-
+  const users = Users();
   const routes = {
     '/users/*': function(ctx,next){
       if(!(this.state.value == 'users')){ this.state.value = 'users'; }
       next();
     },
     '/users/view/all': function(){
-      view.state.value = 'users';
+      view.state.value = 'view users';
     },
     '/users/view/profile/:id': function(ctx){
       view.state.value = 'profile';
-      profile.read(users.find(ctx.params.id).user);
+      users.profile.read(users.list.find(ctx.params.id).user);
+    },
+    '/users/create': function(ctx){
+      view.state.value = 'create user';
     },
 
   }
 
-  {
-    let btns = view.toolbar.buttons.group.readProfile;
+  view.toolbar.events.on('edit profile',users.profile.edit);
+  view.toolbar.events.on('cancel edit profile',users.profile.cancel);
 
-    btns.edit.events.on('click',function(){
-      view.toolbar.state.value = 'edit profile';
-      profile.edit();
-    });
 
-    btns.exit.events.on('click',function(){ Router('/users/view/all'); });
-
-  }
-  {
-    let btns = view.toolbar.buttons.group.editProfile;
-
-    btns.cancel.events.on('click',function(){
-      view.toolbar.state.value = 'read profile';
-      profile.cancel();
-    });
-
-  }
 
   view.routes = [routes];
 
   view.state.register({
-    state: 'users',
+    state: 'view users',
     on: ()=>{
-      users.on();
-      view.toolbar.state.value = 'users';
+      users.list.on();
+      view.toolbar.state.value = 'view users';
     },
 
-    off: ()=>{ users.off(); },
+    off: ()=>{ users.list.off(); },
+  });
+
+  view.state.register({
+    state: 'create user',
+    on: ()=>{
+      users.create.on();
+      view.toolbar.state.value = 'create user';
+    },
+
+    off: ()=>{ users.create.off(); },
   });
 
   view.state.register({
     state: 'profile',
     on: ()=>{
-      profile.on();
+      users.profile.on();
       view.toolbar.state.value = 'read profile';
     },
-    off: ()=>{ profile.off(); },
+    off: ()=>{ users.profile.off(); },
   });
 
   return view;

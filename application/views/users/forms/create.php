@@ -4,12 +4,12 @@ $options = [
   'positions'=>''
 ];
 
-foreach ($work['positions'] as $position) {
-  $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-}
-foreach ($work['areas'] as $area) {
-  $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-}
+// foreach ($work['positions'] as $position) {
+//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
+// }
+// foreach ($work['areas'] as $area) {
+//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
+// }
 
 $html = [
   'image'=> ImageInput([
@@ -78,7 +78,7 @@ $html = [
 ?>
 
 
-<form name="userCreate" class="bg-white p-6">
+<form name="createUser" class="bg-white p-6">
   <div class="flex items-center w-full my-4">
     <?php echo $html['image']; ?>
     <div class="flex flex-col justify-center w-full ml-6">

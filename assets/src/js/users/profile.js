@@ -30,20 +30,20 @@ export default function(){
 
   form.container = $('[data-users="profile"]');
 
-  form.on = function(){ this.container.removeClass('hidden'); }
+  form.on = function(){ form.container.removeClass('hidden'); }
 
-  form.off = function(){ this.container.addClass('hidden'); }
+  form.off = function(){ form.container.addClass('hidden'); }
 
   form.read = function(data){
     user = data;
-    this.disable(true);
+    form.disable(true);
     loadUser(user);
   }
 
-  form.edit = function(){ this.disable(false); }
+  form.edit = function(){ form.disable(false); }
 
   form.cancel = function(){
-    this.disable(true);
+    form.disable(true);
     loadUser(user);
   }
 

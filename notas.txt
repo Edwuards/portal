@@ -1,28 +1,28 @@
 -----------------------------------
-|	PERFIL DE USUARIO	  |
+| PERFIL DE USUARIO		  |
 -----------------------------------
-Los métodos Read, Edit, Save y Cancel van a ser vinculados a botones que se encuentran en la barra de herramienta. 
-Los métodos On y Off van a ser vinculados al estado del componente Users. 
+Los métodos Read, Edit, Save y Cancel van a ser vinculados a botones que se encuentran en la barra de herramienta.
+Los métodos On y Off van a ser vinculados al estado del componente Users.
 
 -----------
 | MÉTODOS |
 -----------
 Nombre: Read
 Descripción: Este método se encarga de inhabilitar los inputs existentes. Los inputs no se podrán modificar.
-Esta función debe aceptar un parámetro USER . Este parámetro va ser usado para cargar los datos correctos a la vista. 
-De esta forma la vista de perfil puede ser compartida por todos los usuarios. Esto significa que el parámetro debe 
-ser guardado en una variable privada del componente.  
+Esta función debe aceptar un parámetro USER . Este parámetro va ser usado para cargar los datos correctos a la vista.
+De esta forma la vista de perfil puede ser compartida por todos los usuarios. Esto significa que el parámetro debe
+ser guardado en una variable privada del componente.
 
 Nombre: Edit
-Descripción: Esta función se va encargar de habilitar ciertos inputs(campos) para que el valor pueda ser habilitado. Esta función debe 
-usar un servicio para realizar la actualización de valores. 
+Descripción: Esta función se va encargar de habilitar ciertos inputs(campos) para que el valor pueda ser habilitado. Esta función debe
+usar un servicio para realizar la actualización de valores.
 
-Nombre: On 
+Nombre: On
 Descripción: Esta función se va encargar de encender el componente. Al realizar esto debemos encender todos los inputs que se encuentran
-en el componente . Esta operación no debe meterse con la habiliatación de los inputs. Al encender los inputs solo debemos prender y dejar listo 
-los eventos que cada input tiene registrado escuchar. 
+en el componente . Esta operación no debe meterse con la habiliatación de los inputs. Al encender los inputs solo debemos prender y dejar listo
+los eventos que cada input tiene registrado escuchar.
 
-Nombre: Off 
+Nombre: Off
 Descripción: Esta función se encarga de apagar el componente. Al realizar esta operación todos los inputs van a ser apagados y la vista principal
 se tendrá que esconder. Al final esta operación debe cambiar el valor de la variable privada USER a nulo .
 
@@ -31,14 +31,24 @@ se tendrá que esconder. Al final esta operación debe cambiar el valor de la va
 -----------------------
 El Admin debe hacer clic en el botón de perfil que se encuentra en cada tarjeta de usuario. Esta acción va usar el ROUTER para mandar a llamar
 la función de leer el usuario . La función default var ser leer el perfil. La URl lleva el ID del usuario que se debe cargar a la vista de perfil.
-El Usuario debe ser cargado usando el modulo LIST. debemos regresar el usuario haciendo una búsqueda en el arreglo . El arreglo regresa el usuario 
-usando la función Find . 
+El Usuario debe ser cargado usando el modulo LIST. debemos regresar el usuario haciendo una búsqueda en el arreglo . El arreglo regresa el usuario
+usando la función Find .
 
 	Diagrama: Botón --> Encuentra Usuario --> Leer Perfil --> Encender Perfil
 
 Al momento de abrir el perfil de un usuario la barra de herramientas debe cambiar de estado .
 El Estado debe cambiar a "Profile" . Este estado debe registrar dos funciones : On , Off
-la función On es llamada por el componente de State. Esta operación va a cambiar los botones disponibles . 
+la función On es llamada por el componente de State. Esta operación va a cambiar los botones disponibles .
 Es decir que va esconder ciertos botones y habilitar otros. Para esto debemos llevar un estado de la barra de herramientas
-El estado de la barra va permitir encender y prender los diferentes estados que le asignimos . 
+El estado de la barra va permitir encender y prender los diferentes estados que le asignimos .
 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-----------------------------------
+|	MODULO CREAR USUARIO	  |
+-----------------------------------
+El modulo para crear usuarios va tomar el mismo formato de usar un contenedor como subvista . Este contendedor va existir 
+dentro del contenedor principal. El contenedor va usar un formulario para capturar los datos del usuario. La intención es que 
+el formulario tenga una sección de pie donde tenga sus botones extra para continurar con la creación del usuario. Cuales son los datos
+que se piensa capturar con este formulario . Tenemos como información básica : Nombre , Apellido , Fecha de nacimiento , Puesto de trabajo , 
+Área de trabajo, vacaciones  

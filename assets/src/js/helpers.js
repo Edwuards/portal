@@ -34,7 +34,7 @@ function Observer(events){
   this.notify = (event,update)=>{
     let test = Rules.is.defined(event,Events);
     if(!test.passed){ throw test.error; }
-    Events[event].forEach((sub)=>{ sub.notify.apply(null,update); });
+    Events[event].forEach((sub)=>{ sub.notify.apply(null,(update == undefined ? [] : update)); });
   }
 
   this.register = (event,subscriber)=>{

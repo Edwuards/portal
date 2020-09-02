@@ -335,7 +335,7 @@
     this.notify = (event,update)=>{
       let test = Rules.is.defined(event,Events);
       if(!test.passed){ throw test.error; }
-      Events[event].forEach((sub)=>{ sub.notify.apply(null,update); });
+      Events[event].forEach((sub)=>{ sub.notify.apply(null,(update == undefined ? [] : update)); });
     };
 
     this.register = (event,subscriber)=>{
@@ -16185,44 +16185,157 @@
     const toolbar = new ToolBar('users');
     const buttons = toolbar.buttons;
     const toggle = (btns,state)=>{
-      for (let btn in btns) {
-        btn = btns[btn];
+      btns.forEach((name)=>{
+        let btn = buttons.name[name];
         btn[state ? 'on' : 'off']();
         btn.element[state ? 'removeClass' : 'addClass']('hidden');
-      }
+      });
+    };
+    const observer = new Observer([
+      'edit profile',
+      'cancel edit profile',
+      'create user',
+    ]);
+    const groups = {
+      'view users': ['create','delete'],
+      'create user': ['exit','cancel','save'],
+      'edit profile': ['exit','cancel','save'],
+      'read profile': ['exit','edit']
     };
 
     toolbar.title = toolbar.element.find('[data="title"]');
 
     toolbar.state.register({
-      state:'users',
+      state:'view users',
       on:()=>{
         toolbar.title.text('Usuarios');
-        toggle(buttons.group.users,true);
+        toggle(groups['view users'],true);
       },
-      off: ()=>{ toggle(buttons.group.users,false); }
+      off: ()=>{ toggle(groups['view users'],false); }
+    });
+
+    toolbar.state.register({
+      state:'create user',
+      on:()=>{
+        toolbar.title.text('Crear Usuario');
+        toggle(groups['create user'],true);
+      },
+      off: ()=>{ toggle(groups['create user'],false); }
     });
 
     toolbar.state.register({
       state:'read profile',
       on:()=>{
         toolbar.title.text('Perfil de Usuario');
-        toggle(buttons.group.readProfile,true);
+        toggle(groups['read profile'],true);
       },
-      off: ()=>{ toggle(buttons.group.readProfile,false); }
+      off: ()=>{ toggle(groups['read profile'],false); }
     });
 
     toolbar.state.register({
       state:'edit profile',
       on:()=>{
         toolbar.title.text('Editar Usuario');
-        toggle(buttons.group.editProfile,true);
+        toggle(groups['edit profile'],true);
       },
-      off: ()=>{ toggle(buttons.group.editProfile,false); }
+      off: ()=>{ toggle(groups['edit profile'],false); }
     });
+
+    toolbar.events = {
+      on: observer.register,
+      off: observer.unregister
+    };
+
+    buttons.name.exit.events.on('click',function(){ page_js('/users/view/all'); });
+
+    buttons.name.edit.events.on('click',function(){
+      toolbar.state.value = 'edit profile';
+      observer.notify('edit profile');
+    });
+
+    buttons.name.create.events.on('click',function(){ page_js('/users/create'); });
+
+
+    buttons.name.cancel.events.on('click',function(){
+      if(toolbar.state.value == 'edit profile'){
+        toolbar.state.value = 'read profile';
+        observer.notify('cancel edit profile');
+      }
+      else if(toolbar.state.value == 'create user'){
+        toolbar.state.value = 'read profile';
+        page_js('/users/view/all');
+      }
+    });
+
 
     return toolbar;
 
+  }
+
+  function Create(){
+    const form = new Form({
+      name: 'createUser',
+      url: 'users/create'
+    });
+
+    form.container = $('[data-users="create"]');
+
+    form.on = function(){ form.container.removeClass('hidden'); };
+
+    form.off = function(){ form.container.addClass('hidden'); };
+
+
+    return form
+  }
+
+  function Profile$1(){
+    let user = undefined;
+    const form = new Form({
+      name: 'usersProfile',
+      url: 'users/edit'
+    });
+    const loadUser = (()=>{
+      const inputs = {};
+      let elements = form.inputs;
+      [
+        elements.type.image,
+        elements.type.text,
+        elements.type.date,
+        elements.type.select
+      ].forEach((type)=>{
+        for(let input in type){
+          input = type[input];
+          inputs[input.name] = input;
+        }
+      });
+
+      return (user)=>{
+        for(let prop in user){
+          if(inputs[prop]){ inputs[prop].value = user[prop]; }
+        }
+      }
+    })();
+
+    form.container = $('[data-users="profile"]');
+
+    form.on = function(){ form.container.removeClass('hidden'); };
+
+    form.off = function(){ form.container.addClass('hidden'); };
+
+    form.read = function(data){
+      user = data;
+      form.disable(true);
+      loadUser(user);
+    };
+
+    form.edit = function(){ form.disable(false); };
+
+    form.cancel = function(){
+      form.disable(true);
+      loadUser(user);
+    };
+
+    return form
   }
 
   function User(data){
@@ -16375,116 +16488,69 @@
     return list
   }
 
-  function Profile$1(){
-    let user = undefined;
-    const form = new Form({
-      name: 'usersProfile',
-      url: 'users/edit'
-    });
-    const loadUser = (()=>{
-      const inputs = {};
-      let elements = form.inputs;
-      [
-        elements.type.image,
-        elements.type.text,
-        elements.type.date,
-        elements.type.select
-      ].forEach((type)=>{
-        for(let input in type){
-          input = type[input];
-          inputs[input.name] = input;
-        }
-      });
-
-      return (user)=>{
-        for(let prop in user){
-          if(inputs[prop]){ inputs[prop].value = user[prop]; }
-        }
-      }
-    })();
-
-    form.container = $('[data-users="profile"]');
-
-    form.on = function(){ this.container.removeClass('hidden'); };
-
-    form.off = function(){ this.container.addClass('hidden'); };
-
-    form.read = function(data){
-      user = data;
-      this.disable(true);
-      loadUser(user);
-    };
-
-    form.edit = function(){ this.disable(false); };
-
-    form.cancel = function(){
-      this.disable(true);
-      loadUser(user);
-    };
-
-    return form
+  function Users(){
+    return {
+      create: Create(),
+      profile: Profile$1(),
+      list: List()
+    }
   }
 
-  function Users(){
+  function Users$1(){
     const view = new View({name:'users',toolbar: ToolBar$4() });
-    const users = List();
-    const profile = Profile$1();
-
+    const users = Users();
     const routes = {
       '/users/*': function(ctx,next){
         if(!(this.state.value == 'users')){ this.state.value = 'users'; }
         next();
       },
       '/users/view/all': function(){
-        view.state.value = 'users';
+        view.state.value = 'view users';
       },
       '/users/view/profile/:id': function(ctx){
         view.state.value = 'profile';
-        profile.read(users.find(ctx.params.id).user);
+        users.profile.read(users.list.find(ctx.params.id).user);
+      },
+      '/users/create': function(ctx){
+        view.state.value = 'create user';
       },
 
     };
 
-    {
-      let btns = view.toolbar.buttons.group.readProfile;
+    view.toolbar.events.on('edit profile',users.profile.edit);
+    view.toolbar.events.on('cancel edit profile',users.profile.cancel);
 
-      btns.edit.events.on('click',function(){
-        view.toolbar.state.value = 'edit profile';
-        profile.edit();
-      });
 
-      btns.exit.events.on('click',function(){ page_js('/users/view/all'); });
-
-    }
-    {
-      let btns = view.toolbar.buttons.group.editProfile;
-
-      btns.cancel.events.on('click',function(){
-        view.toolbar.state.value = 'read profile';
-        profile.cancel();
-      });
-
-    }
 
     view.routes = [routes];
 
     view.state.register({
-      state: 'users',
+      state: 'view users',
       on: ()=>{
-        users.on();
-        view.toolbar.state.value = 'users';
+        users.list.on();
+        view.toolbar.state.value = 'view users';
       },
 
-      off: ()=>{ users.off(); },
+      off: ()=>{ users.list.off(); },
+    });
+
+    view.state.register({
+      state: 'create user',
+      on: ()=>{
+        users.create.on();
+        view.toolbar.state.value = 'create user';
+      },
+
+      off: ()=>{ users.create.off(); },
     });
 
     view.state.register({
       state: 'profile',
       on: ()=>{
-        profile.on();
+        users.profile.on();
         view.toolbar.state.value = 'read profile';
       },
-      off: ()=>{ profile.off(); },
+      off: ()=>{ users.profile.off(); },
     });
 
     return view;
@@ -16544,7 +16610,7 @@
       Calendar$2(),
       Profile(),
       Solicitudes$1(),
-      Users()
+      Users$1()
     ];
 
     page_js({window: window });
