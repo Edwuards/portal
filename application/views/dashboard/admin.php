@@ -6,7 +6,8 @@
       'calendar'=>[],
       'profile'=>[],
       'users'=>[],
-      'solicitudes'=>[]
+      'solicitudes'=>[],
+      'teams'=>[]
     ]
   ];
 

@@ -46,6 +46,16 @@ export function ToolBar(name){
     'off':{
       writable: false,
       value: ()=>{ toggle(false); }
+    },
+    'toggleBtns': {
+      writable: false,
+      value: (btns,state)=>{
+        btns.forEach((name)=>{
+          let btn = buttons.name[name];
+          btn[state ? 'on' : 'off']();
+          btn.element[state ? 'removeClass' : 'addClass']('hidden');
+        })
+      }
     }
   }
 

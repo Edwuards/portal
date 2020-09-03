@@ -5,18 +5,11 @@ import Router from 'page';
 export default function(){
   const toolbar = new ToolBar('users');
   const buttons = toolbar.buttons;
-  const toggle = (btns,state)=>{
-    btns.forEach((name)=>{
-      let btn = buttons.name[name];
-      btn[state ? 'on' : 'off']();
-      btn.element[state ? 'removeClass' : 'addClass']('hidden');
-    })
-  }
   const observer = new Observer([
     'edit profile',
     'cancel edit profile',
-    'create user',
   ]);
+
   const groups = {
     'view users': ['create','delete'],
     'create user': ['exit','cancel','save'],
@@ -24,48 +17,48 @@ export default function(){
     'read profile': ['exit','edit']
   };
 
+  toolbar.events = {
+    on: observer.register,
+    off: observer.unregister
+  }
+
   toolbar.title = toolbar.element.find('[data="title"]');
 
   toolbar.state.register({
     state:'view users',
     on:()=>{
       toolbar.title.text('Usuarios');
-      toggle(groups['view users'],true);
+      toolbar.toggleBtns(groups['view users'],true);
     },
-    off: ()=>{ toggle(groups['view users'],false); }
+    off: ()=>{ toolbar.toggleBtns(groups['view users'],false); }
   });
 
   toolbar.state.register({
     state:'create user',
     on:()=>{
       toolbar.title.text('Crear Usuario');
-      toggle(groups['create user'],true);
+      toolbar.toggleBtns(groups['create user'],true);
     },
-    off: ()=>{ toggle(groups['create user'],false); }
+    off: ()=>{ toolbar.toggleBtns(groups['create user'],false); }
   });
 
   toolbar.state.register({
     state:'read profile',
     on:()=>{
       toolbar.title.text('Perfil de Usuario');
-      toggle(groups['read profile'],true);
+      toolbar.toggleBtns(groups['read profile'],true);
     },
-    off: ()=>{ toggle(groups['read profile'],false); }
+    off: ()=>{ toolbar.toggleBtns(groups['read profile'],false); }
   });
 
   toolbar.state.register({
     state:'edit profile',
     on:()=>{
       toolbar.title.text('Editar Usuario');
-      toggle(groups['edit profile'],true);
+      toolbar.toggleBtns(groups['edit profile'],true);
     },
-    off: ()=>{ toggle(groups['edit profile'],false); }
+    off: ()=>{ toolbar.toggleBtns(groups['edit profile'],false); }
   });
-
-  toolbar.events = {
-    on: observer.register,
-    off: observer.unregister
-  }
 
   buttons.name.exit.events.on('click',function(){ Router('/users/view/all'); });
 
@@ -75,7 +68,6 @@ export default function(){
   });
 
   buttons.name.create.events.on('click',function(){ Router('/users/create'); });
-
 
   buttons.name.cancel.events.on('click',function(){
     if(toolbar.state.value == 'edit profile'){

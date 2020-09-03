@@ -15115,6 +15115,16 @@
       'off':{
         writable: false,
         value: ()=>{ toggle(false); }
+      },
+      'toggleBtns': {
+        writable: false,
+        value: (btns,state)=>{
+          btns.forEach((name)=>{
+            let btn = buttons.name[name];
+            btn[state ? 'on' : 'off']();
+            btn.element[state ? 'removeClass' : 'addClass']('hidden');
+          });
+        }
       }
     };
 
@@ -16184,23 +16194,21 @@
   function ToolBar$4(){
     const toolbar = new ToolBar('users');
     const buttons = toolbar.buttons;
-    const toggle = (btns,state)=>{
-      btns.forEach((name)=>{
-        let btn = buttons.name[name];
-        btn[state ? 'on' : 'off']();
-        btn.element[state ? 'removeClass' : 'addClass']('hidden');
-      });
-    };
     const observer = new Observer([
       'edit profile',
       'cancel edit profile',
-      'create user',
     ]);
+
     const groups = {
       'view users': ['create','delete'],
       'create user': ['exit','cancel','save'],
       'edit profile': ['exit','cancel','save'],
       'read profile': ['exit','edit']
+    };
+
+    toolbar.events = {
+      on: observer.register,
+      off: observer.unregister
     };
 
     toolbar.title = toolbar.element.find('[data="title"]');
@@ -16209,42 +16217,37 @@
       state:'view users',
       on:()=>{
         toolbar.title.text('Usuarios');
-        toggle(groups['view users'],true);
+        toolbar.toggleBtns(groups['view users'],true);
       },
-      off: ()=>{ toggle(groups['view users'],false); }
+      off: ()=>{ toolbar.toggleBtns(groups['view users'],false); }
     });
 
     toolbar.state.register({
       state:'create user',
       on:()=>{
         toolbar.title.text('Crear Usuario');
-        toggle(groups['create user'],true);
+        toolbar.toggleBtns(groups['create user'],true);
       },
-      off: ()=>{ toggle(groups['create user'],false); }
+      off: ()=>{ toolbar.toggleBtns(groups['create user'],false); }
     });
 
     toolbar.state.register({
       state:'read profile',
       on:()=>{
         toolbar.title.text('Perfil de Usuario');
-        toggle(groups['read profile'],true);
+        toolbar.toggleBtns(groups['read profile'],true);
       },
-      off: ()=>{ toggle(groups['read profile'],false); }
+      off: ()=>{ toolbar.toggleBtns(groups['read profile'],false); }
     });
 
     toolbar.state.register({
       state:'edit profile',
       on:()=>{
         toolbar.title.text('Editar Usuario');
-        toggle(groups['edit profile'],true);
+        toolbar.toggleBtns(groups['edit profile'],true);
       },
-      off: ()=>{ toggle(groups['edit profile'],false); }
+      off: ()=>{ toolbar.toggleBtns(groups['edit profile'],false); }
     });
-
-    toolbar.events = {
-      on: observer.register,
-      off: observer.unregister
-    };
 
     buttons.name.exit.events.on('click',function(){ page_js('/users/view/all'); });
 
@@ -16254,7 +16257,6 @@
     });
 
     buttons.name.create.events.on('click',function(){ page_js('/users/create'); });
-
 
     buttons.name.cancel.events.on('click',function(){
       if(toolbar.state.value == 'edit profile'){
@@ -16557,6 +16559,63 @@
 
   }
 
+  function ToolBar$5(){
+    const toolbar = new ToolBar('teams');
+
+    const observer = new Observer([
+      'edit team',
+      'cancel edit team',
+      'create team',
+    ]);
+    const groups = {
+      'view all teams': ['create','delete'],
+      'create team': ['exit','cancel','save'],
+      'edit team': ['exit','cancel','save'],
+      'view team': ['exit','edit']
+    };
+
+    toolbar.title = toolbar.element.find('[data="title"]');
+
+    toolbar.state.register({
+      state:'view all teams',
+      on:()=>{
+        toolbar.title.text('Equipos');
+        toolbar.toggleBtns(groups['view all teams'],true);
+      },
+      off: ()=>{ toolbar.toggleBtns(groups['view all teams'],false); }
+    });
+
+
+    return toolbar;
+
+  }
+
+  function Teams(){
+    const view = new View({name:'teams',toolbar: ToolBar$5() });
+    const routes = {
+      '/teams/*': function(ctx,next){
+        if(!(this.state.value == 'teams')){ this.state.value = 'teams'; }
+        next();
+      },
+      '/teams/view/all': function(){
+        view.state.value = 'view all teams';
+      },
+
+
+    };
+
+    view.routes = [routes];
+
+    view.state.register({
+      state: 'view all teams',
+      on: ()=>{ view.toolbar.state.value = 'view all teams'; },
+      off: ()=>{ }
+    });
+
+    return view;
+
+  }
+
   function Menu(){
     const menu = {};
 
@@ -16606,18 +16665,18 @@
   function App(){
     const state = new State();
     const menu = Menu();
-    const views = [
-      Calendar$2(),
-      Profile(),
-      Solicitudes$1(),
-      Users$1()
-    ];
+    const calendar = Calendar$2();
+    const profile = Profile();
+    const solicitudes = Solicitudes$1();
+    const users = Users$1();
+    const teams = Teams();
+
 
     page_js({window: window });
     page_js.base('/app/dashboard');
-    views.forEach((view) => {
-      state.register({state: view.name, on: view.on, off: view.off});
-      view.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind({state})); } });
+    [calendar,profile,solicitudes,users,teams].forEach((component) => {
+      state.register({state: component.name, on: component.on, off: component.off});
+      component.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind({state})); } });
     });
 
     page_js(window.location.pathname);

@@ -4,6 +4,7 @@
     'calendar'=>[],
     'profile'=>[],
     'users'=>[],
+    'teams'=>[],
     'solicitudes'=>['type'=>'employee']
   ];
 
