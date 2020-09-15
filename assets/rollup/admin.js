@@ -2,7 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: './src/js/app/admin.js',
+  input: './src/js/app/build/admin.js',
   output:{
     file:'./public/js/admin.js',
     format: 'iife',

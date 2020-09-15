@@ -1,12 +1,12 @@
-import { Card } from './card';
 import Router from 'page';
+import { User } from './user';
 
 const Data = (()=>{
   const users = [];
   for (let i = 1; i <= 20 ; i++) {
     users.push({
       id: i,
-      firstname: 'Cesar Edwuards',
+      firstname: ['Cesar Edwuards','Pablo','Juan','Victor'][i%4],
       lastname: 'Perez Robles',
       email: 'ejemplo@figment.com.mx',
       avatar: '/assets/public/img/placeholder.jpeg',
@@ -23,9 +23,10 @@ export default function(){
   const users = [];
   const list = {};
   const add = (user)=>{
-    let card = users[users.push(new Card(user)) - 1];
+    user = users[users.push(new User(user)) - 1];
+    let { card } = user;
     card.buttons.name.profile.events.on('click',function(){
-      Router(`/users/view/profile/${card.user.id}`);
+      Router(`/users/view/profile/${user.data.id}`);
     });
     container.append(card.element);
   }
@@ -34,24 +35,27 @@ export default function(){
 
 
   const methods = {
+    'all': {
+      get:()=>{ return users; }
+    },
     'find': {
       writable: false,
       value: (id)=>{
-        return users.find((card)=>{ return card.user.id == id; });
+        return users.find((user)=>{ return user.data.id == id; });
       }
     },
     'on':{
       writable: false,
       value: ()=>{
         container.removeClass('hidden');
-        users.forEach((user) => { user.on() });
+        users.forEach((user) => { user.card.on() });
       }
     },
     'off':{
       writable: false,
       value: ()=>{
         container.addClass('hidden');
-        users.forEach((user)=>{ user.off() });
+        users.forEach((user)=>{ user.card.off() });
       }
     }
   }

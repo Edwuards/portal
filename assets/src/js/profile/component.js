@@ -2,7 +2,8 @@ import { View } from '../helpers';
 import ToolBar from '../toolbars/profile';
 
 export default function(){
-  const view = new View({ name:'profile', toolbar: ToolBar() });
+  const view = new View({ name:'profile', element: $('[data-content="profile"]') });
+  const toolbar = ToolBar();
 
   const routes = {
     '/profile/*': function(ctx,next){
@@ -13,6 +14,9 @@ export default function(){
     }
 
   }
+
+  view.on = function(){ toolbar.on(); }
+  view.off = function(){ toolbar.off(); }
 
   view.routes = [ routes ];
 

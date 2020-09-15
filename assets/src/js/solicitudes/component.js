@@ -4,10 +4,11 @@ import ToolBar from '../toolbars/solicitudes';
 import Router from 'page';
 
 export default function (){
-  const view = new View({ name:'solicitudes',toolbar: ToolBar() });
+  const view = new View({ name:'solicitudes', element: $('[data-content="solicitudes"]')});
+  const toolbar = ToolBar();
   const body = view.element.children('.body');
   const solicitudes = new Solicitudes(body);
-  const select = view.toolbar.inputs.type.select;
+  const select = toolbar.inputs.type.select;
   const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); }
 
   const routes = {
@@ -19,6 +20,10 @@ export default function (){
   }
 
   view.routes = [routes];
+
+  view.on = function(){ toolbar.on(); }
+  view.off = function(){ toolbar.off(); }
+
 
   select.state.events.on('change',function(){
     let path = urlSegments(); path[1] = this.value;

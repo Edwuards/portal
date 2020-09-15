@@ -30,6 +30,24 @@ export default function(){
   });
 
 
+  toolbar.state.register({
+    state:'create team',
+    on:()=>{
+      toolbar.title.text('Crear Equipo');
+      toolbar.toggleBtns(groups['create team'],true);
+    },
+    off: ()=>{ toolbar.toggleBtns(groups['create team'],false); }
+  });
+
+  buttons.name.create.events.on('click',function(){ Router('/teams/create'); });
+
+  buttons.name.cancel.events.on('click',function(){
+    if(toolbar.state.value = 'create team'){ Router('/teams/view/all'); }
+
+  });
+
+
+
   return toolbar;
 
 }

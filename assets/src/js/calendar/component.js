@@ -4,7 +4,8 @@ import { Calendar } from './calendar';
 import ToolBar from '../toolbars/calendar';
 
 export default function(){
-  const view = new View({ name:'calendar',toolbar: ToolBar() });
+  const view = new View({ name:'calendar', element: $('[data-content="calendar"]') });
+  const toolbar = ToolBar();
   const calendar = new Calendar('main');
   const permissions = new Permissions();
 
@@ -16,19 +17,19 @@ export default function(){
     '/calendar/': permissions.index,
   }
 
-  view.on = function(){ permissions.on(); }
+  view.on = function(){ toolbar.on(); permissions.on(); }
 
-  view.off = function(){ permissions.off(); }
+  view.off = function(){ toolbar.off(); permissions.off(); }
 
   view.routes = [ routes, permissions.routes ]
 
-  view.toolbar.buttons.name.prev.events.on('click',calendar.prev);
+  toolbar.buttons.name.prev.events.on('click',calendar.prev);
 
-  view.toolbar.buttons.name.next.events.on('click',calendar.next);
+  toolbar.buttons.name.next.events.on('click',calendar.next);
 
-  view.toolbar.buttons.name.today.events.on('click',calendar.today);
+  toolbar.buttons.name.today.events.on('click',calendar.today);
 
-  calendar.events.on('updateDate',view.toolbar.setDate);
+  calendar.events.on('updateDate',toolbar.setDate);
 
   calendar.render();
 

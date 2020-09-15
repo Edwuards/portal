@@ -402,13 +402,12 @@
 
   }
 
-  function View({name,toolbar}){
+  function View({name,element}){
     const self = this;
     const state = new State();
-    const element = $(`[data-content="${name}"]`);
     const display = (state)=>{ element[ state ? 'removeClass' : 'addClass' ]('hidden'); };
-    const on = ()=>{ display(true); toolbar.on(); };
-    const off = ()=>{ display(false); toolbar.off(); };
+    const on = ()=>{ display(true); };
+    const off = ()=>{ display(false); };
     const redefine = (prop,action)=>{
       return (fn)=>{
         Object.defineProperty(self,prop,{
@@ -426,7 +425,6 @@
       },
       'element': { get: ()=>{ return element } },
       'name':{ get: ()=>{ return name; } },
-      'toolbar': { get: ()=>{ return toolbar } },
       'on':{
         configurable: true,
         get: ()=>{ return on },
@@ -15144,7 +15142,8 @@
   }
 
   function Calendar$2(){
-    const view = new View({ name:'calendar',toolbar: ToolBar$1() });
+    const view = new View({ name:'calendar', element: $('[data-content="calendar"]') });
+    const toolbar = ToolBar$1();
     const calendar = new Calendar$1('main');
     const permissions = new Permissions();
 
@@ -15156,19 +15155,19 @@
       '/calendar/': permissions.index,
     };
 
-    view.on = function(){ permissions.on(); };
+    view.on = function(){ toolbar.on(); permissions.on(); };
 
-    view.off = function(){ permissions.off(); };
+    view.off = function(){ toolbar.off(); permissions.off(); };
 
     view.routes = [ routes, permissions.routes ];
 
-    view.toolbar.buttons.name.prev.events.on('click',calendar.prev);
+    toolbar.buttons.name.prev.events.on('click',calendar.prev);
 
-    view.toolbar.buttons.name.next.events.on('click',calendar.next);
+    toolbar.buttons.name.next.events.on('click',calendar.next);
 
-    view.toolbar.buttons.name.today.events.on('click',calendar.today);
+    toolbar.buttons.name.today.events.on('click',calendar.today);
 
-    calendar.events.on('updateDate',view.toolbar.setDate);
+    calendar.events.on('updateDate',toolbar.setDate);
 
     calendar.render();
 
@@ -15179,7 +15178,8 @@
   function ToolBar$2(){ return new ToolBar('profile'); }
 
   function Profile(){
-    const view = new View({ name:'profile', toolbar: ToolBar$2() });
+    const view = new View({ name:'profile', element: $('[data-content="profile"]') });
+    const toolbar = ToolBar$2();
 
     const routes = {
       '/profile/*': function(ctx,next){
@@ -15190,6 +15190,9 @@
       }
 
     };
+
+    view.on = function(){ toolbar.on(); };
+    view.off = function(){ toolbar.off(); };
 
     view.routes = [ routes ];
 
@@ -16166,10 +16169,11 @@
   function ToolBar$3(){ return new ToolBar('solicitudes'); }
 
   function Solicitudes$1 (){
-    const view = new View({ name:'solicitudes',toolbar: ToolBar$3() });
+    const view = new View({ name:'solicitudes', element: $('[data-content="solicitudes"]')});
+    const toolbar = ToolBar$3();
     const body = view.element.children('.body');
     const solicitudes = new Solicitudes(body);
-    const select = view.toolbar.inputs.type.select;
+    const select = toolbar.inputs.type.select;
     const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); };
 
     const routes = {
@@ -16181,6 +16185,10 @@
     };
 
     view.routes = [routes];
+
+    view.on = function(){ toolbar.on(); };
+    view.off = function(){ toolbar.off(); };
+
 
     select.state.events.on('change',function(){
       let path = urlSegments(); path[1] = this.value;
@@ -16340,75 +16348,23 @@
     return form
   }
 
-  function User(data){
-    // let {
-    //   id,
-    //   firstname,
-    //   lastname,
-    //   email,
-    //   avatar,
-    //   area,
-    //   dob,
-    //   position,
-    //   vacation,
-    // } = data;
-    //
-    // const methods = {
-    //   'id': {
-    //     get: ()=>{ return id }
-    //   },
-    //   'firstname': {
-    //     get: ()=>{ return firstname; }
-    //   },
-    //   'lastname': {
-    //     get: ()=>{ return lastname; }
-    //   },
-    //   'fullname': {
-    //     get: ()=>{ return `${firstname} ${lastname}`; }
-    //   },
-    //   'dob': {
-    //     get: ()=>{ return dob; }
-    //   },
-    //   'email': {
-    //     get: ()=>{ return email; }
-    //   },
-    //   'avatar': {
-    //     get: ()=>{ return avatar; }
-    //   },
-    //   'position': {
-    //     get: ()=>{ return position; }
-    //   },
-    //   'area': {
-    //     get: ()=>{ return area; }
-    //   },
-    //   'vacation': {
-    //     get: ()=>{ return area; }
-    //   }
-    // }
-    //
-    // Object.defineProperties(this,methods);
-    return data
-  }
-
   const card$1 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"w-full flex justify-center\">");t.b("\n" + i);t.b("  <div class=\"w-24 my-2 mx-4 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\" w-full my-4 px-4 text-center\">");t.b("\n" + i);t.b("  <p class=\"text-sm font-bold my-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs  my-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs my-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\"w-full my-4 px-4 flex justify-center\">");t.b("\n" + i);t.b("  <button class=\"flex justify-center items-center text-sm text-gray-600\" data-type=\"button\" type=\"button\" name=\"profile\">");t.b("\n" + i);t.b("    <i class=\"far fa-eye\"></i>");t.b("\n" + i);t.b("    <p class=\"ml-2\">ver perfil</p>");t.b("\n" + i);t.b("  </button>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
 
   function Card$1(data){
     const element = $(document.createElement('div'));
-    const user = new User(data);
 
     element
     .addClass('w-56 m-4 bg-white py-4')
     .append(card$1.render({
-      avatar: user.avatar,
-      name: user.fullname,
-      area: user.area,
-      position: user.position
+      avatar: data.avatar,
+      name: data.fullname,
+      area: data.area,
+      position: data.position
     }));
 
     const { buttons } = Finder(element);
 
     const methods = {
-      'user': { get: ()=>{ return user } },
       'buttons': { get: ()=>{ return buttons } },
       'element': { get: ()=>{ return element } },
       'off': {
@@ -16430,12 +16386,27 @@
 
   }
 
+  function User(data){
+    const card = new Card$1(data);
+    const methods = {
+      'data': {
+        get: ()=>{ return data }
+      },
+      'card': {
+        get: ()=>{ return card }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+  }
+
   const Data = (()=>{
     const users = [];
     for (let i = 1; i <= 20 ; i++) {
       users.push({
         id: i,
-        firstname: 'Cesar Edwuards',
+        firstname: ['Cesar Edwuards','Pablo','Juan','Victor'][i%4],
         lastname: 'Perez Robles',
         email: 'ejemplo@figment.com.mx',
         avatar: '/assets/public/img/placeholder.jpeg',
@@ -16452,9 +16423,10 @@
     const users = [];
     const list = {};
     const add = (user)=>{
-      let card = users[users.push(new Card$1(user)) - 1];
+      user = users[users.push(new User(user)) - 1];
+      let { card } = user;
       card.buttons.name.profile.events.on('click',function(){
-        page_js(`/users/view/profile/${card.user.id}`);
+        page_js(`/users/view/profile/${user.data.id}`);
       });
       container.append(card.element);
     };
@@ -16463,24 +16435,27 @@
 
 
     const methods = {
+      'all': {
+        get:()=>{ return users; }
+      },
       'find': {
         writable: false,
         value: (id)=>{
-          return users.find((card)=>{ return card.user.id == id; });
+          return users.find((user)=>{ return user.data.id == id; });
         }
       },
       'on':{
         writable: false,
         value: ()=>{
           container.removeClass('hidden');
-          users.forEach((user) => { user.on(); });
+          users.forEach((user) => { user.card.on(); });
         }
       },
       'off':{
         writable: false,
         value: ()=>{
           container.addClass('hidden');
-          users.forEach((user)=>{ user.off(); });
+          users.forEach((user)=>{ user.card.off(); });
         }
       }
     };
@@ -16499,7 +16474,8 @@
   }
 
   function Users$1(){
-    const view = new View({name:'users',toolbar: ToolBar$4() });
+    const view = new View({name:'users',element: $('[data-content="users"]')});
+    const toolbar = ToolBar$4();
     const users = Users();
     const routes = {
       '/users/*': function(ctx,next){
@@ -16511,7 +16487,7 @@
       },
       '/users/view/profile/:id': function(ctx){
         view.state.value = 'profile';
-        users.profile.read(users.list.find(ctx.params.id).user);
+        users.profile.read(users.list.find(ctx.params.id).data);
       },
       '/users/create': function(ctx){
         view.state.value = 'create user';
@@ -16519,10 +16495,11 @@
 
     };
 
-    view.toolbar.events.on('edit profile',users.profile.edit);
-    view.toolbar.events.on('cancel edit profile',users.profile.cancel);
+    toolbar.events.on('edit profile',users.profile.edit);
+    toolbar.events.on('cancel edit profile',users.profile.cancel);
 
-
+    view.on = function(){ toolbar.on(); };
+    view.off = function(){ toolbar.off(); };
 
     view.routes = [routes];
 
@@ -16530,9 +16507,8 @@
       state: 'view users',
       on: ()=>{
         users.list.on();
-        view.toolbar.state.value = 'view users';
+        toolbar.state.value = 'view users';
       },
-
       off: ()=>{ users.list.off(); },
     });
 
@@ -16540,7 +16516,7 @@
       state: 'create user',
       on: ()=>{
         users.create.on();
-        view.toolbar.state.value = 'create user';
+        toolbar.state.value = 'create user';
       },
 
       off: ()=>{ users.create.off(); },
@@ -16550,7 +16526,7 @@
       state: 'profile',
       on: ()=>{
         users.profile.on();
-        view.toolbar.state.value = 'read profile';
+        toolbar.state.value = 'read profile';
       },
       off: ()=>{ users.profile.off(); },
     });
@@ -16561,6 +16537,7 @@
 
   function ToolBar$5(){
     const toolbar = new ToolBar('teams');
+    const buttons = toolbar.buttons;
 
     const observer = new Observer([
       'edit team',
@@ -16586,35 +16563,86 @@
     });
 
 
+    toolbar.state.register({
+      state:'create team',
+      on:()=>{
+        toolbar.title.text('Crear Equipo');
+        toolbar.toggleBtns(groups['create team'],true);
+      },
+      off: ()=>{ toolbar.toggleBtns(groups['create team'],false); }
+    });
+
+    buttons.name.create.events.on('click',function(){ page_js('/teams/create'); });
+
+    buttons.name.cancel.events.on('click',function(){
+      if(toolbar.state.value = 'create team'){ page_js('/teams/view/all'); }
+
+    });
+
+
+
     return toolbar;
 
   }
 
-  function Teams(){
-    const view = new View({name:'teams',toolbar: ToolBar$5() });
+  function Create$1 (){
+    const view = new View({name:'create team',element: $('[data-teams="create"]') });
+    return view;
+  }
+
+  function Team(){
+    return {
+      create: Create$1()
+    }
+  }
+
+  function Teams({users}){
+    const view = new View({name:'teams',element: $('[data-content="teams"]') });
+    const toolbar = ToolBar$5();
+    const team = Team();
+
     const routes = {
       '/teams/*': function(ctx,next){
         if(!(this.state.value == 'teams')){ this.state.value = 'teams'; }
         next();
       },
       '/teams/view/all': function(){
+        console.log(users);
         view.state.value = 'view all teams';
       },
-
-
+      '/teams/create': function(){
+        view.state.value = 'create team';
+      }
     };
+
+    view.on = function(){ toolbar.on(); };
+    view.off = function(){ toolbar.off(); };
 
     view.routes = [routes];
 
     view.state.register({
       state: 'view all teams',
-      on: ()=>{ view.toolbar.state.value = 'view all teams'; },
+      on: ()=>{ toolbar.state.value = 'view all teams'; },
       off: ()=>{ }
+    });
+
+    view.state.register({
+      state: 'create team',
+      on: ()=>{ toolbar.state.value = 'create team'; team.create.on(); },
+      off: ()=>{ team.create.off(); }
     });
 
     return view;
 
   }
+
+  var Components = {
+    calendar: Calendar$2,
+    profile: Profile,
+    solicitudes: Solicitudes$1,
+    users: Users$1,
+    teams: Teams
+  };
 
   function Menu(){
     const menu = {};
@@ -16662,27 +16690,24 @@
 
   }
 
-  function App(){
-    const state = new State();
-    const menu = Menu();
-    const calendar = Calendar$2();
-    const profile = Profile();
-    const solicitudes = Solicitudes$1();
-    const users = Users$1();
-    const teams = Teams();
+  function App(components){
+    return ()=>{
+      const state = new State();
+      const menu = Menu();
 
+      page_js({window: window });
+      page_js.base('/app/dashboard');
+      for (let component  in components) {
+        components[component] = components[component](components);
+        component = components[component];
+        state.register({state: component.name, on: component.on, off: component.off});
+        component.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind({state})); } });
+      }
 
-    page_js({window: window });
-    page_js.base('/app/dashboard');
-    [calendar,profile,solicitudes,users,teams].forEach((component) => {
-      state.register({state: component.name, on: component.on, off: component.off});
-      component.routes.forEach((routes)=>{ for (let route in routes) { page_js(route,routes[route].bind({state})); } });
-    });
-
-    page_js(window.location.pathname);
+      page_js(window.location.pathname);
+    }
   }
 
-
-  $$1(document).ready(App);
+  $$1(document).ready(App(Components));
 
 }($));

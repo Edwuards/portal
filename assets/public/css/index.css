@@ -179,3 +179,24 @@ button[name="toggle"] {
 
 [data-content="solicitudes"] .solicitud {
   height: 160px; }
+
+[data-content="users"] .user {
+  height: 160px; }
+
+[data-teams="create"] [name="createTeam"] {
+  margin: 30px;
+  height: calc(100% - 60px); }
+  [data-teams="create"] [name="createTeam"] h1 {
+    height: 24px; }
+  [data-teams="create"] [name="createTeam"] .body {
+    overflow-y: scroll;
+    height: calc(100% - 230px); }
+
+[data-teams="create"] [name="userList"] {
+  margin: 30px;
+  height: calc(100% - 60px);
+  overflow-y: scroll; }
+  [data-teams="create"] [name="userList"] h1 {
+    height: 24px; }
+  [data-teams="create"] [name="userList"] .body {
+    height: calc(100% - 200px); }

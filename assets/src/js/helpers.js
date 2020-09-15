@@ -101,13 +101,12 @@ function State(){
 
 }
 
-function View({name,toolbar}){
+function View({name,element}){
   const self = this;
   const state = new State();
-  const element = $(`[data-content="${name}"]`);
   const display = (state)=>{ element[ state ? 'removeClass' : 'addClass' ]('hidden'); }
-  const on = ()=>{ display(true); toolbar.on(); }
-  const off = ()=>{ display(false); toolbar.off(); }
+  const on = ()=>{ display(true); }
+  const off = ()=>{ display(false); }
   const redefine = (prop,action)=>{
     return (fn)=>{
       Object.defineProperty(self,prop,{
@@ -125,7 +124,6 @@ function View({name,toolbar}){
     },
     'element': { get: ()=>{ return element } },
     'name':{ get: ()=>{ return name; } },
-    'toolbar': { get: ()=>{ return toolbar } },
     'on':{
       configurable: true,
       get: ()=>{ return on },
