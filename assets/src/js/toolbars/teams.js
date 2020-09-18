@@ -29,7 +29,6 @@ export default function(){
     off: ()=>{ toolbar.toggleBtns(groups['view all teams'],false); }
   });
 
-
   toolbar.state.register({
     state:'create team',
     on:()=>{

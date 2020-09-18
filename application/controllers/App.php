@@ -12,13 +12,11 @@ class App extends CI_Controller {
 		$this->View = new View($this);
 	}
 
-	public function index(){
+	public function index()
+	{
 		// if(!$this->session->verified){ redirect('app/login'); }
 		// else{ redirect('app/dashboard',301); }
-		echo 'hello';
 	}
-
-
 
 	public function dashboard()
 	{

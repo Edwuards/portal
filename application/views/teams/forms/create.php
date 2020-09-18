@@ -13,7 +13,7 @@ $options = [
 
 $html = [
   'image'=> ImageInput([
-    'css'=>['cont'=>'items-center','img'=>'w-40 h-40 rounded-full overflow-hidden' ],
+    'css'=>['cont'=>'items-center','img'=>'w-32 h-32 rounded-full overflow-hidden' ],
     'label'=>'Avatar',
     'attrs'=>[
       'input'=>[
@@ -64,16 +64,16 @@ $html = [
   </div>
   <div class="body px-4">
     <div class="w-full my-2">
-      <p class="text-xl text-gray-700">Líder de área</p>
-      <div class="flex justify-center items-center my-2 h-24 border-2 border-dashed border-gray-600">
+      <p class="text-md text-gray-700">Líder de área</p>
+      <div data="leader" class="flex felx-col mb-2 border-2 border-dashed border-gray-600">
 
       </div>
 
     </div>
 
-    <div class="w-full my-2">
-      <p class="text-xl text-gray-700">Integrantes</p>
-      <div class="flex justify-center items-center my-2 h-24 border-2 border-dashed border-gray-600">
+    <div class="w-full my-2 scroll">
+      <p class="text-md text-gray-700">Integrantes <span data="count">0</span> </p>
+      <div data="members" class="flex flex-col mb-2 border-2 border-dashed border-gray-600">
 
       </div>
 

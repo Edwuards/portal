@@ -189,14 +189,22 @@ button[name="toggle"] {
   [data-teams="create"] [name="createTeam"] h1 {
     height: 24px; }
   [data-teams="create"] [name="createTeam"] .body {
-    overflow-y: scroll;
     height: calc(100% - 230px); }
+    [data-teams="create"] [name="createTeam"] .body [data="leader"] {
+      height: 50px; }
+    [data-teams="create"] [name="createTeam"] .body .scroll {
+      height: calc(100% - 82px); }
+      [data-teams="create"] [name="createTeam"] .body .scroll [data="members"] {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        height: calc(100% - 40px); }
 
 [data-teams="create"] [name="userList"] {
   margin: 30px;
-  height: calc(100% - 60px);
-  overflow-y: scroll; }
+  height: calc(100% - 60px); }
   [data-teams="create"] [name="userList"] h1 {
     height: 24px; }
   [data-teams="create"] [name="userList"] .body {
-    height: calc(100% - 200px); }
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: calc(100% - 110px); }

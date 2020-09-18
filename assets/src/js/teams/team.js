@@ -1,7 +1,7 @@
 import Create from './create';
 
-export default function(){
+export default function(users){
   return {
-    create: Create()
+    create: Create(users)
   }
 }

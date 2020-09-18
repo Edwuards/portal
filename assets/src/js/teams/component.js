@@ -5,7 +5,7 @@ import Team from './team';
 export default function({users}){
   const view = new View({name:'teams',element: $('[data-content="teams"]') });
   const toolbar = ToolBar();
-  const team = Team();
+  const team = Team(users.list);
 
   const routes = {
     '/teams/*': function(ctx,next){
@@ -13,7 +13,6 @@ export default function({users}){
       next();
     },
     '/teams/view/all': function(){
-      console.log(users);
       view.state.value = 'view all teams';
     },
     '/teams/create': function(){

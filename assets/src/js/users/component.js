@@ -29,6 +29,8 @@ export default function(){
   view.on = function(){ toolbar.on(); }
   view.off = function(){ toolbar.off(); }
 
+  view.list = users.list
+
   view.routes = [routes];
 
   view.state.register({
