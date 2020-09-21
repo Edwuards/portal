@@ -1,0 +1,4 @@
+import Hogan from '/var/www/avisame/assets/node_modules/hogan.js/lib/hogan.js' 
+const userRow = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
+const card = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");return t.fl(); },partials: {}, subs: {  }}); 
+export {userRow,card} 

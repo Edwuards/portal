@@ -12,7 +12,7 @@ export default function(){
     'create team',
   ]);
   const groups = {
-    'view all teams': ['create','delete'],
+    'view teams': ['create','delete'],
     'create team': ['exit','cancel','save'],
     'edit team': ['exit','cancel','save'],
     'view team': ['exit','edit']
@@ -21,12 +21,12 @@ export default function(){
   toolbar.title = toolbar.element.find('[data="title"]');
 
   toolbar.state.register({
-    state:'view all teams',
+    state:'view teams',
     on:()=>{
       toolbar.title.text('Equipos');
-      toolbar.toggleBtns(groups['view all teams'],true);
+      toolbar.toggleBtns(groups['view teams'],true);
     },
-    off: ()=>{ toolbar.toggleBtns(groups['view all teams'],false); }
+    off: ()=>{ toolbar.toggleBtns(groups['view teams'],false); }
   });
 
   toolbar.state.register({
@@ -42,10 +42,11 @@ export default function(){
 
   buttons.name.cancel.events.on('click',function(){
     if(toolbar.state.value = 'create team'){ Router('/teams/view/all'); }
-
   });
 
-
+  buttons.name.exit.events.on('click',function(){
+    if(toolbar.state.value = 'view teams'){ Router('/teams/view/all'); }
+  });
 
   return toolbar;
 

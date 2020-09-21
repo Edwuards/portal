@@ -1,11 +1,11 @@
-import { View, State } from '../helpers';
+import { View } from '../helpers';
 import ToolBar from '../toolbars/teams';
-import Team from './team';
+import Teams from './teams';
 
 export default function({users}){
   const view = new View({name:'teams',element: $('[data-content="teams"]') });
   const toolbar = ToolBar();
-  const team = Team(users.list);
+  const teams = Teams(users.list);
 
   const routes = {
     '/teams/*': function(ctx,next){
@@ -13,7 +13,7 @@ export default function({users}){
       next();
     },
     '/teams/view/all': function(){
-      view.state.value = 'view all teams';
+      view.state.value = 'view teams';
     },
     '/teams/create': function(){
       view.state.value = 'create team';
@@ -27,15 +27,15 @@ export default function({users}){
   view.routes = [routes];
 
   view.state.register({
-    state: 'view all teams',
-    on: ()=>{ toolbar.state.value = 'view all teams'; },
+    state: 'view teams',
+    on: ()=>{ toolbar.state.value = 'view teams'; },
     off: ()=>{ }
   });
 
   view.state.register({
     state: 'create team',
-    on: ()=>{ toolbar.state.value = 'create team'; team.create.on(); },
-    off: ()=>{ team.create.off(); }
+    on: ()=>{ toolbar.state.value = 'create team'; teams.create.on(); },
+    off: ()=>{ teams.create.off(); }
   });
 
   return view;

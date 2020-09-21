@@ -72,7 +72,7 @@ $html = [
     </div>
 
     <div class="w-full my-2 scroll">
-      <p class="text-md text-gray-700">Integrantes <span data="count">0</span> </p>
+      <p class="text-md text-gray-700">Integrantes <span data="counter">0</span> </p>
       <div data="members" class="flex flex-col mb-2 border-2 border-dashed border-gray-600">
 
       </div>

@@ -16348,7 +16348,6 @@
     return form
   }
 
-  const row = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
   const card$1 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"w-full flex justify-center\">");t.b("\n" + i);t.b("  <div class=\"w-24 my-2 mx-4 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\" w-full my-4 px-4 text-center\">");t.b("\n" + i);t.b("  <p class=\"text-sm font-bold my-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs  my-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-xs my-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n" + i);t.b("<div class=\"w-full my-4 px-4 flex justify-center\">");t.b("\n" + i);t.b("  <button class=\"flex justify-center items-center text-sm text-gray-600\" data-type=\"button\" type=\"button\" name=\"profile\">");t.b("\n" + i);t.b("    <i class=\"far fa-eye\"></i>");t.b("\n" + i);t.b("    <p class=\"ml-2\">ver perfil</p>");t.b("\n" + i);t.b("  </button>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
 
   function Card$1(data){
@@ -16548,7 +16547,7 @@
       'create team',
     ]);
     const groups = {
-      'view all teams': ['create','delete'],
+      'view teams': ['create','delete'],
       'create team': ['exit','cancel','save'],
       'edit team': ['exit','cancel','save'],
       'view team': ['exit','edit']
@@ -16557,12 +16556,12 @@
     toolbar.title = toolbar.element.find('[data="title"]');
 
     toolbar.state.register({
-      state:'view all teams',
+      state:'view teams',
       on:()=>{
         toolbar.title.text('Equipos');
-        toolbar.toggleBtns(groups['view all teams'],true);
+        toolbar.toggleBtns(groups['view teams'],true);
       },
-      off: ()=>{ toolbar.toggleBtns(groups['view all teams'],false); }
+      off: ()=>{ toolbar.toggleBtns(groups['view teams'],false); }
     });
 
     toolbar.state.register({
@@ -16578,10 +16577,11 @@
 
     buttons.name.cancel.events.on('click',function(){
       if(toolbar.state.value = 'create team'){ page_js('/teams/view/all'); }
-
     });
 
-
+    buttons.name.exit.events.on('click',function(){
+      if(toolbar.state.value = 'view teams'){ page_js('/teams/view/all'); }
+    });
 
     return toolbar;
 
@@ -17451,9 +17451,13 @@
 
   var dragula_1 = dragula;
 
-  function Users$2(users,element){
+  const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
+  const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");return t.fl(); },partials: {}, subs: {  }});
+
+  function Users$2(users,element,available){
     const view = new View({name: 'users list', element: element });
-    let available = [];
+    (available = !available ? users.all.map((user)=> user.data) : available );
+
 
     const { search } = Finder(view.element).inputs.type.text;
 
@@ -17461,17 +17465,12 @@
       let value = this.value;
       let children = view.body.children();
       if(value){
-        let found = [];
+        let members = [];
         children.addClass('hidden');
+        children.each((i,el)=>{ members[Number(el.attributes['data-id'].value)] = el; });
 
         available.forEach((user) => {
-          let pattern = new RegExp(`${value}`,'gi');
-          if(user.name.search(pattern) != -1){ found.push(user.id); }
-        });
-
-        children.each((i,el)=>{
-          let id = Number(el.attributes['data-id'].value);
-          if(found.indexOf(id) != -1){ el.classList.remove('hidden'); }
+          if(user.name.search(new RegExp(`${value}`,'gi')) != -1){ members[user.id].classList.remove('hidden');  }
         });
 
       }
@@ -17483,33 +17482,37 @@
     view.body = view.element.find('.body');
 
     view.on = function(){
-      users.all.forEach((user) => {
+      available.forEach((user) => {
         user = {
-          id: user.data.id,
-          avatar: user.data.avatar,
-          name: user.data.firstname,
-          position: user.data.position
+          id: user.id,
+          avatar: user.avatar,
+          name: user.firstname,
+          position: user.position
         };
 
-        view.body.append(row.render(user));
-        available.push(user);
+        view.body.append(userRow.render(user));
       });
       search.on();
     };
 
-    view.off = function(){ view.body.empty(); available = []; search.off(); };
+    view.off = function(){ view.body.empty(); search.off(); };
 
     view.available = {
-      add: (user)=>{ available.push(user); },
+      add: (user)=>{ available.push({
+          id: user.id,
+          avatar: user.avatar,
+          name: user.firstname,
+          position: user.position
+        });
+      },
       remove: (id)=>{
         available = available.reduce((list,user,i)=>{
           if(id != user.id){ list.push(user); }
           return list;
         },[]);
-      }
+      },
+      reset: ()=>{ available = users.all.map((user)=> user.data); }
     };
-
-
 
     return view
   }
@@ -17532,6 +17535,7 @@
       'members':{
         writable: false,
         value: {
+          'empty': ()=>{ members = []; },
           'get': ()=>{ return members; },
           'add': (user)=>{ members.push(user); },
           'remove': (id)=>{
@@ -17552,96 +17556,80 @@
 
   }
 
-  function Drag(containers){
-    const events = new Observer([
-      'dropped on users',
-      'dropped on leader',
-      'dragged from users',
-      'dragged from leader',
-      'dropped'
-    ]);
-
-    const drag = dragula_1(containers);
-
-    drag.on('drop',function(el,target,source){
-      target = $(target); source = $(source);
-      let user = Number($(el).attr('data-id'));
-      const dragged = {
-        to: target.attr('data'),
-        from: source.attr('data'),
-      };
-
-      if(dragged.to == 'users'){ events.notify('dropped on users',[user]); }
-      if(dragged.to == 'leader'){ events.notify('dropped on leader',[user]); }
-      if(dragged.to == 'leader' || dragged.to == 'members'){ target.removeClass('border-2'); }
-      if(dragged.from == 'users'){ events.notify('dragged from users',[user]); }
-      if(dragged.from == 'leader'){ events.notify('dragged from leader',[user]); source.addClass('border-2'); }
-
-      events.notify('dropped',[user]);
-
-    });
-
-
-
-    return {
-      on: events.register,
-      off: events.unregister
-    };
-
-  }
-
-  function teamForm(){
-    const form = new Form({ name: 'createTeam', url: 'createTeam' });
-    form.view = {};
-    form.view.body = form.element.find('.body');
-    form.view.leader = form.view.body.find('[data="leader"]');
-    form.view.members = form.view.body.find('[data="members"]');
-
-    form.off = function(){
-      form.view.leader.empty().addClass('border-2');
-      form.view.members.empty().addClass('border-2');
-    };
-
-    return form;
-
-  }
-
-
   function Create$1 (userList){
     const team = new Team();
     const view = new View({name:'create team',element: $('[data-teams="create"]') });
     const users = Users$2(userList,view.element.find('[name="userList"]'));
-    const form = teamForm();
-    const drag = Drag([
+    const form =  new Form({ name: 'createTeam', url: 'createTeam' });
+    form.view = {};
+    form.view.body = form.element.find('.body');
+    form.view.counter = form.view.body.find('[data="counter"]');
+    form.view.leader = form.view.body.find('[data="leader"]');
+    form.view.members = form.view.body.find('[data="members"]');
+    form.off = function(){
+      form.view.counter.text('0');
+      form.view.leader.empty().addClass('border-2');
+      form.view.members.empty().addClass('border-2');
+      users.available.reset();
+      team.members.empty();
+      userList.all;
+    };
+
+    const drag = dragula_1([
       form.view.leader[0],
       form.view.members[0],
       users.body[0]
     ]);
 
-    drag.on('dropped on users',function(user){
-      team.members.remove(user);
-      users.available.add(userList.find(user).data);
-    });
-    drag.on('dropped on leader',function(user){
-      if(team.leader !== null){
-        let leader = form.view.leader.find(`[data-id="${team.leader}"]`);
-        leader.detach();
-        form.view.members.prepend(leader);
+    const members = {
+      remove: (id)=>{
+        team.members.remove(id);
+        users.available.add(userList.find(id).data);
+        form.view.counter.text(String(team.members.get().length));
+      },
+      add: (id,from)=>{
+        users.available.remove(id);
+        team.members.add(userList.find(id).data);
+        form.view.counter.text(String(team.members.get().length));
       }
-      team.leader = user;
-    });
-    drag.on('dragged from users',function(user){
-      users.available.remove(user);
-      team.members.add(userList.find(user).data);
-    });
-    drag.on('dragged from leader',function(user){
-      team.leader = null;
-    });
-    drag.on('dropped',function(user){
-      let members = team.members.get().length;
-      if( !members || (members == 1 && team.leader != null) ){
-          form.view.members.addClass('border-2');
+    };
+
+
+    drag.on('drop',function(el,target,source){
+      target = $(target); source = $(source);
+      let id = Number($(el).attr('data-id'));
+      const dropped = {
+        on: target.attr('data'),
+        from: source.attr('data')
+      };
+
+      if(dropped.on == 'members'){
+        if(dropped.from == 'users'){ members.add(id); }
+        else { team.leader = null; }
+        target.removeClass('border-2');
       }
+      if(dropped.on == 'users'){
+        if(dropped.from == 'leader'){ team.leader = null; }
+        members.remove(id);
+      }
+      if(dropped.on == 'leader'){
+        if(dropped.from == 'users'){ members.add(id); }
+        if(team.leader !== null){
+          let leader = form.view.leader.find(`[data-id="${team.leader}"]`);
+          leader.detach();
+          form.view.members.prepend(leader);
+        }
+
+        target.removeClass('border-2');
+        team.leader = id;
+      }
+
+      {
+        let members = team.members.get().length;
+        if(dropped.from == 'leader'){ source.addClass('border-2'); }
+        if(dropped.from == 'members' && (!members || (team.leader != null && members == 1)) ){ source.addClass('border-2'); }
+      }
+
     });
 
 
@@ -17653,16 +17641,16 @@
     return view;
   }
 
-  function Team$1(users){
+  function Teams(users){
     return {
       create: Create$1(users)
     }
   }
 
-  function Teams({users}){
+  function Teams$1({users}){
     const view = new View({name:'teams',element: $('[data-content="teams"]') });
     const toolbar = ToolBar$5();
-    const team = Team$1(users.list);
+    const teams = Teams(users.list);
 
     const routes = {
       '/teams/*': function(ctx,next){
@@ -17670,7 +17658,7 @@
         next();
       },
       '/teams/view/all': function(){
-        view.state.value = 'view all teams';
+        view.state.value = 'view teams';
       },
       '/teams/create': function(){
         view.state.value = 'create team';
@@ -17684,15 +17672,15 @@
     view.routes = [routes];
 
     view.state.register({
-      state: 'view all teams',
-      on: ()=>{ toolbar.state.value = 'view all teams'; },
+      state: 'view teams',
+      on: ()=>{ toolbar.state.value = 'view teams'; },
       off: ()=>{ }
     });
 
     view.state.register({
       state: 'create team',
-      on: ()=>{ toolbar.state.value = 'create team'; team.create.on(); },
-      off: ()=>{ team.create.off(); }
+      on: ()=>{ toolbar.state.value = 'create team'; teams.create.on(); },
+      off: ()=>{ teams.create.off(); }
     });
 
     return view;
@@ -17704,7 +17692,7 @@
     profile: Profile,
     solicitudes: Solicitudes$1,
     users: Users$1,
-    teams: Teams
+    teams: Teams$1
   };
 
   function Menu(){
