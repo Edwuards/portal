@@ -5,6 +5,7 @@ export default function(){
   const view = new View({name:'users',element: $('[data-content="users"]')});
   const toolbar = ToolBar();
   const users = Users();
+
   const routes = {
     '/users/*': function(ctx,next){
       if(!(this.state.value == 'users')){ this.state.value = 'users'; }

@@ -36,30 +36,30 @@ export function Solicitudes(body){
     'validating':3
   }
   const state = {
-    view: undefined,
+    type: undefined,
     status: undefined
   };
 
   dataMock(solicitudes,body);
   const methods = {
-    'view': {
+    'type': {
       writable: false,
       value: (ctx)=>{
-        let { view , status } = ctx.params;
-        if(view !== state.view){
-          if(state.view !== undefined){
-            solicitudes[state.view][state.status].forEach((solicitud) => {
+        let { type , status } = ctx.params;
+        if(type !== state.type){
+          if(state.type !== undefined){
+            solicitudes[state.type][state.status].forEach((solicitud) => {
               solicitud.off();
             });
           }
 
-          state.view = view;
+          state.type = type;
 
         }
 
         if(status !== state.status){
           if(state.status !== undefined){
-            solicitudes[state.view][state.status].forEach((solicitud) => {
+            solicitudes[state.type][state.status].forEach((solicitud) => {
               solicitud.off();
             });
           }
@@ -67,7 +67,7 @@ export function Solicitudes(body){
         }
 
 
-        solicitudes[state.view][state.status].forEach((solicitud) => {
+        solicitudes[state.type][state.status].forEach((solicitud) => {
           solicitud.on();
         });
 
