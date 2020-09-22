@@ -16047,8 +16047,8 @@
     const card = new Card(solicitud);
     const methods = {
       'id':{ get: ()=>{ return id } },
-      'buttons':{ get: ()=>{ return buttons.name; } },
       'card': { get: ()=>{return card } },
+      'data': { get: ()=>{ return solicitud } },
       'status': {
         get: ()=>{ return status },
         set: (value)=>{
@@ -16058,6 +16058,7 @@
           card.buttons.name.approve.element[visibility]('hidden');
           card.buttons.name.deny.element[visibility]('hidden');
           card.status = status;
+          solicitud.status = status;
         }
       },
       'on':{
@@ -16087,15 +16088,14 @@
     Solicitud.call(this,solicitud,Modes['users']);
   }
 
-  const dataMock = (obj,body)=>{
-
-    for (let i = 0; i < 3; i++) {
-      let type = (i ? (i == 1 ? 'team' : 'users') : 'mine');
-      let fn = (i ? (i == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud);
-      obj[type] = [[],[],[],[]];
+  const dataMock = ()=>{
+    const list = [];
+    for (let owner = 0; owner < 3; owner++) {
+      let type = (owner ? (owner == 1 ? 'team' : 'users') : 'mine');
       for (let j = 0; j < 20; j++) {
         let status = (j >= 5 ? (j >= 10 ? (j >= 15 ?  3 : 2) :  1) : 0);
         let data = {
+          owner,
           status,
           user: {
             avatar: 'assets/public/img/placeholder.jpeg',
@@ -16107,81 +16107,129 @@
           end: '10 Aug 2020',
           color: 'bg-blue-600'
         };
-         body.append(obj[type][status][obj[type][status].push(new fn(data)) - 1].card.element);
+         list.push(data);
       }
     }
+    return list;
   };
 
-
-  function Solicitudes(body){
-    const solicitudes = {};
-    const statusMap = {
-      'denied':0,
-      'approved':1,
-      'pending':2,
-      'validating':3
+  function List(){
+    const view = new View({ name:'solicitudes list', element: $('[data-solicitudes="list"]')});
+    const solicitudes = [
+      [[],[],[],[]],
+      [[],[],[],[]],
+      [[],[],[],[]],
+    ];
+    const map = {
+      'owner': {
+        'mine':0,
+        'team': 1,
+        'users': 2
+      },
+      'status': {
+        'denied':0,
+        'approved':1,
+        'pending':2,
+        'validating':3
+      }
     };
     const state = {
-      view: undefined,
-      status: undefined
+      status: undefined,
+      owner: undefined
+    };
+    const add = (solicitud)=>{
+      let {owner,status} = solicitud;
+      solicitud = new (!status ? (status == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud)(solicitud);
+      solicitudes[owner][status].push(solicitud);
+      view.element.append(solicitud.card.element);
     };
 
-    dataMock(solicitudes,body);
+    dataMock().forEach(add);
+
     const methods = {
-      'view': {
+      'show': {
         writable: false,
-        value: (ctx)=>{
-          let { view , status } = ctx.params;
-          if(view !== state.view){
-            if(state.view !== undefined){
-              solicitudes[state.view][state.status].forEach((solicitud) => {
+        value: (owner,status)=>{
+          owner = map.owner[owner];
+          status = map.status[status];
+          if(owner !== state.owner || status !== state.status){
+            if(state.status !== undefined && state.owner !== undefined){
+              solicitudes[state.owner][state.status].forEach((solicitud) => {
                 solicitud.off();
               });
             }
 
-            state.view = view;
+            state.owner = owner;
+            state.status = status;
+
+            solicitudes[state.owner][state.status].forEach((solicitud) => {
+              solicitud.on();
+            });
 
           }
-
-          if(status !== state.status){
-            if(state.status !== undefined){
-              solicitudes[state.view][state.status].forEach((solicitud) => {
-                solicitud.off();
-              });
-            }
-            state.status = statusMap[status];
-          }
-
-
-          solicitudes[state.view][state.status].forEach((solicitud) => {
-            solicitud.on();
-          });
-
+        }
+      },
+      'get': {
+        writable: false,
+        value: ()=>{ return solicitudes; }
+      },
+      'find': {
+        writable: false,
+        value: (owner,status,id)=>{
+          owner = map.owner[owner];
+          status = map.status[status];
+          return solicitudes[owner][status].find((s)=>{ return id == s.id });
         }
       }
     };
 
-    Object.defineProperties(this,methods);
+    Object.defineProperties(view,methods);
 
-
+    return view
   }
 
-  function ToolBar$3(){ return new ToolBar('solicitudes'); }
+  function Solicitudes(){
+    return {list: List()}
+  }
+
+  function ToolBar$3(){
+    const toolbar = new ToolBar('solicitudes');
+    const select = toolbar.inputs.type.select;
+    const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); };
+
+    select.status.events.on('change',function(){
+      let path = urlSegments(); path[1] = this.value;
+      page_js(`/solicitudes/${path.join('/')}`);
+    });
+    if(select.owner){
+      select.owner.events.on('change',function(){
+        let path = urlSegments(); path[0] = this.value;
+        page_js(`/solicitudes/${path.join('/')}`);
+      });
+    }
+
+    return toolbar
+  }
 
   function Solicitudes$1 (){
     const view = new View({ name:'solicitudes', element: $('[data-content="solicitudes"]')});
     const toolbar = ToolBar$3();
-    const body = view.element.children('.body');
-    const solicitudes = new Solicitudes(body);
-    const select = toolbar.inputs.type.select;
-    const urlSegments = ()=>{ return window.location.pathname.split('/app/dashboard/solicitudes/')[1].split('/'); };
+    const solicitudes = new Solicitudes();
 
     const routes = {
       '/solicitudes/*': function(ctx,next){
         if(!(this.state.value == 'solicitudes')){ this.state.value = 'solicitudes'; }
         next();
       },
-      '/solicitudes/:view/:status': solicitudes.view
+      '/solicitudes/:owner/:status/:solicitud': function(ctx){
+        let { owner, solicitud , status } = ctx.params;
+        if(solicitud == 'all'){
+          if(!(view.state.value !== 'view all')){ view.state.value = 'view all'; }
+          solicitudes.list.show(owner,status);
+        }
+
+
+      }
     };
 
     view.routes = [routes];
@@ -16189,11 +16237,6 @@
     view.on = function(){ toolbar.on(); };
     view.off = function(){ toolbar.off(); };
 
-
-    select.state.events.on('change',function(){
-      let path = urlSegments(); path[1] = this.value;
-      page_js(`/solicitudes/${path.join('/')}`);
-    });
 
     return view
 
@@ -16418,7 +16461,7 @@
     return users;
   })();
 
-  function List(){
+  function List$1(){
     const container = $('[data-users="list"]');
     const users = [];
     const list = {};
@@ -16469,7 +16512,7 @@
     return {
       create: Create(),
       profile: Profile$1(),
-      list: List()
+      list: List$1()
     }
   }
 
@@ -16477,6 +16520,7 @@
     const view = new View({name:'users',element: $('[data-content="users"]')});
     const toolbar = ToolBar$4();
     const users = Users();
+
     const routes = {
       '/users/*': function(ctx,next){
         if(!(this.state.value == 'users')){ this.state.value = 'users'; }
@@ -17456,7 +17500,12 @@
 
   function Users$2(users,element,available){
     const view = new View({name: 'users list', element: element });
-    (available = !available ? users.all.map((user)=> user.data) : available );
+    (available = !available ? users.all.map((user)=>{ return {
+      id: user.data.id,
+      avatar: user.data.avatar,
+      name: user.data.firstname,
+      position: user.data.position
+    }}) : available );
 
 
     const { search } = Finder(view.element).inputs.type.text;
@@ -17483,12 +17532,7 @@
 
     view.on = function(){
       available.forEach((user) => {
-        user = {
-          id: user.id,
-          avatar: user.avatar,
-          name: user.firstname,
-          position: user.position
-        };
+
 
         view.body.append(userRow.render(user));
       });
@@ -17572,7 +17616,6 @@
       form.view.members.empty().addClass('border-2');
       users.available.reset();
       team.members.empty();
-      userList.all;
     };
 
     const drag = dragula_1([

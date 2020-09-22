@@ -20,3 +20,12 @@ Falta la función de eliminar un usuario y conectar todas las habilidades a los 
 
 Mi Perfil
 falta agregar subvista para editar tu pefil 
+
+  -----------------------------------
+  | 	     SOLICITUDES 	    |
+  -----------------------------------
+  Estamos trabajando el modulo de solicitudes donde nos encontramos con el desafio de poder visualizar 
+  una solicitud de manera individual y también como un listado. El listado de solicitudes es la vista
+  principal . Esta vista permite navegar a la vista de una solicitud individual. Las solicitudes en 
+  esta vista se pueden ver por categoria y por dueño. La categoría y dueño son dinamicos en el sentido
+  de que pueden cambiar. La url se actualiza al momento de cambiar caulquiera de los dos . 

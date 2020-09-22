@@ -5,7 +5,12 @@ import { Finder } from '../form/inputs';
 
 function Users(users,element,available){
   const view = new View({name: 'users list', element: element });
-  (available = !available ? users.all.map((user)=> user.data) : available );
+  (available = !available ? users.all.map((user)=>{ return {
+    id: user.data.id,
+    avatar: user.data.avatar,
+    name: user.data.firstname,
+    position: user.data.position
+  }}) : available );
 
 
   const { search } = Finder(view.element).inputs.type.text;
@@ -32,12 +37,7 @@ function Users(users,element,available){
 
   view.on = function(){
     available.forEach((user) => {
-      user = {
-        id: user.id,
-        avatar: user.avatar,
-        name: user.firstname,
-        position: user.position
-      };
+
 
       view.body.append(userRow.render(user));
     });

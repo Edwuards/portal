@@ -1,5 +1,5 @@
 import { View } from '../helpers';
-import { Solicitudes } from './solicitudes';
+import Solicitudes from './solicitudes';
 import ToolBar from '../toolbars/solicitudes';
 import Router from 'page';
 
@@ -13,11 +13,11 @@ export default function (){
       if(!(this.state.value == 'solicitudes')){ this.state.value = 'solicitudes'; }
       next();
     },
-    '/solicitudes/:type/:status/:view': function(ctx){
-      let { type, view , status } = ctx.params;
-      if(view == 'all'){
+    '/solicitudes/:owner/:status/:solicitud': function(ctx){
+      let { owner, solicitud , status } = ctx.params;
+      if(solicitud == 'all'){
         if(!(view.state.value !== 'view all')){ view.state.value = 'view all'; }
-        solicitudes.view(type,status)
+        solicitudes.list.show(owner,status)
       }
 
 

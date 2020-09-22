@@ -5,7 +5,7 @@
     'profile'=>[],
     'users'=>[],
     'teams'=>[],
-    'solicitudes'=>['type'=>'employee']
+    'solicitudes'=>['type'=>'admin']
   ];
 
   $html = $this->load->view('nav/nav',['bars'=>$bars],true);

@@ -26,8 +26,8 @@ function Solicitud(solicitud,mode){
   const card = new Card(solicitud);
   const methods = {
     'id':{ get: ()=>{ return id } },
-    'buttons':{ get: ()=>{ return buttons.name; } },
     'card': { get: ()=>{return card } },
+    'data': { get: ()=>{ return solicitud } },
     'status': {
       get: ()=>{ return status },
       set: (value)=>{
@@ -37,6 +37,7 @@ function Solicitud(solicitud,mode){
         card.buttons.name.approve.element[visibility]('hidden');
         card.buttons.name.deny.element[visibility]('hidden');
         card.status = status;
+        solicitud.status = status;
       }
     },
     'on':{

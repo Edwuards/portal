@@ -1,46 +1,51 @@
 <?php
   $states = [
-    ['value'=>'approved','title'=>'Aprobados'],
+    ['value'=>'approved','title'=>'Aprobadas'],
     ['value'=>'pending','title'=>'Pendiente'],
     ['value'=>'validating','title'=>'En Validación'],
-    ['value'=>'denied','title'=>'Rechazados']
+    ['value'=>'denied','title'=>'Rechazadas']
   ];
 
-  $views = [
+  $owner = [
     'employee'=>[],
     'teamlead'=>[
-      ['value'=>'mine','title'=>'Míos'],
-      ['value'=>'team','title'=>'Equipo'],
-    ]
+      ['value'=>'mine','title'=>'Mías'],
+      ['value'=>'team','title'=>'De mi Equipo'],
+    ],
+    'admin'=>[
+      ['value'=>'mine','title'=>'Mías'],
+      ['value'=>'team','title'=>'De mi equipo'],
+      ['value'=>'users','title'=>'De usuarios'],
+    ],
   ];
 
   $options = '';
-  foreach ($states as $state) {
-    $options .= '<option  value="'.$state['value'].'">'.$state['title'].'</option>';
+  foreach ($states as $status) {
+    $options .= '<option  value="'.$status['value'].'">'.$status['title'].'</option>';
   }
 
   $states = SelectInput([
     'css'=>['cont'=>'','input'=>'border-b-2 border-red-600'],
     'label'=>'',
-    'attrs'=>['name'=>'state'],
+    'attrs'=>['name'=>'status'],
     'options'=>$options
   ]);
 
   $options = '';
-  foreach ($views[$type] as $view) {
+  foreach ($owner[$type] as $view) {
     $options .= '<option  value="'.$view['value'].'">'.$view['title'].'</option>';
   }
 
   if($options != ''){
-    $views = SelectInput([
+    $owner = SelectInput([
       'css'=>['cont'=>'','input'=>'border-b-2 border-red-600'],
       'label'=>'',
-      'attrs'=>['name'=>'views'],
+      'attrs'=>['name'=>'owner'],
       'options'=>$options
     ]);
   }
   else{
-    $views = '';
+    $owner = '';
   }
 
  ?>
@@ -50,7 +55,7 @@
   <div class="flex ml-6">
     <?php
       echo $states;
-      echo $views;
+      echo $owner;
     ?>
   </div>
 </div>
