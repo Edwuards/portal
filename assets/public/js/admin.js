@@ -16208,6 +16208,19 @@
       });
     }
 
+    toolbar.matchSelectToUrl = (status,owner)=>{
+      if(select.status.value != status){
+        select.status.off();
+        select.status.options.select(status);
+        select.status.on();
+      }
+      if(select.owner.value != owner){
+        select.owner.off();
+        select.owner.options.select(owner);
+        select.owner.on();
+      }
+    };
+
     return toolbar
   }
 
@@ -16225,6 +16238,7 @@
         let { owner, solicitud , status } = ctx.params;
         if(solicitud == 'all'){
           if(!(view.state.value !== 'view all')){ view.state.value = 'view all'; }
+          toolbar.matchSelectToUrl(status,owner);
           solicitudes.list.show(owner,status);
         }
 

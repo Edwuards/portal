@@ -17,7 +17,8 @@ export default function (){
       let { owner, solicitud , status } = ctx.params;
       if(solicitud == 'all'){
         if(!(view.state.value !== 'view all')){ view.state.value = 'view all'; }
-        solicitudes.list.show(owner,status)
+        toolbar.matchSelectToUrl(status,owner);
+        solicitudes.list.show(owner,status);
       }
 
 

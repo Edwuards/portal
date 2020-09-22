@@ -17,5 +17,18 @@ export default function(){
     });
   }
 
+  toolbar.matchSelectToUrl = (status,owner)=>{
+    if(select.status.value != status){
+      select.status.off();
+      select.status.options.select(status);
+      select.status.on();
+    }
+    if(select.owner.value != owner){
+      select.owner.off();
+      select.owner.options.select(owner);
+      select.owner.on();
+    }
+  }
+
   return toolbar
 }
