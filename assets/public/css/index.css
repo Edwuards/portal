@@ -183,6 +183,12 @@ button[name="toggle"] {
 [data-content="users"] .user {
   height: 160px; }
 
+[data-users="list"] .card {
+  border: 2px solid white; }
+
+[data-users="list"] .delete {
+  border: 2px solid red; }
+
 [data-teams="create"] [name="createTeam"] {
   margin: 30px;
   height: calc(100% - 60px); }

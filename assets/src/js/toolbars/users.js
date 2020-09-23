@@ -8,12 +8,14 @@ export default function(){
   const observer = new Observer([
     'edit profile',
     'cancel edit profile',
+    'delete users',
   ]);
 
   const groups = {
     'view users': ['create','delete'],
-    'create user': ['exit','cancel','save'],
-    'edit profile': ['exit','cancel','save'],
+    'create user': ['exit','cancel','confirm'],
+    'edit profile': ['exit','cancel','confirm'],
+    'delete users': ['exit','cancel','confirm'],
     'read profile': ['exit','edit']
   };
 
@@ -60,6 +62,15 @@ export default function(){
     off: ()=>{ toolbar.toggleBtns(groups['edit profile'],false); }
   });
 
+  toolbar.state.register({
+    state:'delete users',
+    on:()=>{
+      toolbar.title.text('Eliminar Usuarios');
+      toolbar.toggleBtns(groups['delete users'],true);
+    },
+    off: ()=>{ toolbar.toggleBtns(groups['delete users'],false); }
+  });
+
   buttons.name.exit.events.on('click',function(){ Router('/users/view/all'); });
 
   buttons.name.edit.events.on('click',function(){
@@ -67,17 +78,27 @@ export default function(){
     observer.notify('edit profile');
   });
 
+  buttons.name.delete.events.on('click',function(){
+    Router('/users/delete');
+  });
+
   buttons.name.create.events.on('click',function(){ Router('/users/create'); });
 
   buttons.name.cancel.events.on('click',function(){
-    if(toolbar.state.value == 'edit profile'){
+    let state = toolbar.state.value;
+    if( state == 'edit profile'){
       toolbar.state.value = 'read profile';
       observer.notify('cancel edit profile')
     }
-    else if(toolbar.state.value == 'create user'){
-      toolbar.state.value = 'read profile';
+    else if(state == 'create user' || state == 'delete users'){
       Router('/users/view/all');
     }
+  });
+
+  buttons.name.confirm.events.on('click',function(){
+    let state = toolbar.state.value;
+    if(state == 'delete users'){ observer.notify('delete users'); }
+
   });
 
 

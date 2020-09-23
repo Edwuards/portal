@@ -1,5 +1,6 @@
 import Router from 'page';
 import { User } from './user';
+import { View } from '../helpers';
 
 const Data = (()=>{
   const users = [];
@@ -19,9 +20,9 @@ const Data = (()=>{
 })();
 
 export default function(){
+  let users = [];
+  const view = new View({name: 'user list',element: $('[data-users="list"]')});
   const container = $('[data-users="list"]');
-  const users = [];
-  const list = {};
   const add = (user)=>{
     user = users[users.push(new User(user)) - 1];
     let { card } = user;
@@ -30,9 +31,29 @@ export default function(){
     });
     container.append(card.element);
   }
+  const selectCard = (e)=>{
+    let el = $(e.currentTarget);
+    el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
+  }
 
   Data.forEach(add);
 
+  view.state.register({
+    state: 'view users',
+    on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
+    off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
+  });
+
+  view.state.register({
+    state: 'delete users',
+    on: ()=>{ view.element.on('click','.card',selectCard); },
+    off: ()=>{
+      view.element.off('click','.card',selectCard);
+      view.element.children('.delete').removeClass('delete');
+    }
+  });
+
+  view.off = function(){ users.forEach((u)=>{ u.card.off(); }); }
 
   const methods = {
     'all': {
@@ -44,23 +65,27 @@ export default function(){
         return users.find((user)=>{ return user.data.id == id; });
       }
     },
-    'on':{
+    'delete': {
       writable: false,
       value: ()=>{
-        container.removeClass('hidden');
-        users.forEach((user) => { user.card.on() });
-      }
-    },
-    'off':{
-      writable: false,
-      value: ()=>{
-        container.addClass('hidden');
-        users.forEach((user)=>{ user.card.off() });
+        let remove = [];
+        users.forEach((user,i) => {
+          let { card } = user;
+          let selected = card.element.hasClass('delete');
+          if(selected){ remove.push(i); card.element.remove(); }
+        });
+
+        users = users.reduce((a,c,i)=>{
+            if(remove.indexOf(i) != -1){ a.push(c); }
+            return a;
+        },[]);
       }
     }
   }
 
-  Object.defineProperties(list,methods);
+  Object.defineProperties(view,methods);
 
-  return list
+
+
+  return view
 }

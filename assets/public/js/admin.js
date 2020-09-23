@@ -16293,12 +16293,14 @@
     const observer = new Observer([
       'edit profile',
       'cancel edit profile',
+      'delete users',
     ]);
 
     const groups = {
       'view users': ['create','delete'],
-      'create user': ['exit','cancel','save'],
-      'edit profile': ['exit','cancel','save'],
+      'create user': ['exit','cancel','confirm'],
+      'edit profile': ['exit','cancel','confirm'],
+      'delete users': ['exit','cancel','confirm'],
       'read profile': ['exit','edit']
     };
 
@@ -16345,6 +16347,15 @@
       off: ()=>{ toolbar.toggleBtns(groups['edit profile'],false); }
     });
 
+    toolbar.state.register({
+      state:'delete users',
+      on:()=>{
+        toolbar.title.text('Eliminar Usuarios');
+        toolbar.toggleBtns(groups['delete users'],true);
+      },
+      off: ()=>{ toolbar.toggleBtns(groups['delete users'],false); }
+    });
+
     buttons.name.exit.events.on('click',function(){ page_js('/users/view/all'); });
 
     buttons.name.edit.events.on('click',function(){
@@ -16352,17 +16363,27 @@
       observer.notify('edit profile');
     });
 
+    buttons.name.delete.events.on('click',function(){
+      page_js('/users/delete');
+    });
+
     buttons.name.create.events.on('click',function(){ page_js('/users/create'); });
 
     buttons.name.cancel.events.on('click',function(){
-      if(toolbar.state.value == 'edit profile'){
+      let state = toolbar.state.value;
+      if( state == 'edit profile'){
         toolbar.state.value = 'read profile';
         observer.notify('cancel edit profile');
       }
-      else if(toolbar.state.value == 'create user'){
-        toolbar.state.value = 'read profile';
+      else if(state == 'create user' || state == 'delete users'){
         page_js('/users/view/all');
       }
+    });
+
+    buttons.name.confirm.events.on('click',function(){
+      let state = toolbar.state.value;
+      if(state == 'delete users'){ observer.notify('delete users'); }
+
     });
 
 
@@ -16442,7 +16463,7 @@
     const element = $(document.createElement('div'));
 
     element
-    .addClass('w-56 m-4 bg-white py-4')
+    .addClass('card w-56 m-4 bg-white py-4')
     .append(card$1.render({
       avatar: data.avatar,
       name: data.firstname,
@@ -16507,9 +16528,9 @@
   })();
 
   function List$1(){
+    let users = [];
+    const view = new View({name: 'user list',element: $('[data-users="list"]')});
     const container = $('[data-users="list"]');
-    const users = [];
-    const list = {};
     const add = (user)=>{
       user = users[users.push(new User(user)) - 1];
       let { card } = user;
@@ -16518,9 +16539,29 @@
       });
       container.append(card.element);
     };
+    const selectCard = (e)=>{
+      let el = $(e.currentTarget);
+      el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
+    };
 
     Data.forEach(add);
 
+    view.state.register({
+      state: 'view users',
+      on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
+      off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
+    });
+
+    view.state.register({
+      state: 'delete users',
+      on: ()=>{ view.element.on('click','.card',selectCard); },
+      off: ()=>{
+        view.element.off('click','.card',selectCard);
+        view.element.children('.delete').removeClass('delete');
+      }
+    });
+
+    view.off = function(){ users.forEach((u)=>{ u.card.off(); }); };
 
     const methods = {
       'all': {
@@ -16532,25 +16573,29 @@
           return users.find((user)=>{ return user.data.id == id; });
         }
       },
-      'on':{
+      'delete': {
         writable: false,
         value: ()=>{
-          container.removeClass('hidden');
-          users.forEach((user) => { user.card.on(); });
-        }
-      },
-      'off':{
-        writable: false,
-        value: ()=>{
-          container.addClass('hidden');
-          users.forEach((user)=>{ user.card.off(); });
+          let remove = [];
+          users.forEach((user,i) => {
+            let { card } = user;
+            let selected = card.element.hasClass('delete');
+            if(selected){ remove.push(i); card.element.remove(); }
+          });
+
+          users = users.reduce((a,c,i)=>{
+              if(remove.indexOf(i) != -1){ a.push(c); }
+              return a;
+          },[]);
         }
       }
     };
 
-    Object.defineProperties(list,methods);
+    Object.defineProperties(view,methods);
 
-    return list
+
+
+    return view
   }
 
   function Users(){
@@ -16574,6 +16619,9 @@
       '/users/view/all': function(){
         view.state.value = 'view users';
       },
+      '/users/delete': function(){
+        view.state.value = 'delete users';
+      },
       '/users/view/profile/:id': function(ctx){
         view.state.value = 'profile';
         users.profile.read(users.list.find(ctx.params.id).data);
@@ -16586,9 +16634,10 @@
 
     toolbar.events.on('edit profile',users.profile.edit);
     toolbar.events.on('cancel edit profile',users.profile.cancel);
+    toolbar.events.on('delete users',users.list.delete);
 
-    view.on = function(){ toolbar.on(); };
-    view.off = function(){ toolbar.off(); };
+    view.on = function(){ users.list.on(); toolbar.on(); };
+    view.off = function(){ users.list.off(); toolbar.off(); };
 
     view.list = users.list;
 
@@ -16598,24 +16647,35 @@
       state: 'view users',
       on: ()=>{
         users.list.on();
+        users.list.state.value = 'view users';
         toolbar.state.value = 'view users';
       },
-      off: ()=>{ users.list.off(); },
+      off: ()=>{ },
+    });
+
+    view.state.register({
+      state: 'delete users',
+      on: ()=>{
+        users.list.state.value  = 'delete users';
+        toolbar.state.value = 'delete users';
+      },
+      off: ()=>{ },
     });
 
     view.state.register({
       state: 'create user',
       on: ()=>{
+        users.list.off();
         users.create.on();
         toolbar.state.value = 'create user';
       },
-
       off: ()=>{ users.create.off(); },
     });
 
     view.state.register({
       state: 'profile',
       on: ()=>{
+        users.list.off();
         users.profile.on();
         toolbar.state.value = 'read profile';
       },

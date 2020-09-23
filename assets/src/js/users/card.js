@@ -5,7 +5,7 @@ export function Card(data){
   const element = $(document.createElement('div'));
 
   element
-  .addClass('w-56 m-4 bg-white py-4')
+  .addClass('card w-56 m-4 bg-white py-4')
   .append(card.render({
     avatar: data.avatar,
     name: data.firstname,
