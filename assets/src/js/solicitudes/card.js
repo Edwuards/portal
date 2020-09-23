@@ -37,6 +37,7 @@ export function Card(solicitud){
     'status':{
       get: ()=>{ return status },
       set: (value)=>{
+        element.addClass('hidden');
         element.removeClass(css[status]).addClass(css[value]);
         status = value;
       }

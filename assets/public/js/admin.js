@@ -16011,6 +16011,7 @@
       'status':{
         get: ()=>{ return status },
         set: (value)=>{
+          element.addClass('hidden');
           element.removeClass(css[status]).addClass(css[value]);
           status = value;
         }
@@ -16044,6 +16045,7 @@
 
   function Solicitud(solicitud,mode){
     let {status,id} = solicitud;
+    const events = new Observer(['status update']);
     const card = new Card(solicitud);
     const methods = {
       'id':{ get: ()=>{ return id } },
@@ -16052,6 +16054,7 @@
       'status': {
         get: ()=>{ return status },
         set: (value)=>{
+          events.notify('status update',[solicitud,value]);
           status = value;
           let visibility = mode[status];
           visibility = (visibility.approve ? 'removeClass' : 'addClass');
@@ -16059,6 +16062,13 @@
           card.buttons.name.deny.element[visibility]('hidden');
           card.status = status;
           solicitud.status = status;
+        }
+      },
+      'events':{
+        writable: false,
+        value: {
+          on: events.register,
+          off: events.unregister
         }
       },
       'on':{
@@ -16082,10 +16092,22 @@
 
   function TeamSolicitud(solicitud){
     Solicitud.call(this,solicitud,Modes['team']);
+    if(this.status == 2){
+      let solicitud = this;
+      const { approve,deny } = this.card.buttons.name;
+      approve.events.on('click',function(){ solicitud.status = 3; });
+      deny.events.on('click',function(){ solicitud.status = 0; });
+    }
   }
 
   function UsersSolicitud(solicitud){
     Solicitud.call(this,solicitud,Modes['users']);
+    if(this.status == 3){
+      let solicitud = this;
+      const { approve,deny } = this.card.buttons.name;
+      approve.events.on('click',function(){ solicitud.status = 1; });
+      deny.events.on('click',function(){ solicitud.status = 0; });
+    }
   }
 
   const dataMock = ()=>{
@@ -16139,8 +16161,14 @@
     };
     const add = (solicitud)=>{
       let {owner,status} = solicitud;
-      solicitud = new (!status ? (status == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud)(solicitud);
-      solicitudes[owner][status].push(solicitud);
+      solicitud = new (owner ? (owner == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud)(solicitud);
+      solicitud.data.index = (solicitudes[owner][status].push(solicitud) - 1);
+      solicitud.events.on('status update',function(solicitud,update){
+        let {owner,status,index} = solicitud;
+        let obj = solicitudes[owner][status][index];
+        solicitudes[owner][status][index] = false;
+        solicitud.index = (solicitudes[owner][update].push(obj) - 1);
+      });
       view.element.append(solicitud.card.element);
     };
 
@@ -16155,7 +16183,7 @@
           if(owner !== state.owner || status !== state.status){
             if(state.status !== undefined && state.owner !== undefined){
               solicitudes[state.owner][state.status].forEach((solicitud) => {
-                solicitud.off();
+                if(solicitud){ solicitud.off(); }
               });
             }
 
@@ -16163,7 +16191,7 @@
             state.status = status;
 
             solicitudes[state.owner][state.status].forEach((solicitud) => {
-              solicitud.on();
+              if(solicitud){ solicitud.on(); }
             });
 
           }
@@ -16178,7 +16206,10 @@
         value: (owner,status,id)=>{
           owner = map.owner[owner];
           status = map.status[status];
-          return solicitudes[owner][status].find((s)=>{ return id == s.id });
+          return solicitudes[owner][status].find((s)=>{
+            if(s){ return id == s.id }
+            return false;
+          });
         }
       }
     };

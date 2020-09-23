@@ -52,8 +52,14 @@ export default function(){
   };
   const add = (solicitud)=>{
     let {owner,status} = solicitud;
-    solicitud = new (!status ? (status == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud)(solicitud);
-    solicitudes[owner][status].push(solicitud);
+    solicitud = new (owner ? (owner == 1 ? TeamSolicitud : UsersSolicitud) : MySolicitud)(solicitud);
+    solicitud.data.index = (solicitudes[owner][status].push(solicitud) - 1);
+    solicitud.events.on('status update',function(solicitud,update){
+      let {owner,status,index} = solicitud;
+      let obj = solicitudes[owner][status][index];
+      solicitudes[owner][status][index] = false;
+      solicitud.index = (solicitudes[owner][update].push(obj) - 1);
+    });
     view.element.append(solicitud.card.element);
   };
 
@@ -68,7 +74,7 @@ export default function(){
         if(owner !== state.owner || status !== state.status){
           if(state.status !== undefined && state.owner !== undefined){
             solicitudes[state.owner][state.status].forEach((solicitud) => {
-              solicitud.off();
+              if(solicitud){ solicitud.off(); }
             });
           }
 
@@ -76,7 +82,7 @@ export default function(){
           state.status = status;
 
           solicitudes[state.owner][state.status].forEach((solicitud) => {
-            solicitud.on();
+            if(solicitud){ solicitud.on(); }
           });
 
         }
@@ -91,7 +97,10 @@ export default function(){
       value: (owner,status,id)=>{
         owner = map.owner[owner];
         status = map.status[status];
-        return solicitudes[owner][status].find((s)=>{ return id == s.id });
+        return solicitudes[owner][status].find((s)=>{
+          if(s){ return id == s.id }
+          return false;
+        });
       }
     }
   }
