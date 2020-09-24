@@ -111,7 +111,7 @@ function View({name,element}){
     return (fn)=>{
       Object.defineProperty(self,prop,{
         configurable: false,
-        value: ()=>{ action(); fn(); }
+        value: function(){ action(); fn.apply(null,arguments); }
       });
     }
 

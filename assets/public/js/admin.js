@@ -412,7 +412,7 @@
       return (fn)=>{
         Object.defineProperty(self,prop,{
           configurable: false,
-          value: ()=>{ action(); fn(); }
+          value: function(){ action(); fn.apply(null,arguments); }
         });
       }
 
@@ -16580,11 +16580,11 @@
           users.forEach((user,i) => {
             let { card } = user;
             let selected = card.element.hasClass('delete');
-            if(selected){ remove.push(i); card.element.remove(); }
+            if(selected){ remove[i] = true; card.element.remove(); }
           });
 
           users = users.reduce((a,c,i)=>{
-              if(remove.indexOf(i) != -1){ a.push(c); }
+              if(!remove[i]){ a.push(c); }
               return a;
           },[]);
         }
@@ -17603,18 +17603,18 @@
   const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
   const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");return t.fl(); },partials: {}, subs: {  }});
 
-  function Users$2(users,element,available){
+  function Users$2(element){
+    let available = [];
     const view = new View({name: 'users list', element: element });
-    (available = !available ? users.all.map((user)=>{ return {
-      id: user.data.id,
-      avatar: user.data.avatar,
-      name: user.data.firstname,
-      position: user.data.position
-    }}) : available );
-
-
     const { search } = Finder(view.element).inputs.type.text;
-
+    const userFormat = (user)=>{
+      return {
+        id: user.data.id,
+        avatar: user.data.avatar,
+        name: user.data.firstname,
+        position: user.data.position
+      }
+    };
     search.events.on('input',function(){
       let value = this.value;
       let children = view.body.children();
@@ -17635,32 +17635,22 @@
 
     view.body = view.element.find('.body');
 
-    view.on = function(){
-      available.forEach((user) => {
-
-
-        view.body.append(userRow.render(user));
-      });
+    view.on = function(users){
+      available = users.all.map((user)=>{ return userFormat(user); });
+      available.forEach((user)=>{ view.body.append(userRow.render(user)); });
       search.on();
     };
 
     view.off = function(){ view.body.empty(); search.off(); };
 
     view.available = {
-      add: (user)=>{ available.push({
-          id: user.id,
-          avatar: user.avatar,
-          name: user.firstname,
-          position: user.position
-        });
-      },
+      add: (user)=>{ available.push(userFormat(user)); },
       remove: (id)=>{
         available = available.reduce((list,user,i)=>{
           if(id != user.id){ list.push(user); }
           return list;
         },[]);
-      },
-      reset: ()=>{ available = users.all.map((user)=> user.data); }
+      }
     };
 
     return view
@@ -17708,7 +17698,7 @@
   function Create$1 (userList){
     const team = new Team();
     const view = new View({name:'create team',element: $('[data-teams="create"]') });
-    const users = Users$2(userList,view.element.find('[name="userList"]'));
+    const users = Users$2(view.element.find('[name="userList"]'));
     const form =  new Form({ name: 'createTeam', url: 'createTeam' });
     form.view = {};
     form.view.body = form.element.find('.body');
@@ -17719,7 +17709,6 @@
       form.view.counter.text('0');
       form.view.leader.empty().addClass('border-2');
       form.view.members.empty().addClass('border-2');
-      users.available.reset();
       team.members.empty();
     };
 
@@ -17732,7 +17721,7 @@
     const members = {
       remove: (id)=>{
         team.members.remove(id);
-        users.available.add(userList.find(id).data);
+        users.available.add(userList.find(id));
         form.view.counter.text(String(team.members.get().length));
       },
       add: (id,from)=>{
@@ -17781,7 +17770,7 @@
     });
 
 
-    view.on = function(){ users.on(); form.on(); };
+    view.on = function(){ users.on(userList); form.on(); };
 
     view.off = function(){ users.off(); form.off(); };
 

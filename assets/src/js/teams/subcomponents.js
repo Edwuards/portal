@@ -3,18 +3,18 @@ import { View } from '../helpers';
 import { Finder } from '../form/inputs';
 
 
-function Users(users,element,available){
+function Users(element){
+  let available = [];
   const view = new View({name: 'users list', element: element });
-  (available = !available ? users.all.map((user)=>{ return {
-    id: user.data.id,
-    avatar: user.data.avatar,
-    name: user.data.firstname,
-    position: user.data.position
-  }}) : available );
-
-
   const { search } = Finder(view.element).inputs.type.text;
-
+  const userFormat = (user)=>{
+    return {
+      id: user.data.id,
+      avatar: user.data.avatar,
+      name: user.data.firstname,
+      position: user.data.position
+    }
+  }
   search.events.on('input',function(){
     let value = this.value;
     let children = view.body.children();
@@ -35,32 +35,22 @@ function Users(users,element,available){
 
   view.body = view.element.find('.body');
 
-  view.on = function(){
-    available.forEach((user) => {
-
-
-      view.body.append(userRow.render(user));
-    });
+  view.on = function(users){
+    available = users.all.map((user)=>{ return userFormat(user); });
+    available.forEach((user)=>{ view.body.append(userRow.render(user)); });
     search.on();
   }
 
   view.off = function(){ view.body.empty(); search.off(); }
 
   view.available = {
-    add: (user)=>{ available.push({
-        id: user.id,
-        avatar: user.avatar,
-        name: user.firstname,
-        position: user.position
-      });
-    },
+    add: (user)=>{ available.push(userFormat(user)); },
     remove: (id)=>{
       available = available.reduce((list,user,i)=>{
         if(id != user.id){ list.push(user); }
         return list;
       },[]);
-    },
-    reset: ()=>{ available = users.all.map((user)=> user.data) }
+    }
   }
 
   return view

@@ -6,7 +6,7 @@ import { Users , Team } from './subcomponents';
 export default function (userList){
   const team = new Team();
   const view = new View({name:'create team',element: $('[data-teams="create"]') });
-  const users = Users(userList,view.element.find('[name="userList"]'));
+  const users = Users(view.element.find('[name="userList"]'));
   const form =  new Form({ name: 'createTeam', url: 'createTeam' });
   form.view = {};
   form.view.body = form.element.find('.body');
@@ -17,7 +17,6 @@ export default function (userList){
     form.view.counter.text('0');
     form.view.leader.empty().addClass('border-2');
     form.view.members.empty().addClass('border-2');
-    users.available.reset();
     team.members.empty();
   }
 
@@ -30,7 +29,7 @@ export default function (userList){
   const members = {
     remove: (id)=>{
       team.members.remove(id);
-      users.available.add(userList.find(id).data);
+      users.available.add(userList.find(id));
       form.view.counter.text(String(team.members.get().length));
     },
     add: (id,from)=>{
@@ -79,7 +78,7 @@ export default function (userList){
   });
 
 
-  view.on = function(){ users.on(); form.on(); }
+  view.on = function(){ users.on(userList); form.on(); }
 
   view.off = function(){ users.off(); form.off(); }
 

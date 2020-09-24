@@ -72,11 +72,11 @@ export default function(){
         users.forEach((user,i) => {
           let { card } = user;
           let selected = card.element.hasClass('delete');
-          if(selected){ remove.push(i); card.element.remove(); }
+          if(selected){ remove[i] = true; card.element.remove(); }
         });
 
         users = users.reduce((a,c,i)=>{
-            if(remove.indexOf(i) != -1){ a.push(c); }
+            if(!remove[i]){ a.push(c); }
             return a;
         },[]);
       }
