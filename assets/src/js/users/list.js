@@ -22,14 +22,13 @@ const Data = (()=>{
 export default function(){
   let users = [];
   const view = new View({name: 'user list',element: $('[data-users="list"]')});
-  const container = $('[data-users="list"]');
   const add = (user)=>{
     user = users[users.push(new User(user)) - 1];
     let { card } = user;
     card.buttons.name.profile.events.on('click',function(){
       Router(`/users/view/profile/${user.data.id}`);
     });
-    container.append(card.element);
+    view.element.append(card.element);
   }
   const selectCard = (e)=>{
     let el = $(e.currentTarget);

@@ -16245,7 +16245,7 @@
         select.status.options.select(status);
         select.status.on();
       }
-      if(select.owner.value != owner){
+      if(select.owner && select.owner.value != owner){
         select.owner.off();
         select.owner.options.select(owner);
         select.owner.on();

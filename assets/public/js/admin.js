@@ -16245,7 +16245,7 @@
         select.status.options.select(status);
         select.status.on();
       }
-      if(select.owner.value != owner){
+      if(select.owner && select.owner.value != owner){
         select.owner.off();
         select.owner.options.select(owner);
         select.owner.on();
@@ -16530,14 +16530,13 @@
   function List$1(){
     let users = [];
     const view = new View({name: 'user list',element: $('[data-users="list"]')});
-    const container = $('[data-users="list"]');
     const add = (user)=>{
       user = users[users.push(new User(user)) - 1];
       let { card } = user;
       card.buttons.name.profile.events.on('click',function(){
         page_js(`/users/view/profile/${user.data.id}`);
       });
-      container.append(card.element);
+      view.element.append(card.element);
     };
     const selectCard = (e)=>{
       let el = $(e.currentTarget);
@@ -17601,7 +17600,7 @@
   var dragula_1 = dragula;
 
   const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
-  const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");return t.fl(); },partials: {}, subs: {  }});
+  const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"solicitud m-4 bg-white approved\">");t.b("\n" + i);t.b("  <div class=\"header inline-flex  pt-2 px-4\">");t.b("\n" + i);t.b("    <div class=\"w-16 mr-4 mt-2\">");t.b("\n" + i);t.b("      <div class=\"w-16 h-16 overflow-hidden rounded-full\">");t.b("\n" + i);t.b("        <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-56 flex flex-col justify-center\">");t.b("\n" + i);t.b("      <div class=\"w-full flex items-center\">");t.b("\n" + i);t.b("        <p class=\"text-md text-gray-700\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("      <div class=\"w-full\">");t.b("\n" + i);t.b("        <p class=\"text-sm text-gray-600 pr-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n");t.b("\n" + i);t.b("    </div>");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("  <div class=\"body px-4 \">");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("  <div class=\"footer pb-2 px-4\">");t.b("\n" + i);t.b("    <div class=\"flex justify-start items-center h-10 w-full\">");t.b("\n" + i);t.b("      <div class=\"w-1/2 flex justify-start text-gray-700\">");t.b("\n");t.b("\n" + i);t.b("        <button data-type=\"button\" type=\"button\" name=\"view\" class=\"flex text-gray-500 items-center\">");t.b("\n" + i);t.b("          <div class=\"mr-2\">");t.b("\n" + i);t.b("            <i class=\"far fa-eye\" aria-hidden=\"true\"></i>");t.b("\n" + i);t.b("          </div>");t.b("\n" + i);t.b("          <p class=\"text-sm\">Ver más</p>");t.b("\n" + i);t.b("        </button>");t.b("\n");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("      <div class=\"w-1/2 flex items-center justify-end text-gray-700\">");t.b("\n" + i);t.b("        <p class=\"text-sm mr-2\">Integrantes :</p>");t.b("\n" + i);t.b("        <p class=\"text-sm\">");t.b(t.v(t.f("members",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
 
   function Users$2(element){
     let available = [];
@@ -17656,13 +17655,28 @@
     return view
   }
 
-  function Team(){
+  function Team(data){
     let members = [];
     let leader = null;
     let area = undefined;
     let name = undefined;
+    let id = undefined;
+    let avatar = undefined;
+
+    if(data){
+      data.members.forEach((member) => { members.push(member); });
+      leader = data.leader;
+      area = data.area;
+      name = data.name;
+      avatar = data.avatar;
+      id = data.id;
+    }
 
     const methods = {
+      'id': {
+        get: ()=>{ return id },
+        set: (value)=>{ id = value; }
+      },
       'name':{
         get: ()=>{ return name },
         set: (value)=>{ name = value; }
@@ -17670,6 +17684,10 @@
       'area':{
         get: ()=>{ return area },
         set: (value)=>{ area = value; }
+      },
+      'avatar':{
+        get: ()=>{ return avatar },
+        set: (value)=>{ avatar = value; }
       },
       'members':{
         writable: false,
@@ -17778,9 +17796,98 @@
     return view;
   }
 
+  function Card$2(data){
+    const element = $(document.createElement('div'));
+
+    element
+    .addClass('card m-4 bg-white')
+    .append(card$2.render({
+      avatar: data.avatar,
+      area: data.area,
+      name: data.name,
+      members: data.members.get().length,
+    }));
+
+    const { buttons } = Finder(element);
+
+    const methods = {
+      'buttons': { get: ()=>{ return buttons } },
+      'element': { get: ()=>{ return element } },
+      'off': {
+        writable: false,
+        value: ()=>{
+          buttons.all.forEach((btn)=>{ btn.off(); });
+        }
+      },
+      'on': {
+        writable: false,
+        value: ()=>{
+          buttons.all.forEach((btn)=>{ btn.on(); });
+        }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+
+  }
+
+  const Data$1 = (users)=>{
+    let teams = [];
+
+    for (var i = 0; i < 5; i++) {
+      let team = {
+        id: i,
+        members: [],
+        avatar: `${window.location.origin}/assets/public/img/placeholder-team.png`,
+        leader: users[5].data.id,
+        name: 'Team '+i,
+        area: 'Área de Ejemplo'
+      };
+      for (var j = 0; j < 5; j++) { team.members.push(users[j].data.id); }
+      teams.push(team);
+    }
+
+    return teams;
+
+  };
+
+  function List$2(users){
+    const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+    let teams = [];
+
+    const add = (team)=>{
+      team = teams[teams.push(new Team(team)) - 1];
+      team.card = new Card$2(team);
+      view.element.append(team.card.element);
+    };
+
+    Data$1(users.all).forEach(add);
+
+    const methods = {
+      'all': {
+        get: ()=>{ return teams }
+      },
+      'find': {
+        writable: false,
+        value: (id)=>{
+          return teams.find((team)=>{ return team.id == id; });
+        }
+      }
+    };
+
+    Object.defineProperties(view,methods);
+    view.on = function(){ teams.forEach((team)=>{ team.card.on(); }); };
+    view.off = function(){ teams.forEach((team)=>{ team.card.off(); }); };
+
+    return view;
+
+  }
+
   function Teams(users){
     return {
-      create: Create$1(users)
+      create: Create$1(users),
+      list: List$2(users)
     }
   }
 
@@ -17810,8 +17917,11 @@
 
     view.state.register({
       state: 'view teams',
-      on: ()=>{ toolbar.state.value = 'view teams'; },
-      off: ()=>{ }
+      on: ()=>{
+        teams.list.on();
+        toolbar.state.value = 'view teams';
+      },
+      off: ()=>{ teams.list.off(); }
     });
 
     view.state.register({

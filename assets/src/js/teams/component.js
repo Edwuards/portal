@@ -28,8 +28,11 @@ export default function({users}){
 
   view.state.register({
     state: 'view teams',
-    on: ()=>{ toolbar.state.value = 'view teams'; },
-    off: ()=>{ }
+    on: ()=>{
+      teams.list.on();
+      toolbar.state.value = 'view teams';
+    },
+    off: ()=>{ teams.list.off(); }
   });
 
   view.state.register({

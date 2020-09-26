@@ -56,13 +56,28 @@ function Users(element){
   return view
 }
 
-function Team(){
+function Team(data){
   let members = [];
   let leader = null;
   let area = undefined;
   let name = undefined;
+  let id = undefined;
+  let avatar = undefined;
+
+  if(data){
+    data.members.forEach((member) => { members.push(member); });
+    leader = data.leader;
+    area = data.area;
+    name = data.name;
+    avatar = data.avatar;
+    id = data.id;
+  }
 
   const methods = {
+    'id': {
+      get: ()=>{ return id },
+      set: (value)=>{ id = value; }
+    },
     'name':{
       get: ()=>{ return name },
       set: (value)=>{ name = value }
@@ -70,6 +85,10 @@ function Team(){
     'area':{
       get: ()=>{ return area },
       set: (value)=>{ area = value }
+    },
+    'avatar':{
+      get: ()=>{ return avatar },
+      set: (value)=>{ avatar = value }
     },
     'members':{
       writable: false,
