@@ -13,6 +13,7 @@ export default function({users}){
       next();
     },
     '/teams/view/all': function(){
+
       view.state.value = 'view teams';
     },
     '/teams/create': function(){
