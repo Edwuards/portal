@@ -1,4 +1,4 @@
-import TeamView from './subcomponents';
+import TeamView from './team';
 
 export default function (Users){
   const view = TeamView({
@@ -8,7 +8,8 @@ export default function (Users){
 
   return {
     on: ()=>{
-      view.on({ users: Users.all });
+      view.on();
+      view.load({ users: Users.all });
       view.disable(false);
     },
     off: view.off

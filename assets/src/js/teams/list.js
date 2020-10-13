@@ -13,11 +13,16 @@ const Data = (users)=>{
       name: 'Team '+i,
       area: 'Área de Ejemplo'
     };
-    for (var j = 0; j < 5; j++) { team.members.push(users[j].data.id); }
+    for (var j = 0; j < 5; j++) { team.members.push(users[j]); }
     teams.push(team);
   }
 
   return teams;
+
+}
+
+function Team(data){
+  const card = new Card(data);
 
 }
 
