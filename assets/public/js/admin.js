@@ -16735,7 +16735,7 @@
 
   }
 
-  const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
+  const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" data-drag=\"0\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
   const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"header inline-flex  pt-2 px-4\">");t.b("\n" + i);t.b("  <div class=\"w-16 mr-4 mt-2\">");t.b("\n" + i);t.b("    <div class=\"w-16 h-16 overflow-hidden rounded-full\">");t.b("\n" + i);t.b("      <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <div class=\"w-56 flex flex-col justify-center\">");t.b("\n" + i);t.b("    <div class=\"w-full flex items-center\">");t.b("\n" + i);t.b("      <p class=\"text-md text-gray-700\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-full\">");t.b("\n" + i);t.b("      <p class=\"text-sm text-gray-600 pr-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("</div>");t.b("\n");t.b("\n" + i);t.b("<div class=\"body px-4 \">");t.b("\n");t.b("\n" + i);t.b("</div>");t.b("\n");t.b("\n" + i);t.b("<div class=\"footer pb-2 px-4\">");t.b("\n" + i);t.b("  <div class=\"flex justify-start items-center h-10 w-full\">");t.b("\n" + i);t.b("    <div class=\"w-1/2 flex justify-start text-gray-700\">");t.b("\n");t.b("\n" + i);t.b("      <button data-type=\"button\" type=\"button\" name=\"view\" class=\"flex text-gray-500 items-center\">");t.b("\n" + i);t.b("        <div class=\"mr-2\">");t.b("\n" + i);t.b("          <i class=\"far fa-eye\" aria-hidden=\"true\"></i>");t.b("\n" + i);t.b("        </div>");t.b("\n" + i);t.b("        <p class=\"text-sm\">Ver más</p>");t.b("\n" + i);t.b("      </button>");t.b("\n");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-1/2 flex items-center justify-end text-gray-700\">");t.b("\n" + i);t.b("      <p class=\"text-sm mr-2\">Integrantes :</p>");t.b("\n" + i);t.b("      <p class=\"text-sm\">");t.b(t.v(t.f("members",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
 
   var atoa = function atoa (a, n) { return Array.prototype.slice.call(a, n); };
@@ -17739,12 +17739,9 @@
     const view = new View(data.view);
     const form = Team(data.form);
     const users = Users$2(view.element.find('[name="userList"]'));
-
-    const drag = dragula_1([
-      form.view.leader[0],
-      form.view.members[0],
-      users.body[0]
-    ]);
+    const containers = [ form.view.leader[0],form.view.members[0],users.body[0]];
+    const options = { moves:(el)=>{ return Number(el.attributes['data-drag'].value) } };
+    const drag = dragula_1(containers,options);
 
     const members = {
       remove: (id)=>{
@@ -17765,7 +17762,7 @@
 
       if(dropped.on == 'members'){
         if(dropped.from == 'users'){ members.add(id); }
-        else{ team.leader = null; }
+        else{ form.team.leader = null; }
         target.removeClass('border-2');
       }
       if(dropped.on == 'users'){
@@ -17792,7 +17789,6 @@
 
     });
 
-
     view.on = function(data){
       if(data.team){ data.team.members = data.team.members.map(formatUser); }
       users.on(data.users.map(formatUser));
@@ -17800,6 +17796,12 @@
     };
 
     view.off = function(){ users.off(); form.off(); };
+
+    view.disable = (toggle)=>{
+      form.disable(toggle);
+      form.view.members.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
+      users.body.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
+    };
 
     return view;
 
@@ -17812,7 +17814,10 @@
     });
 
     return {
-      on: ()=>{ view.on({ users: Users.all }); },
+      on: ()=>{
+        view.on({ users: Users.all });
+        view.disable(false);
+      },
       off: view.off
     }
   }

@@ -49,7 +49,7 @@ function Users(element){
       },[]);
       return removed;
     }
-  }
+  };
 
   return view
 }
@@ -146,12 +146,9 @@ export default function(data){
   const view = new View(data.view);
   const form = Team(data.form);
   const users = Users(view.element.find('[name="userList"]'));
-
-  const drag = dragula([
-    form.view.leader[0],
-    form.view.members[0],
-    users.body[0]
-  ]);
+  const containers = [ form.view.leader[0],form.view.members[0],users.body[0]];
+  const options = { moves:(el)=>{ return Number(el.attributes['data-drag'].value) } }
+  const drag = dragula(containers,options);
 
   const members = {
     remove: (id)=>{
@@ -172,7 +169,7 @@ export default function(data){
 
     if(dropped.on == 'members'){
       if(dropped.from == 'users'){ members.add(id); }
-      else{ team.leader = null; }
+      else{ form.team.leader = null; }
       target.removeClass('border-2');
     }
     if(dropped.on == 'users'){
@@ -199,7 +196,6 @@ export default function(data){
 
   });
 
-
   view.on = function(data){
     if(data.team){ data.team.members = data.team.members.map(formatUser); }
     users.on(data.users.map(formatUser));
@@ -207,6 +203,12 @@ export default function(data){
   }
 
   view.off = function(){ users.off(); form.off(); }
+
+  view.disable = (toggle)=>{
+    form.disable(toggle);
+    form.view.members.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
+    users.body.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
+  }
 
   return view;
 

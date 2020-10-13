@@ -7,7 +7,10 @@ export default function (Users){
   });
 
   return {
-    on: ()=>{ view.on({ users: Users.all }); },
+    on: ()=>{
+      view.on({ users: Users.all });
+      view.disable(false);
+    },
     off: view.off
   }
 }
