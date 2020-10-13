@@ -1,6 +1,5 @@
 import { View } from '../helpers';
 import { Card } from './card';
-import { Team } from './subcomponents';
 
 const Data = (users)=>{
   let teams = [];
@@ -26,13 +25,8 @@ export default function(users){
   const view = new View({name: 'team list', element: $('[data-teams="list"]') });
   let teams = [];
 
-  const add = (team)=>{
-    team = teams[teams.push(new Team(team)) - 1];
-    team.card = new Card(team);
-    view.element.append(team.card.element);
-  }
 
-  Data(users.all).forEach(add);
+
 
   const methods = {
     'all': {

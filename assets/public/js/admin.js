@@ -1,7 +1,7 @@
 (function ($$1) {
   'use strict';
 
-  $$1 = $$1 && Object.prototype.hasOwnProperty.call($$1, 'default') ? $$1['default'] : $$1;
+  $$1 = $$1 && $$1.hasOwnProperty('default') ? $$1['default'] : $$1;
 
   /*
     All RULES must have a test and message property
@@ -4369,17 +4369,17 @@
           if(!found.inputs.type[type][group]){ found.inputs.type[type][group] = {}; }
           found.inputs.type[type][group][name] = el;
         }
-        else {
+        else{
           found.inputs.type[type][name] = el;
         }
       }
-      else {
+      else{
         el = new Button(el);
         if(group){
           if(!found.buttons.group[group]){ found.buttons.group[group] = {}; }
           found.buttons.group[group][name] = el;
         }
-        else {
+        else{
           found.buttons.name[name] = el;
         }
 
@@ -4465,7 +4465,7 @@
             if(id == undefined){
               registered.forEach((id)=>{ observer.unregister(type,id); });
             }
-            else {
+            else{
               observer.unregister(type,id);
             }
           }
@@ -4700,7 +4700,7 @@
               if(e.tagName !== 'BODY'){
                 found = e.classList.toString().indexOf('flatpickr') != -1;
                 if(found){ search = false;}            }
-              else {
+              else{
                 search = false;
               }
               e = e.parentElement;
@@ -16735,6 +16735,9 @@
 
   }
 
+  const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
+  const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"header inline-flex  pt-2 px-4\">");t.b("\n" + i);t.b("  <div class=\"w-16 mr-4 mt-2\">");t.b("\n" + i);t.b("    <div class=\"w-16 h-16 overflow-hidden rounded-full\">");t.b("\n" + i);t.b("      <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <div class=\"w-56 flex flex-col justify-center\">");t.b("\n" + i);t.b("    <div class=\"w-full flex items-center\">");t.b("\n" + i);t.b("      <p class=\"text-md text-gray-700\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-full\">");t.b("\n" + i);t.b("      <p class=\"text-sm text-gray-600 pr-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("</div>");t.b("\n");t.b("\n" + i);t.b("<div class=\"body px-4 \">");t.b("\n");t.b("\n" + i);t.b("</div>");t.b("\n");t.b("\n" + i);t.b("<div class=\"footer pb-2 px-4\">");t.b("\n" + i);t.b("  <div class=\"flex justify-start items-center h-10 w-full\">");t.b("\n" + i);t.b("    <div class=\"w-1/2 flex justify-start text-gray-700\">");t.b("\n");t.b("\n" + i);t.b("      <button data-type=\"button\" type=\"button\" name=\"view\" class=\"flex text-gray-500 items-center\">");t.b("\n" + i);t.b("        <div class=\"mr-2\">");t.b("\n" + i);t.b("          <i class=\"far fa-eye\" aria-hidden=\"true\"></i>");t.b("\n" + i);t.b("        </div>");t.b("\n" + i);t.b("        <p class=\"text-sm\">Ver más</p>");t.b("\n" + i);t.b("      </button>");t.b("\n");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-1/2 flex items-center justify-end text-gray-700\">");t.b("\n" + i);t.b("      <p class=\"text-sm mr-2\">Integrantes :</p>");t.b("\n" + i);t.b("      <p class=\"text-sm\">");t.b(t.v(t.f("members",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
+
   var atoa = function atoa (a, n) { return Array.prototype.slice.call(a, n); };
 
   var si = typeof setImmediate === 'function', tick;
@@ -17599,21 +17602,11 @@
 
   var dragula_1 = dragula;
 
-  const userRow = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div data-id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" class=\"flex items-center cursor-move border-b border-gray-500 py-2 mx-2 w-full\">");t.b("\n" + i);t.b("  <div class=\"w-8 mr-2 rounded-full overflow-hidden\">");t.b("\n" + i);t.b("    <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("  <p class=\"text-gray-700 text-sm mx-2\">");t.b(t.v(t.f("position",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}); 
-  const card$2 = new hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"solicitud m-4 bg-white approved\">");t.b("\n" + i);t.b("  <div class=\"header inline-flex  pt-2 px-4\">");t.b("\n" + i);t.b("    <div class=\"w-16 mr-4 mt-2\">");t.b("\n" + i);t.b("      <div class=\"w-16 h-16 overflow-hidden rounded-full\">");t.b("\n" + i);t.b("        <img class=\"w-full\" src=\"");t.b(t.v(t.f("avatar",c,p,0)));t.b("\" alt=\"\">");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"w-56 flex flex-col justify-center\">");t.b("\n" + i);t.b("      <div class=\"w-full flex items-center\">");t.b("\n" + i);t.b("        <p class=\"text-md text-gray-700\">");t.b(t.v(t.f("name",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("      <div class=\"w-full\">");t.b("\n" + i);t.b("        <p class=\"text-sm text-gray-600 pr-2\">");t.b(t.v(t.f("area",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n");t.b("\n" + i);t.b("    </div>");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("  <div class=\"body px-4 \">");t.b("\n");t.b("\n" + i);t.b("  </div>");t.b("\n");t.b("\n" + i);t.b("  <div class=\"footer pb-2 px-4\">");t.b("\n" + i);t.b("    <div class=\"flex justify-start items-center h-10 w-full\">");t.b("\n" + i);t.b("      <div class=\"w-1/2 flex justify-start text-gray-700\">");t.b("\n");t.b("\n" + i);t.b("        <button data-type=\"button\" type=\"button\" name=\"view\" class=\"flex text-gray-500 items-center\">");t.b("\n" + i);t.b("          <div class=\"mr-2\">");t.b("\n" + i);t.b("            <i class=\"far fa-eye\" aria-hidden=\"true\"></i>");t.b("\n" + i);t.b("          </div>");t.b("\n" + i);t.b("          <p class=\"text-sm\">Ver más</p>");t.b("\n" + i);t.b("        </button>");t.b("\n");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("      <div class=\"w-1/2 flex items-center justify-end text-gray-700\">");t.b("\n" + i);t.b("        <p class=\"text-sm mr-2\">Integrantes :</p>");t.b("\n" + i);t.b("        <p class=\"text-sm\">");t.b(t.v(t.f("members",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("      </div>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("  </div>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
-
   function Users$2(element){
     let available = [];
     const view = new View({name: 'users list', element: element });
     const { search } = Finder(view.element).inputs.type.text;
-    const userFormat = (user)=>{
-      return {
-        id: user.data.id,
-        avatar: user.data.avatar,
-        name: user.data.firstname,
-        position: user.data.position
-      }
-    };
+
     search.events.on('input',function(){
       let value = this.value;
       let children = view.body.children();
@@ -17627,7 +17620,7 @@
         });
 
       }
-      else {
+      else{
         children.removeClass('hidden');
       }
     });
@@ -17635,7 +17628,7 @@
     view.body = view.element.find('.body');
 
     view.on = function(users){
-      available = users.all.map((user)=>{ return userFormat(user); });
+      available = users;
       available.forEach((user)=>{ view.body.append(userRow.render(user)); });
       search.on();
     };
@@ -17643,12 +17636,15 @@
     view.off = function(){ view.body.empty(); search.off(); };
 
     view.available = {
-      add: (user)=>{ available.push(userFormat(user)); },
+      add: (user)=>{ available.push(user); },
       remove: (id)=>{
+        let removed = undefined;
         available = available.reduce((list,user,i)=>{
           if(id != user.id){ list.push(user); }
+          else{ removed = user; }
           return list;
         },[]);
+        return removed;
       }
     };
 
@@ -17658,67 +17654,9 @@
   function Team(data){
     let members = [];
     let leader = null;
-    let area = undefined;
-    let name = undefined;
-    let id = undefined;
-    let avatar = undefined;
-
-    if(data){
-      data.members.forEach((member) => { members.push(member); });
-      leader = data.leader;
-      area = data.area;
-      name = data.name;
-      avatar = data.avatar;
-      id = data.id;
-    }
-
-    const methods = {
-      'id': {
-        get: ()=>{ return id },
-        set: (value)=>{ id = value; }
-      },
-      'name':{
-        get: ()=>{ return name },
-        set: (value)=>{ name = value; }
-      },
-      'area':{
-        get: ()=>{ return area },
-        set: (value)=>{ area = value; }
-      },
-      'avatar':{
-        get: ()=>{ return avatar },
-        set: (value)=>{ avatar = value; }
-      },
-      'members':{
-        writable: false,
-        value: {
-          'empty': ()=>{ members = []; },
-          'get': ()=>{ return members; },
-          'add': (user)=>{ members.push(user); },
-          'remove': (id)=>{
-            members = members.reduce((list,user,i)=>{
-              if(id != user.id){ list.push(user); }
-              return list;
-            },[]);
-          }
-        }
-      },
-      'leader':{
-        set: (value)=>{ leader = value; },
-        get: ()=>{ return leader; }
-      }
-    };
-
-    Object.defineProperties(this,methods);
-
-  }
-
-  function Create$1 (userList){
-    const team = new Team();
-    const view = new View({name:'create team',element: $('[data-teams="create"]') });
-    const users = Users$2(view.element.find('[name="userList"]'));
-    const form =  new Form({ name: 'createTeam', url: 'createTeam' });
+    const form =  new Form({ name: data.name, url: data.url });
     form.view = {};
+    form.team = {};
     form.view.body = form.element.find('.body');
     form.view.counter = form.view.body.find('[data="counter"]');
     form.view.leader = form.view.body.find('[data="leader"]');
@@ -17727,8 +17665,80 @@
       form.view.counter.text('0');
       form.view.leader.empty().addClass('border-2');
       form.view.members.empty().addClass('border-2');
-      team.members.empty();
+      members = [];
     };
+    form.on = function(team){
+      if(team){
+        form.team.name = team.name;
+        form.team.area = team.area;
+        form.team.avatar = team.avatar;
+        form.team.leader = team.leader;
+        team.members.forEach((member)=>{
+          form.team.members.add(member);
+          form.view[team.leader == member.id ? 'leader' : 'members'].append(userRow.render(member));
+        });
+      }
+    };
+
+
+    const methods = {
+
+      'name':{
+        get: ()=>{ return form.inputs.text.name.value; },
+        set: (value)=>{ form.inputs.text.name.value = value; }
+      },
+      'area':{
+        get: ()=>{ return form.inputs.select.area.value; },
+        set: (value)=>{ form.inputs.select.area.value = value; }
+      },
+      'avatar':{
+        get: ()=>{ return form.inputs.image.avatar.value },
+        set: (value)=>{ form.inputs.image.avatar.value = value; }
+      },
+      'members':{
+        writable: false,
+        value: {
+          'get': ()=>{ return members; },
+          'add': (user)=>{
+            form.view.counter.text(members.push(user));
+          },
+          'remove': (id)=>{
+            let removed = undefined;
+            members = members.reduce((list,user,i)=>{
+              if(id != user.id){ list.push(user); }
+              else{ removed = user; }
+              return list;
+            },[]);
+
+            form.view.counter.text(members.length);
+            return removed;
+          }
+        }
+      },
+      'leader':{
+        set: (userID)=>{ leader = userID; },
+        get: ()=>{ return leader; }
+      }
+    };
+
+    Object.defineProperties(form.team,methods);
+
+    return form;
+
+  }
+
+  function TeamView(data){
+    const formatUser = (user)=>{
+      return {
+        id: user.data.id,
+        avatar: user.data.avatar,
+        name: user.data.firstname,
+        position: user.data.position
+      }
+    };
+    const view = new View(data.view);
+    const form = Team(data.form);
+    const users = Users$2(view.element.find('[name="userList"]'));
 
     const drag = dragula_1([
       form.view.leader[0],
@@ -17738,17 +17748,12 @@
 
     const members = {
       remove: (id)=>{
-        team.members.remove(id);
-        users.available.add(userList.find(id));
-        form.view.counter.text(String(team.members.get().length));
+        users.available.add(form.team.members.remove(id));
       },
-      add: (id,from)=>{
-        users.available.remove(id);
-        team.members.add(userList.find(id).data);
-        form.view.counter.text(String(team.members.get().length));
+      add: (id)=>{
+        form.team.members.add(users.available.remove(id));
       }
     };
-
 
     drag.on('drop',function(el,target,source){
       target = $(target); source = $(source);
@@ -17760,109 +17765,64 @@
 
       if(dropped.on == 'members'){
         if(dropped.from == 'users'){ members.add(id); }
-        else { team.leader = null; }
+        else{ team.leader = null; }
         target.removeClass('border-2');
       }
       if(dropped.on == 'users'){
-        if(dropped.from == 'leader'){ team.leader = null; }
+        if(dropped.from == 'leader'){ form.team.leader = null; }
         members.remove(id);
       }
       if(dropped.on == 'leader'){
         if(dropped.from == 'users'){ members.add(id); }
-        if(team.leader !== null){
-          let leader = form.view.leader.find(`[data-id="${team.leader}"]`);
+        if(form.team.leader !== null){
+          let leader = form.view.leader.find(`[data-id="${form.team.leader}"]`);
           leader.detach();
           form.view.members.prepend(leader);
         }
 
         target.removeClass('border-2');
-        team.leader = id;
+        form.team.leader = id;
       }
 
       {
-        let members = team.members.get().length;
+        let members = form.team.members.get().length;
         if(dropped.from == 'leader'){ source.addClass('border-2'); }
-        if(dropped.from == 'members' && (!members || (team.leader != null && members == 1)) ){ source.addClass('border-2'); }
+        if(dropped.from == 'members' && (!members || (form.team.leader != null && members == 1)) ){ source.addClass('border-2'); }
       }
 
     });
 
 
-    view.on = function(){ users.on(userList); form.on(); };
+    view.on = function(data){
+      if(data.team){ data.team.members = data.team.members.map(formatUser); }
+      users.on(data.users.map(formatUser));
+      form.on((data.team ? data.team : undefined));
+    };
 
     view.off = function(){ users.off(); form.off(); };
 
-
     return view;
-  }
-
-  function Card$2(data){
-    const element = $(document.createElement('div'));
-
-    element
-    .addClass('card m-4 bg-white')
-    .append(card$2.render({
-      avatar: data.avatar,
-      area: data.area,
-      name: data.name,
-      members: data.members.get().length,
-    }));
-
-    const { buttons } = Finder(element);
-
-    const methods = {
-      'buttons': { get: ()=>{ return buttons } },
-      'element': { get: ()=>{ return element } },
-      'off': {
-        writable: false,
-        value: ()=>{
-          buttons.all.forEach((btn)=>{ btn.off(); });
-        }
-      },
-      'on': {
-        writable: false,
-        value: ()=>{
-          buttons.all.forEach((btn)=>{ btn.on(); });
-        }
-      }
-    };
-
-    Object.defineProperties(this,methods);
-
 
   }
 
-  const Data$1 = (users)=>{
-    let teams = [];
+  function Create$1 (Users){
+    const view = TeamView({
+      view: {name: 'create user', element: $('[data-teams="create"]')},
+      form: {name: 'createTeam', url:'createTeam'}
+    });
 
-    for (var i = 0; i < 5; i++) {
-      let team = {
-        id: i,
-        members: [],
-        avatar: `${window.location.origin}/assets/public/img/placeholder-team.png`,
-        leader: users[5].data.id,
-        name: 'Team '+i,
-        area: 'Área de Ejemplo'
-      };
-      for (var j = 0; j < 5; j++) { team.members.push(users[j].data.id); }
-      teams.push(team);
+    return {
+      on: ()=>{ view.on({ users: Users.all }); },
+      off: view.off
     }
-
-    return teams;
-
-  };
+  }
 
   function List$2(users){
     const view = new View({name: 'team list', element: $('[data-teams="list"]') });
     let teams = [];
 
-    const add = (team)=>{
-      team = teams[teams.push(new Team(team)) - 1];
-      team.card = new Card$2(team);
-      view.element.append(team.card.element);
-    };
 
-    Data$1(users.all).forEach(add);
+
 
     const methods = {
       'all': {
@@ -17887,7 +17847,7 @@
   function Teams(users){
     return {
       create: Create$1(users),
-      list: List$2(users)
+      list: List$2()
     }
   }
 
@@ -17902,6 +17862,7 @@
         next();
       },
       '/teams/view/all': function(){
+
         view.state.value = 'view teams';
       },
       '/teams/create': function(){
