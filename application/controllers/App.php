@@ -14,6 +14,7 @@ class App extends CI_Controller {
 
 	public function index()
 	{
+		echo 'h';
 		// if(!$this->session->verified){ redirect('app/login'); }
 		// else{ redirect('app/dashboard',301); }
 	}
