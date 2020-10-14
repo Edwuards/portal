@@ -16713,6 +16713,15 @@
     });
 
     toolbar.state.register({
+      state:'view team',
+      on:()=>{
+        toolbar.title.text('Perfil de Equipo');
+        toolbar.toggleBtns(groups['view team'],true);
+      },
+      off: ()=>{ toolbar.toggleBtns(groups['view team'],false); }
+    });
+
+    toolbar.state.register({
       state:'create team',
       on:()=>{
         toolbar.title.text('Crear Equipo');
@@ -17655,6 +17664,7 @@
     let members = [];
     let leader = null;
     const form =  new Form({ name: data.name, url: data.url });
+    const inputs = form.inputs.type;
     form.view = {};
     form.team = {};
     form.view.body = form.element.find('.body');
@@ -17673,6 +17683,8 @@
         form.team.area = team.area;
         form.team.avatar = team.avatar;
         form.team.leader = team.leader;
+        if(team.leader){ form.view.leader.removeClass('border-2'); }
+        if(team.members.length){ form.view.members.removeClass('border-2'); }
         team.members.forEach((member)=>{
           form.team.members.add(member);
           form.view[team.leader == member.id ? 'leader' : 'members'].append(userRow.render(member));
@@ -17681,19 +17693,20 @@
     };
 
 
+
     const methods = {
 
       'name':{
-        get: ()=>{ return form.inputs.text.name.value; },
-        set: (value)=>{ form.inputs.text.name.value = value; }
+        get: ()=>{ return inputs.text.name.value; },
+        set: (value)=>{ inputs.text.name.value = value; }
       },
       'area':{
-        get: ()=>{ return form.inputs.select.area.value; },
-        set: (value)=>{ form.inputs.select.area.value = value; }
+        get: ()=>{ return inputs.select.work_area.value; },
+        set: (value)=>{ inputs.select.work_area.value = value; }
       },
       'avatar':{
-        get: ()=>{ return form.inputs.image.avatar.value },
-        set: (value)=>{ form.inputs.image.avatar.value = value; }
+        get: ()=>{ return inputs.image.avatar.value },
+        set: (value)=>{ inputs.image.avatar.value = value; }
       },
       'members':{
         writable: false,
@@ -17789,7 +17802,7 @@
 
     });
 
-    view.on = function(data){
+    view.load = function(data){
       if(data.team){ data.team.members = data.team.members.map(formatUser); }
       users.on(data.users.map(formatUser));
       form.on((data.team ? data.team : undefined));
@@ -17815,18 +17828,99 @@
 
     return {
       on: ()=>{
-        view.on({ users: Users.all });
+        view.on();
+        view.load({ users: Users.all });
         view.disable(false);
       },
       off: view.off
     }
   }
 
-  function List$2(users){
-    const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+  function Card$2(data){
+    const element = $(document.createElement('div'));
+
+    element
+    .addClass('card m-4 bg-white')
+    .append(card$2.render({
+      avatar: data.avatar,
+      area: data.area,
+      name: data.name,
+      members: data.members.length,
+    }));
+
+    const { buttons } = Finder(element);
+
+    const methods = {
+      'buttons': { get: ()=>{ return buttons } },
+      'element': { get: ()=>{ return element } },
+      'off': {
+        writable: false,
+        value: ()=>{
+          buttons.all.forEach((btn)=>{ btn.off(); });
+        }
+      },
+      'on': {
+        writable: false,
+        value: ()=>{
+          buttons.all.forEach((btn)=>{ btn.on(); });
+        }
+      }
+    };
+
+    buttons.name.view.events.on('click',function(){
+      page_js(`/teams/view/team/${data.id}`);
+    });
+
+    Object.defineProperties(this,methods);
+
+
+  }
+
+  const Data$1 = (users)=>{
     let teams = [];
 
+    for (var i = 0; i < 5; i++) {
+      let team = {
+        id: i,
+        members: [],
+        avatar: `${window.location.origin}/assets/public/img/placeholder-team.png`,
+        leader: users[4].data.id,
+        name: 'Team '+i,
+        area: 'Área de Ejemplo'
+      };
+      for (var j = 0; j < 5; j++) { team.members.push(users[j]); }
+      teams.push(team);
+    }
 
+    return teams;
+
+  };
+
+  function Team$1(data){
+    const card = new Card$2(data);
+
+    const methods = {
+      'data': {
+        get: ()=>{ return data }
+      },
+      'card': {
+        get: ()=>{ return card }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+  }
+
+  function List$2(users){
+    let teams = [];
+    const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+    const add = (team)=>{
+      team = teams[teams.push(new Team$1(team)) - 1];
+      view.element.append(team.card.element);
+    };
+
+    Data$1(users.all).forEach(add);
 
 
     const methods = {
@@ -17836,7 +17930,7 @@
       'find': {
         writable: false,
         value: (id)=>{
-          return teams.find((team)=>{ return team.id == id; });
+          return teams.find((team)=>{ return team.data.id == id; });
         }
       }
     };
@@ -17849,10 +17943,43 @@
 
   }
 
+  function Edit (Users){
+    const view = TeamView({
+      view: {name: 'edit user', element: $('[data-teams="edit"]')},
+      form: {name: 'editTeam', url:'createTeam'}
+    });
+    let currentTeam = undefined;
+
+    return {
+      on: view.on,
+      off: view.off,
+      load: (team)=>{
+        currentTeam = team.id;
+        let exclude = team.members.map(m => m.data.id);
+        let data = {};
+        data.team = {
+          name: team.name,
+          area: team.area,
+          avatar: team.avatar,
+          leader: team.leader,
+          members: team.members.map(m => m)
+        };
+
+        data.users = Users.all.reduce((a,c)=>{
+          if(exclude.indexOf(c.data.id) == -1){ a.push(c); }
+          return a
+        },[]);
+
+        view.load(data);
+      }
+    }
+  }
+
   function Teams(users){
     return {
       create: Create$1(users),
-      list: List$2()
+      list: List$2(users),
+      view: Edit(users)
     }
   }
 
@@ -17867,8 +17994,11 @@
         next();
       },
       '/teams/view/all': function(){
-
         view.state.value = 'view teams';
+      },
+      '/teams/view/team/:id': function(ctx){
+        view.state.value = 'view team';
+        teams.view.load(teams.list.find(ctx.params.id).data);
       },
       '/teams/create': function(){
         view.state.value = 'create team';
@@ -17888,6 +18018,15 @@
         toolbar.state.value = 'view teams';
       },
       off: ()=>{ teams.list.off(); }
+    });
+
+    view.state.register({
+      state: 'view team',
+      on: ()=>{
+        teams.view.on();
+        toolbar.state.value = 'view team';
+      },
+      off: ()=>{ teams.view.off(); }
     });
 
     view.state.register({

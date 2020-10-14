@@ -1,5 +1,6 @@
 import { Finder } from '../form/inputs';
 import { card } from '../templates/teams';
+import Router from 'page';
 
 export function Card(data){
   const element = $(document.createElement('div'));
@@ -10,7 +11,7 @@ export function Card(data){
     avatar: data.avatar,
     area: data.area,
     name: data.name,
-    members: data.members.get().length,
+    members: data.members.length,
   }));
 
   const { buttons } = Finder(element);
@@ -31,6 +32,10 @@ export function Card(data){
       }
     }
   }
+
+  buttons.name.view.events.on('click',function(){
+    Router(`/teams/view/team/${data.id}`);
+  })
 
   Object.defineProperties(this,methods);
 

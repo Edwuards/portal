@@ -62,6 +62,7 @@ function Team(data){
   let id = undefined;
   let avatar = undefined;
   const form =  new Form({ name: data.name, url: data.url });
+  const inputs = form.inputs.type;
   form.view = {};
   form.team = {};
   form.view.body = form.element.find('.body');
@@ -80,6 +81,8 @@ function Team(data){
       form.team.area = team.area;
       form.team.avatar = team.avatar;
       form.team.leader = team.leader;
+      if(team.leader){ form.view.leader.removeClass('border-2'); }
+      if(team.members.length){ form.view.members.removeClass('border-2'); }
       team.members.forEach((member)=>{
         form.team.members.add(member);
         form.view[team.leader == member.id ? 'leader' : 'members'].append(userRow.render(member));
@@ -88,19 +91,20 @@ function Team(data){
   }
 
 
+
   const methods = {
 
     'name':{
-      get: ()=>{ return form.inputs.text.name.value; },
-      set: (value)=>{ form.inputs.text.name.value = value }
+      get: ()=>{ return inputs.text.name.value; },
+      set: (value)=>{ inputs.text.name.value = value }
     },
     'area':{
-      get: ()=>{ return form.inputs.select.area.value; },
-      set: (value)=>{ form.inputs.select.area.value = value }
+      get: ()=>{ return inputs.select.work_area.value; },
+      set: (value)=>{ inputs.select.work_area.value = value }
     },
     'avatar':{
-      get: ()=>{ return form.inputs.image.avatar.value },
-      set: (value)=>{ form.inputs.image.avatar.value = value }
+      get: ()=>{ return inputs.image.avatar.value },
+      set: (value)=>{ inputs.image.avatar.value = value }
     },
     'members':{
       writable: false,

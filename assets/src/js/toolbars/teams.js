@@ -30,6 +30,15 @@ export default function(){
   });
 
   toolbar.state.register({
+    state:'view team',
+    on:()=>{
+      toolbar.title.text('Perfil de Equipo');
+      toolbar.toggleBtns(groups['view team'],true);
+    },
+    off: ()=>{ toolbar.toggleBtns(groups['view team'],false); }
+  });
+
+  toolbar.state.register({
     state:'create team',
     on:()=>{
       toolbar.title.text('Crear Equipo');

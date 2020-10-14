@@ -9,7 +9,7 @@ const Data = (users)=>{
       id: i,
       members: [],
       avatar: `${window.location.origin}/assets/public/img/placeholder-team.png`,
-      leader: users[5].data.id,
+      leader: users[4].data.id,
       name: 'Team '+i,
       area: 'Área de Ejemplo'
     };
@@ -24,13 +24,28 @@ const Data = (users)=>{
 function Team(data){
   const card = new Card(data);
 
+  const methods = {
+    'data': {
+      get: ()=>{ return data }
+    },
+    'card': {
+      get: ()=>{ return card }
+    }
+  }
+
+  Object.defineProperties(this,methods);
+
 }
 
 export default function(users){
-  const view = new View({name: 'team list', element: $('[data-teams="list"]') });
   let teams = [];
+  const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+  const add = (team)=>{
+    team = teams[teams.push(new Team(team)) - 1];
+    view.element.append(team.card.element);
+  }
 
-
+  Data(users.all).forEach(add);
 
 
   const methods = {
@@ -40,7 +55,7 @@ export default function(users){
     'find': {
       writable: false,
       value: (id)=>{
-        return teams.find((team)=>{ return team.id == id; });
+        return teams.find((team)=>{ return team.data.id == id; });
       }
     }
   }

@@ -10,7 +10,7 @@ export default function (Users){
   return {
     on: view.on,
     off: view.off,
-    edit: (team)=>{
+    load: (team)=>{
       currentTeam = team.id;
       let exclude = team.members.map(m => m.data.id);
       let data = {};
