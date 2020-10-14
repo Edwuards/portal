@@ -7,27 +7,33 @@ export default function (Users){
   });
   let currentTeam = undefined;
 
+  const load = (team)=>{
+    currentTeam = team;
+    let exclude = team.members.map(m => m.data.id);
+    let data = {};
+    data.team = {
+      name: team.name,
+      area: team.area,
+      avatar: team.avatar,
+      leader: team.leader,
+      members: team.members.map(m => m)
+    };
+
+    data.users = Users.all.reduce((a,c)=>{
+      if(exclude.indexOf(c.data.id) == -1){ a.push(c); }
+      return a
+    },[]);
+
+    view.load(data);
+  }
+
   return {
-    on: view.on,
+    on: ()=>{ view.disable(true); view.on() },
     off: view.off,
-    load: (team)=>{
-      currentTeam = team.id;
-      let exclude = team.members.map(m => m.data.id);
-      let data = {};
-      data.team = {
-        name: team.name,
-        area: team.area,
-        avatar: team.avatar,
-        leader: team.leader,
-        members: team.members.map(m => m)
-      };
-
-      data.users = Users.all.reduce((a,c)=>{
-        if(exclude.indexOf(c.data.id) == -1){ a.push(c); }
-        return a
-      },[]);
-
-      view.load(data);
+    load: load,
+    edit:(toggle)=>{
+      view.disable(!toggle);
+      if(!toggle){ load(currentTeam); }
     }
   }
 }

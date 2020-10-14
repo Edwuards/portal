@@ -30,13 +30,15 @@ function Users(element){
 
   view.body = view.element.find('.body');
 
-  view.on = function(users){
+  view.on = function(){ search.on(); }
+
+  view.load = (users)=>{
+    view.body.empty();
     available = users;
     available.forEach((user)=>{ view.body.append(userRow.render(user)); });
-    search.on();
   }
 
-  view.off = function(){ view.body.empty(); search.off(); }
+  view.off = function(){ search.off(); }
 
   view.available = {
     add: (user)=>{ available.push(user); },
@@ -63,33 +65,35 @@ function Team(data){
   let avatar = undefined;
   const form =  new Form({ name: data.name, url: data.url });
   const inputs = form.inputs.type;
+  const load = (team)=>{
+    form.team.name = team.name;
+    form.team.area = team.area;
+    form.team.avatar = team.avatar;
+    form.team.leader = team.leader;
+    if(team.leader){ form.view.leader.removeClass('border-2'); }
+    if(team.members.length){ form.view.members.removeClass('border-2'); }
+    team.members.forEach((member)=>{
+      form.team.members.add(member);
+      form.view[team.leader == member.id ? 'leader' : 'members'].append(userRow.render(member));
+    });
+  }
   form.view = {};
   form.team = {};
   form.view.body = form.element.find('.body');
   form.view.counter = form.view.body.find('[data="counter"]');
   form.view.leader = form.view.body.find('[data="leader"]');
   form.view.members = form.view.body.find('[data="members"]');
-  form.off = function(){
+  form.load = (data)=>{
+    form.reset();
+    load(data);
+  }
+  form.off = function(){ form.reset(); }
+  form.reset = ()=>{
     form.view.counter.text('0');
     form.view.leader.empty().addClass('border-2');
     form.view.members.empty().addClass('border-2');
     members = [];
   }
-  form.on = function(team){
-    if(team){
-      form.team.name = team.name;
-      form.team.area = team.area;
-      form.team.avatar = team.avatar;
-      form.team.leader = team.leader;
-      if(team.leader){ form.view.leader.removeClass('border-2'); }
-      if(team.members.length){ form.view.members.removeClass('border-2'); }
-      team.members.forEach((member)=>{
-        form.team.members.add(member);
-        form.view[team.leader == member.id ? 'leader' : 'members'].append(userRow.render(member));
-      });
-    }
-  }
-
 
 
   const methods = {
@@ -202,17 +206,20 @@ export default function(data){
 
   view.load = function(data){
     if(data.team){ data.team.members = data.team.members.map(formatUser); }
-    users.on(data.users.map(formatUser));
-    form.on((data.team ? data.team : undefined));
+    users.load(data.users.map(formatUser));
+    form.load((data.team ? data.team : undefined));
   }
+
+  view.on = function(){ users.on(); form.on(); }
 
   view.off = function(){ users.off(); form.off(); }
 
-  view.disable = (toggle)=>{
+  view.disable = function(toggle){
     form.disable(toggle);
     form.view.members.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
     users.body.find('[data-drag]').attr('data-drag',(toggle ? '0' : '1'));
   }
+
 
   return view;
 

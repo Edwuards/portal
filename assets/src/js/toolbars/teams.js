@@ -18,6 +18,11 @@ export default function(){
     'view team': ['exit','edit']
   };
 
+  toolbar.events = {
+    on: observer.register,
+    off: observer.unregister
+  }
+
   toolbar.title = toolbar.element.find('[data="title"]');
 
   toolbar.state.register({
@@ -47,15 +52,33 @@ export default function(){
     off: ()=>{ toolbar.toggleBtns(groups['create team'],false); }
   });
 
+  toolbar.state.register({
+    state:'edit team',
+    on:()=>{
+      toolbar.title.text('Editar Equipo');
+      toolbar.toggleBtns(groups['edit team'],true);
+    },
+    off: ()=>{ toolbar.toggleBtns(groups['edit team'],false); }
+  });
+
   buttons.name.create.events.on('click',function(){ Router('/teams/create'); });
 
   buttons.name.cancel.events.on('click',function(){
-    if(toolbar.state.value = 'create team'){ Router('/teams/view/all'); }
+    if(toolbar.state.value == 'create team'){ Router('/teams/view/all'); }
+    if(toolbar.state.value == 'edit team'){
+      toolbar.state.value = 'view team';
+      observer.notify('cancel edit team');
+    }
   });
 
-  buttons.name.exit.events.on('click',function(){
-    if(toolbar.state.value = 'view teams'){ Router('/teams/view/all'); }
+  buttons.name.exit.events.on('click',function(){ Router('/teams/view/all'); });
+
+  buttons.name.edit.events.on('click',function(){
+    toolbar.state.value = 'edit team';
+    observer.notify('edit team');
   });
+
+
 
   return toolbar;
 

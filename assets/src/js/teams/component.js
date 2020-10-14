@@ -24,6 +24,9 @@ export default function({users}){
     }
   }
 
+  toolbar.events.on('edit team',function(){ teams.view.edit(true); })
+  toolbar.events.on('cancel edit team',function(){ teams.view.edit(false); })
+
   view.on = function(){ toolbar.on(); }
   view.off = function(){ toolbar.off(); }
   view.users = users.list;
