@@ -37,22 +37,7 @@ export default function(){
 
   Data.forEach(add);
 
-  view.state.register({
-    state: 'view users',
-    on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
-    off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
-  });
 
-  view.state.register({
-    state: 'delete users',
-    on: ()=>{ view.element.on('click','.card',selectCard); },
-    off: ()=>{
-      view.element.off('click','.card',selectCard);
-      view.element.children('.delete').removeClass('delete');
-    }
-  });
-
-  view.off = function(){ users.forEach((u)=>{ u.card.off(); }); }
 
   const methods = {
     'all': {
@@ -85,6 +70,22 @@ export default function(){
   Object.defineProperties(view,methods);
 
 
+  view.state.register({
+    state: 'view users',
+    on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
+    off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
+  });
+
+  view.state.register({
+    state: 'delete users',
+    on: ()=>{ view.element.on('click','.card',selectCard); },
+    off: ()=>{
+      view.element.off('click','.card',selectCard);
+      view.element.children('.delete').removeClass('delete');
+    }
+  });
+
+  view.off = function(){ users.forEach((u)=>{ u.card.off(); }); }
 
   return view
 }

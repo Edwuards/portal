@@ -12,7 +12,7 @@
     ['i'=>'fas fa-users','name'=>'delete','text'=>'Eliminar','css'=>'text-red-600 mr-4'],
     ['i'=>'fas fa-edit','name'=>'edit','text'=>'Editar','css'=>'text-blue-600 mr-4'],
     ['i'=>'fas fa-ban','name'=>'cancel','text'=>'Cancelar','css'=>'text-red-600 mr-4'],
-    ['i'=>'fas fa-check','name'=>'save','text'=>'Guardar','css'=>'text-green-600 mr-4'],
+    ['i'=>'fas fa-check','name'=>'confirm','text'=>'Guardar','css'=>'text-green-600 mr-4'],
   ];
 
   $exit = $createButton($buttons['exit']);

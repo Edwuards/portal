@@ -16545,22 +16545,7 @@
 
     Data.forEach(add);
 
-    view.state.register({
-      state: 'view users',
-      on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
-      off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
-    });
 
-    view.state.register({
-      state: 'delete users',
-      on: ()=>{ view.element.on('click','.card',selectCard); },
-      off: ()=>{
-        view.element.off('click','.card',selectCard);
-        view.element.children('.delete').removeClass('delete');
-      }
-    });
-
-    view.off = function(){ users.forEach((u)=>{ u.card.off(); }); };
 
     const methods = {
       'all': {
@@ -16593,6 +16578,22 @@
     Object.defineProperties(view,methods);
 
 
+    view.state.register({
+      state: 'view users',
+      on: ()=>{ users.forEach((u)=>{ u.card.on(); }); },
+      off: ()=>{ users.forEach((u)=>{ u.card.off(); }); }
+    });
+
+    view.state.register({
+      state: 'delete users',
+      on: ()=>{ view.element.on('click','.card',selectCard); },
+      off: ()=>{
+        view.element.off('click','.card',selectCard);
+        view.element.children('.delete').removeClass('delete');
+      }
+    });
+
+    view.off = function(){ users.forEach((u)=>{ u.card.off(); }); };
 
     return view
   }
@@ -16693,12 +16694,14 @@
       'edit team',
       'cancel edit team',
       'create team',
+      'delete teams'
     ]);
     const groups = {
       'view teams': ['create','delete'],
       'create team': ['exit','cancel','save'],
       'edit team': ['exit','cancel','save'],
-      'view team': ['exit','edit']
+      'view team': ['exit','edit'],
+      'delete teams': ['exit','cancel','confirm'],
     };
 
     toolbar.events = {
@@ -16744,13 +16747,26 @@
       off: ()=>{ toolbar.toggleBtns(groups['edit team'],false); }
     });
 
+    toolbar.state.register({
+      state:'delete teams',
+      on:()=>{
+        toolbar.title.text('Eliminar Equipos');
+        toolbar.toggleBtns(groups['delete teams'],true);
+      },
+      off: ()=>{ toolbar.toggleBtns(groups['delete teams'],false); }
+    });
+
+
     buttons.name.create.events.on('click',function(){ page_js('/teams/create'); });
 
     buttons.name.cancel.events.on('click',function(){
-      if(toolbar.state.value == 'create team'){ page_js('/teams/view/all'); }
-      if(toolbar.state.value == 'edit team'){
+      let state = toolbar.state.value;
+      if( state == 'edit team'){
         toolbar.state.value = 'view team';
         observer.notify('cancel edit team');
+      }
+      else if(state == 'create team' || state == 'delete teams'){
+        page_js('/teams/view/all');
       }
     });
 
@@ -16761,6 +16777,15 @@
       observer.notify('edit team');
     });
 
+    buttons.name.confirm.events.on('click',function(){
+      let state = toolbar.state.value;
+      if(state == 'delete teams'){ observer.notify('delete teams'); }
+
+    });
+
+    buttons.name.delete.events.on('click',function(){
+      page_js('/teams/delete');
+    });
 
 
     return toolbar;
@@ -17830,9 +17855,11 @@
     });
 
     view.load = function(data){
-      if(data.team){ data.team.members = data.team.members.map(formatUser); }
+      if(data.team){
+        data.team.members = data.team.members.map(formatUser);
+        form.load((data.team ? data.team : undefined));
+      }
       users.load(data.users.map(formatUser));
-      form.load((data.team ? data.team : undefined));
     };
 
     view.on = function(){ users.on(); form.on(); };
@@ -17949,6 +17976,10 @@
       team = teams[teams.push(new Team$1(team)) - 1];
       view.element.append(team.card.element);
     };
+    const selectCard = (e)=>{
+      let el = $(e.currentTarget);
+      el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
+    };
 
     Data$1(users.all).forEach(add);
 
@@ -17962,12 +17993,44 @@
         value: (id)=>{
           return teams.find((team)=>{ return team.data.id == id; });
         }
+      },
+      'delete': {
+        writable: false,
+        value: ()=>{
+          let remove = [];
+          teams.forEach((team,i) => {
+            let { card } = team;
+            let selected = card.element.hasClass('delete');
+            if(selected){ remove[i] = true; card.element.remove(); }
+          });
+
+          teams = teams.reduce((a,c,i)=>{
+              if(!remove[i]){ a.push(c); }
+              return a;
+          },[]);
+        }
       }
     };
 
     Object.defineProperties(view,methods);
-    view.on = function(){ teams.forEach((team)=>{ team.card.on(); }); };
-    view.off = function(){ teams.forEach((team)=>{ team.card.off(); }); };
+
+    view.state.register({
+      state: 'view teams',
+      on: ()=>{ teams.forEach((t)=>{ t.card.on(); }); },
+      off: ()=>{ teams.forEach((t)=>{ t.card.off(); }); }
+    });
+
+    view.state.register({
+      state: 'delete teams',
+      on: ()=>{ view.element.on('click','.card',selectCard); },
+      off: ()=>{
+        view.element.off('click','.card',selectCard);
+        view.element.children('.delete').removeClass('delete');
+      }
+    });
+
+    view.off = function(){ teams.forEach((t)=>{ t.card.off(); }); };
+
 
     return view;
 
@@ -18036,6 +18099,9 @@
         view.state.value = 'view team';
         teams.view.load(teams.list.find(ctx.params.id).data);
       },
+      '/teams/delete': function(){
+        view.state.value = 'delete teams';
+      },
       '/teams/create': function(){
         view.state.value = 'create team';
       }
@@ -18043,25 +18109,37 @@
 
     toolbar.events.on('edit team',function(){ teams.view.edit(true); });
     toolbar.events.on('cancel edit team',function(){ teams.view.edit(false); });
+    toolbar.events.on('delete teams',teams.list.delete);
 
-    view.on = function(){ toolbar.on(); };
-    view.off = function(){ toolbar.off(); };
+    view.on = function(){ teams.list.on(); toolbar.on(); };
+    view.off = function(){ teams.list.off(); toolbar.off(); };
     view.users = users.list;
 
     view.routes = [routes];
 
     view.state.register({
+      state: 'delete teams',
+      on: ()=>{
+        teams.list.state.value  = 'delete teams';
+        toolbar.state.value = 'delete teams';
+      },
+      off: ()=>{ },
+    });
+
+    view.state.register({
       state: 'view teams',
       on: ()=>{
         teams.list.on();
+        teams.list.state.value  = 'view teams';
         toolbar.state.value = 'view teams';
       },
-      off: ()=>{ teams.list.off(); }
+      off: ()=>{ }
     });
 
     view.state.register({
       state: 'view team',
       on: ()=>{
+        teams.list.off();
         teams.view.on();
         toolbar.state.value = 'view team';
       },
@@ -18070,7 +18148,11 @@
 
     view.state.register({
       state: 'create team',
-      on: ()=>{ toolbar.state.value = 'create team'; teams.create.on(); },
+      on: ()=>{
+        teams.list.off();
+        toolbar.state.value = 'create team';
+        teams.create.on();
+      },
       off: ()=>{ teams.create.off(); }
     });
 

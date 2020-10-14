@@ -183,10 +183,12 @@ button[name="toggle"] {
 [data-content="users"] .user {
   height: 160px; }
 
-[data-users="list"] .card {
+[data-users="list"] .card,
+[data-teams="list"] .card {
   border: 2px solid white; }
 
-[data-users="list"] .delete {
+[data-users="list"] .delete,
+[data-teams="list"] .delete {
   border: 2px solid red; }
 
 [data-teams="create"] [name="createTeam"], [data-teams="create"] form,

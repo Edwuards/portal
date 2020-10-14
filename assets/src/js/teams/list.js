@@ -44,6 +44,10 @@ export default function(users){
     team = teams[teams.push(new Team(team)) - 1];
     view.element.append(team.card.element);
   }
+  const selectCard = (e)=>{
+    let el = $(e.currentTarget);
+    el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
+  }
 
   Data(users.all).forEach(add);
 
@@ -57,12 +61,44 @@ export default function(users){
       value: (id)=>{
         return teams.find((team)=>{ return team.data.id == id; });
       }
+    },
+    'delete': {
+      writable: false,
+      value: ()=>{
+        let remove = [];
+        teams.forEach((team,i) => {
+          let { card } = team;
+          let selected = card.element.hasClass('delete');
+          if(selected){ remove[i] = true; card.element.remove(); }
+        });
+
+        teams = teams.reduce((a,c,i)=>{
+            if(!remove[i]){ a.push(c); }
+            return a;
+        },[]);
+      }
     }
   }
 
   Object.defineProperties(view,methods);
-  view.on = function(){ teams.forEach((team)=>{ team.card.on(); }); }
-  view.off = function(){ teams.forEach((team)=>{ team.card.off(); }); }
+
+  view.state.register({
+    state: 'view teams',
+    on: ()=>{ teams.forEach((t)=>{ t.card.on(); }); },
+    off: ()=>{ teams.forEach((t)=>{ t.card.off(); }); }
+  });
+
+  view.state.register({
+    state: 'delete teams',
+    on: ()=>{ view.element.on('click','.card',selectCard); },
+    off: ()=>{
+      view.element.off('click','.card',selectCard);
+      view.element.children('.delete').removeClass('delete');
+    }
+  });
+
+  view.off = function(){ teams.forEach((t)=>{ t.card.off(); }); }
+
 
   return view;
 

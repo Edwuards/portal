@@ -10,12 +10,14 @@ export default function(){
     'edit team',
     'cancel edit team',
     'create team',
+    'delete teams'
   ]);
   const groups = {
     'view teams': ['create','delete'],
     'create team': ['exit','cancel','save'],
     'edit team': ['exit','cancel','save'],
-    'view team': ['exit','edit']
+    'view team': ['exit','edit'],
+    'delete teams': ['exit','cancel','confirm'],
   };
 
   toolbar.events = {
@@ -61,13 +63,26 @@ export default function(){
     off: ()=>{ toolbar.toggleBtns(groups['edit team'],false); }
   });
 
+  toolbar.state.register({
+    state:'delete teams',
+    on:()=>{
+      toolbar.title.text('Eliminar Equipos');
+      toolbar.toggleBtns(groups['delete teams'],true);
+    },
+    off: ()=>{ toolbar.toggleBtns(groups['delete teams'],false); }
+  });
+
+
   buttons.name.create.events.on('click',function(){ Router('/teams/create'); });
 
   buttons.name.cancel.events.on('click',function(){
-    if(toolbar.state.value == 'create team'){ Router('/teams/view/all'); }
-    if(toolbar.state.value == 'edit team'){
+    let state = toolbar.state.value;
+    if( state == 'edit team'){
       toolbar.state.value = 'view team';
       observer.notify('cancel edit team');
+    }
+    else if(state == 'create team' || state == 'delete teams'){
+      Router('/teams/view/all');
     }
   });
 
@@ -78,6 +93,15 @@ export default function(){
     observer.notify('edit team');
   });
 
+  buttons.name.confirm.events.on('click',function(){
+    let state = toolbar.state.value;
+    if(state == 'delete teams'){ observer.notify('delete teams'); }
+
+  });
+
+  buttons.name.delete.events.on('click',function(){
+    Router('/teams/delete');
+  });
 
 
   return toolbar;

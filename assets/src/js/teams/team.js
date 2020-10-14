@@ -205,9 +205,11 @@ export default function(data){
   });
 
   view.load = function(data){
-    if(data.team){ data.team.members = data.team.members.map(formatUser); }
+    if(data.team){
+      data.team.members = data.team.members.map(formatUser);
+      form.load((data.team ? data.team : undefined));
+    }
     users.load(data.users.map(formatUser));
-    form.load((data.team ? data.team : undefined));
   }
 
   view.on = function(){ users.on(); form.on(); }
