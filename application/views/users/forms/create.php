@@ -10,6 +10,7 @@ $options = [
 // foreach ($work['areas'] as $area) {
 //   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
 // }
+//
 
 $html = [
   'image'=> ImageInput([
@@ -18,89 +19,86 @@ $html = [
     'attrs'=>[
       'input'=>[
         'data-group'=>'avatar',
-        'name'=>'file'
       ],
       'button'=>[
         'data-group'=>'avatar',
-        'name'=>'upload',
       ],
       'img'=>[
         'data-group'=>'avatar',
-        'name'=>'preview',
         'src'=>"https://www.androfast.com/wp-content/uploads/2018/01/placeholder.png"
       ]
     ]
   ]),
   'name' => TextInput([
-    'css'=>['cont'=>'w-full mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Nombre',
-    'attrs'=>['name'=>'name'],
+    'attrs'=>['name'=>'firstname'],
   ]),
-  'apellido' => TextInput([
-    'css'=>['cont'=>'w-full mx-1 mb-2','input'=>'pb-2 pl-1'],
+  'lastname' => TextInput([
+    'css'=>['cont'=>'mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Apellido',
     'attrs'=>['name'=>'lastname'],
   ]),
   'work_position' => SelectInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Puesto',
-    'attrs'=>['name'=>'work_position'],
+    'attrs'=>['name'=>'position'],
     'options'=>$options['positions']
   ]),
   'work_area' => SelectInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Área',
-    'attrs'=>['name'=>'work_area'],
+    'attrs'=>['name'=>'area'],
     'options'=>$options['areas']
   ]),
   'email' => TextInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Coreo',
     'attrs'=>['name'=>'email'],
   ]),
   'birthday' => DateInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Cumpleaños',
-    'attrs'=>['name'=>'birthday'],
+    'attrs'=>['name'=>'dob'],
   ]),
   'vacations' => NumberInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Días de Vacaciones',
-    'attrs'=>['name'=>'vacations','min'=>'6','max'=>'14','value'=>'6'],
+    'attrs'=>['name'=>'vacations','min'=>'7','max'=>'14'],
   ]),
   'work_start' => DateInput([
-    'css'=>['cont'=>'w-1/2 mx-1 mb-2','input'=>'pb-2 pl-1'],
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Fecha de ingreso',
-    'attrs'=>['name'=>'work_start'],
+    'attrs'=>['name'=>'initialized'],
   ]),
 
 ];
+
+
 ?>
 
-
-<form name="createUser" class="bg-white p-6">
-  <div class="flex items-center w-full my-4">
+<form name="createUser" class="bg-white p-10 shadow-lg">
+  <div class="flex flex-col sm:flex-row items-center w-full my-4">
     <?php echo $html['image']; ?>
-    <div class="flex flex-col justify-center w-full ml-6">
-      <div class="w-full mb-4">
+    <div class="flex flex-col justify-center w-full sm:ml-6">
+      <div class="mb-2">
         <?php echo $html['name']; ?>
       </div>
-      <div class="w-full">
-        <?php echo $html['apellido']; ?>
+      <div class="mb-2">
+        <?php echo $html['lastname']; ?>
       </div>
     </div>
   </div>
-  <div class="flex my-4">
+  <div class="flex flex-col my-4 sm:flex-row">
     <?php echo $html['birthday']; ?>
     <?php echo $html['email']; ?>
   </div>
-  <div class="flex my-4">
+  <div class="flex flex-col my-4 sm:flex-row">
     <?php echo $html['work_area']; ?>
     <?php echo $html['work_position']; ?>
   </div>
-  <div class="flex my-4">
+  <div class="flex flex-col my-4 sm:flex-row">
     <?php echo $html['work_start']; ?>
     <?php echo $html['vacations']; ?>
   </div>
-
 </form>
