@@ -111,6 +111,7 @@ export default function(){
     modal.off();
     Router('/users/view/all');
   });
+  modal.message('Seguro que quieres eleminar los siguientes usuarios :');
 
   Object.defineProperties(view,methods);
 

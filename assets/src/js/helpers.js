@@ -183,7 +183,6 @@ function Modal(){
   .append(elements.btnCont);
 
   elements.message.addClass('my-4 text-center')
-  .text('Seguro que quieres eleminar los siguientes usuarios :');
 
   elements.list.addClass('w-full overflow-y-scroll px-4')
   .css('height','calc(100% - 125px)');
@@ -202,6 +201,7 @@ function Modal(){
   return {
     on,
     off,
+    message: (message)=>{ elements.message.text(message); },
     confirm: (fn)=>{ observer.register('confirm',fn); },
     cancel: (fn)=>{ observer.unregister('cancel',fn); }
   }

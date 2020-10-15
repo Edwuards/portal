@@ -483,8 +483,7 @@
     .append(elements.list)
     .append(elements.btnCont);
 
-    elements.message.addClass('my-4 text-center')
-    .text('Seguro que quieres eleminar los siguientes usuarios :');
+    elements.message.addClass('my-4 text-center');
 
     elements.list.addClass('w-full overflow-y-scroll px-4')
     .css('height','calc(100% - 125px)');
@@ -503,6 +502,7 @@
     return {
       on,
       off,
+      message: (message)=>{ elements.message.text(message); },
       confirm: (fn)=>{ observer.register('confirm',fn); },
       cancel: (fn)=>{ observer.unregister('cancel',fn); }
     }
@@ -16676,6 +16676,7 @@
       modal.off();
       page_js('/users/view/all');
     });
+    modal.message('Seguro que quieres eleminar los siguientes usuarios :');
 
     Object.defineProperties(view,methods);
 
@@ -16784,8 +16785,8 @@
     ]);
     const groups = {
       'view teams': ['create','delete'],
-      'create team': ['exit','cancel','save'],
-      'edit team': ['exit','cancel','save'],
+      'create team': ['exit','cancel','confirm'],
+      'edit team': ['exit','cancel','confirm'],
       'view team': ['exit','edit'],
       'delete teams': ['exit','cancel','confirm'],
     };
@@ -16818,6 +16819,7 @@
     toolbar.state.register({
       state:'create team',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Crear Equipo');
         toolbar.title.text('Crear Equipo');
         toolbar.toggleBtns(groups['create team'],true);
       },
@@ -16827,6 +16829,7 @@
     toolbar.state.register({
       state:'edit team',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Guardar');
         toolbar.title.text('Editar Equipo');
         toolbar.toggleBtns(groups['edit team'],true);
       },
@@ -16836,6 +16839,7 @@
     toolbar.state.register({
       state:'delete teams',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Eliminar');
         toolbar.title.text('Eliminar Equipos');
         toolbar.toggleBtns(groups['delete teams'],true);
       },
@@ -18057,10 +18061,29 @@
 
   function List$2(users){
     let teams = [];
+    let remove = [];
     const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+    const modal = Modal();
     const add = (team)=>{
       team = teams[teams.push(new Team$1(team)) - 1];
       view.element.append(team.card.element);
+    };
+    const findSelectedTeams = ()=>{
+      remove = [];
+      teams.forEach((team,i) => {
+        let { card } = team;
+        let selected = card.element.hasClass('delete');
+        if(selected){ remove[i] = team.data.name; }
+      });
+      return remove;
+    };
+    const deleteTeams = ()=>{
+      teams = teams.reduce((a,c,i)=>{
+          if(!remove[i]){ a.push(c); }
+          else{ c.card.element.remove();}
+          
+          return a;
+      },[]);
     };
     const selectCard = (e)=>{
       let el = $(e.currentTarget);
@@ -18082,19 +18105,7 @@
       },
       'delete': {
         writable: false,
-        value: ()=>{
-          let remove = [];
-          teams.forEach((team,i) => {
-            let { card } = team;
-            let selected = card.element.hasClass('delete');
-            if(selected){ remove[i] = true; card.element.remove(); }
-          });
-
-          teams = teams.reduce((a,c,i)=>{
-              if(!remove[i]){ a.push(c); }
-              return a;
-          },[]);
-        }
+        value: ()=>{ modal.on(findSelectedTeams()); }
       }
     };
 
@@ -18116,6 +18127,13 @@
     });
 
     view.off = function(){ teams.forEach((t)=>{ t.card.off(); }); };
+
+    modal.confirm(()=>{
+      deleteTeams();
+      modal.off();
+      page_js('/teams/view/all');
+    });
+    modal.message('Seguro que quieres eleminar los siguientes equipos :');
 
 
     return view;

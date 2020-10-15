@@ -1,5 +1,6 @@
-import { View } from '../helpers';
+import { View, Modal } from '../helpers';
 import { Card } from './card';
+import Router from 'page';
 
 const Data = (users)=>{
   let teams = [];
@@ -39,10 +40,29 @@ function Team(data){
 
 export default function(users){
   let teams = [];
+  let remove = [];
   const view = new View({name: 'team list', element: $('[data-teams="list"]') });
+  const modal = Modal();
   const add = (team)=>{
     team = teams[teams.push(new Team(team)) - 1];
     view.element.append(team.card.element);
+  }
+  const findSelectedTeams = ()=>{
+    remove = [];
+    teams.forEach((team,i) => {
+      let { card } = team;
+      let selected = card.element.hasClass('delete');
+      if(selected){ remove[i] = team.data.name; }
+    });
+    return remove;
+  }
+  const deleteTeams = ()=>{
+    teams = teams.reduce((a,c,i)=>{
+        if(!remove[i]){ a.push(c); }
+        else{ c.card.element.remove();}
+        
+        return a;
+    },[]);
   }
   const selectCard = (e)=>{
     let el = $(e.currentTarget);
@@ -64,19 +84,7 @@ export default function(users){
     },
     'delete': {
       writable: false,
-      value: ()=>{
-        let remove = [];
-        teams.forEach((team,i) => {
-          let { card } = team;
-          let selected = card.element.hasClass('delete');
-          if(selected){ remove[i] = true; card.element.remove(); }
-        });
-
-        teams = teams.reduce((a,c,i)=>{
-            if(!remove[i]){ a.push(c); }
-            return a;
-        },[]);
-      }
+      value: ()=>{ modal.on(findSelectedTeams()); }
     }
   }
 
@@ -98,6 +106,13 @@ export default function(users){
   });
 
   view.off = function(){ teams.forEach((t)=>{ t.card.off(); }); }
+
+  modal.confirm(()=>{
+    deleteTeams();
+    modal.off();
+    Router('/teams/view/all');
+  });
+  modal.message('Seguro que quieres eleminar los siguientes equipos :');
 
 
   return view;

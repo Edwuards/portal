@@ -14,8 +14,8 @@ export default function(){
   ]);
   const groups = {
     'view teams': ['create','delete'],
-    'create team': ['exit','cancel','save'],
-    'edit team': ['exit','cancel','save'],
+    'create team': ['exit','cancel','confirm'],
+    'edit team': ['exit','cancel','confirm'],
     'view team': ['exit','edit'],
     'delete teams': ['exit','cancel','confirm'],
   };
@@ -48,6 +48,7 @@ export default function(){
   toolbar.state.register({
     state:'create team',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Crear Equipo');
       toolbar.title.text('Crear Equipo');
       toolbar.toggleBtns(groups['create team'],true);
     },
@@ -57,6 +58,7 @@ export default function(){
   toolbar.state.register({
     state:'edit team',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Guardar');
       toolbar.title.text('Editar Equipo');
       toolbar.toggleBtns(groups['edit team'],true);
     },
@@ -66,6 +68,7 @@ export default function(){
   toolbar.state.register({
     state:'delete teams',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Eliminar');
       toolbar.title.text('Eliminar Equipos');
       toolbar.toggleBtns(groups['delete teams'],true);
     },
