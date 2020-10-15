@@ -38,6 +38,7 @@ export default function(){
   toolbar.state.register({
     state:'create user',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Crear Usuario');
       toolbar.title.text('Crear Usuario');
       toolbar.toggleBtns(groups['create user'],true);
     },
@@ -56,6 +57,7 @@ export default function(){
   toolbar.state.register({
     state:'edit profile',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Guardar');
       toolbar.title.text('Editar Usuario');
       toolbar.toggleBtns(groups['edit profile'],true);
     },
@@ -65,6 +67,7 @@ export default function(){
   toolbar.state.register({
     state:'delete users',
     on:()=>{
+      buttons.name.confirm.element.children('p').text('Eliminar');
       toolbar.title.text('Eliminar Usuarios');
       toolbar.toggleBtns(groups['delete users'],true);
     },

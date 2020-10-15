@@ -1,6 +1,6 @@
 import { View, State } from '../helpers';
 import ToolBar from '../toolbars/users';
-import Users from './users';
+import Users from './subcomponents';
 export default function(){
   const view = new View({name:'users',element: $('[data-content="users"]')});
   const toolbar = ToolBar();

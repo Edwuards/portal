@@ -441,6 +441,74 @@
 
   }
 
+  function Modal(){
+    const observer = new Observer(['cancel','confirm']);
+    const elements = {
+      cont: $(document.createElement('div')),
+      modal: $(document.createElement('div')),
+      message: $(document.createElement('div')),
+      list: $(document.createElement('div')),
+      btnCont: $(document.createElement('div')),
+      buttons: {
+        cancel: $(document.createElement('button')),
+        confirm: $(document.createElement('button'))
+      }
+    };
+    const on = (data)=>{
+      elements.cont.removeClass('hidden');
+      elements.buttons.confirm.on('click',()=>{ observer.notify('confirm'); });
+      elements.buttons.cancel.on('click',()=>{ observer.notify('cancel'); off(); });
+      elements.list.empty();
+      data.forEach((item, i) => {
+        let p = document.createElement('p');
+        p.textContent = item;
+        let css = 'p-2 mx-4 border-b border-gray-600'.split(' ');
+        css.forEach((style)=>{ p.classList.add(style); });
+        elements.list.append(p);
+      });
+
+    };
+    const off = ()=>{
+      elements.cont.addClass('hidden');
+      elements.buttons.confirm.off('click');
+      elements.buttons.cancel.off('click');
+    };
+
+    elements.cont.addClass('absolute w-screen h-screen top-0 left-0 z-10 flex justify-center items-center hidden')
+    .css('background-color','rgba(0,0,0,.7)').append(elements.modal);
+
+    elements.modal.addClass('bg-white p-4')
+    .css({width:'500px',height:'350px'})
+    .append(elements.message)
+    .append(elements.list)
+    .append(elements.btnCont);
+
+    elements.message.addClass('my-4 text-center')
+    .text('Seguro que quieres eleminar los siguientes usuarios :');
+
+    elements.list.addClass('w-full overflow-y-scroll px-4')
+    .css('height','calc(100% - 125px)');
+
+    elements.btnCont.addClass('w-full flex justify-around items-center my-4')
+    .append(elements.buttons.cancel)
+    .append(elements.buttons.confirm);
+
+    elements.buttons.confirm.addClass('flex items-center text-white text-sm bg-green-600 rounded p-2 mr-2')
+    .text('confirmar');
+    elements.buttons.cancel.addClass('flex items-center text-white text-sm bg-red-600 rounded p-2 mr-2')
+    .text('cancelar');
+
+    $('body').append(elements.cont);
+
+    return {
+      on,
+      off,
+      confirm: (fn)=>{ observer.register('confirm',fn); },
+      cancel: (fn)=>{ observer.unregister('cancel',fn); }
+    }
+
+  }
+
   var isarray = Array.isArray || function (arr) {
     return Object.prototype.toString.call(arr) == '[object Array]';
   };
@@ -4761,7 +4829,7 @@
     this.events.on('click',this.close);
   }
 
-  function Modal(){
+  function Modal$1(){
     const elements = {};
     elements.container = $('[data-modal="permissions"]');
     elements.modal = elements.container.find('.modal');
@@ -5095,7 +5163,7 @@
 
     const { buttons } = Finder(elements.container);
 
-    const modal = new Modal();
+    const modal = new Modal$1();
     const options = {};
     const forms = {};
 
@@ -16324,6 +16392,7 @@
     toolbar.state.register({
       state:'create user',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Crear Usuario');
         toolbar.title.text('Crear Usuario');
         toolbar.toggleBtns(groups['create user'],true);
       },
@@ -16342,6 +16411,7 @@
     toolbar.state.register({
       state:'edit profile',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Guardar');
         toolbar.title.text('Editar Usuario');
         toolbar.toggleBtns(groups['edit profile'],true);
       },
@@ -16351,6 +16421,7 @@
     toolbar.state.register({
       state:'delete users',
       on:()=>{
+        buttons.name.confirm.element.children('p').text('Eliminar');
         toolbar.title.text('Eliminar Usuarios');
         toolbar.toggleBtns(groups['delete users'],true);
       },
@@ -16496,21 +16567,6 @@
 
   }
 
-  function User(data){
-    const card = new Card$1(data);
-    const methods = {
-      'data': {
-        get: ()=>{ return data }
-      },
-      'card': {
-        get: ()=>{ return card }
-      }
-    };
-
-    Object.defineProperties(this,methods);
-
-  }
-
   const Data = (()=>{
     const users = [];
     for (let i = 1; i <= 20 ; i++) {
@@ -16528,9 +16584,29 @@
     return users;
   })();
 
+
+
+
+  function User(data){
+    const card = new Card$1(data);
+    const methods = {
+      'data': {
+        get: ()=>{ return data }
+      },
+      'card': {
+        get: ()=>{ return card }
+      }
+    };
+
+    Object.defineProperties(this,methods);
+
+  }
+
   function List$1(){
     let users = [];
+    let remove = [];
     const view = new View({name: 'user list',element: $('[data-users="list"]')});
+    const modal = Modal();
     const add = (user)=>{
       user = users[users.push(new User(user)) - 1];
       let { card } = user;
@@ -16539,14 +16615,28 @@
       });
       view.element.append(card.element);
     };
+    const deleteUsers = ()=>{
+      users = users.reduce((a,c,i)=>{
+          if(!remove[i]){ a.push(c); }
+          else{ c.card.element.remove();}
+          return a;
+      },[]);
+    };
+    const findSelectedUsers = ()=>{
+      remove = [];
+      users.forEach((user,i) => {
+        let { card } = user;
+        let selected = card.element.hasClass('delete');
+        if(selected){ remove[i] = user.data.firstname + ' ' + user.data.lastname; }
+      });
+
+      return remove;
+
+    };
     const selectCard = (e)=>{
       let el = $(e.currentTarget);
       el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
     };
-
-    Data.forEach(add);
-
-
 
     const methods = {
       'all': {
@@ -16560,24 +16650,9 @@
       },
       'delete': {
         writable: false,
-        value: ()=>{
-          let remove = [];
-          users.forEach((user,i) => {
-            let { card } = user;
-            let selected = card.element.hasClass('delete');
-            if(selected){ remove[i] = true; card.element.remove(); }
-          });
-
-          users = users.reduce((a,c,i)=>{
-              if(!remove[i]){ a.push(c); }
-              return a;
-          },[]);
-        }
+        value: ()=>{ modal.on(findSelectedUsers()); }
       }
     };
-
-    Object.defineProperties(view,methods);
-
 
     view.state.register({
       state: 'view users',
@@ -16595,6 +16670,16 @@
     });
 
     view.off = function(){ users.forEach((u)=>{ u.card.off(); }); };
+
+    modal.confirm(()=>{
+      deleteUsers();
+      modal.off();
+      page_js('/users/view/all');
+    });
+
+    Object.defineProperties(view,methods);
+
+    Data.forEach(add);
 
     return view
   }

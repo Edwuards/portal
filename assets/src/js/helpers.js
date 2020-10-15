@@ -140,4 +140,73 @@ function View({name,element}){
 
 }
 
-export { Observer, State ,View }
+function Modal(){
+  const observer = new Observer(['cancel','confirm']);
+  const elements = {
+    cont: $(document.createElement('div')),
+    modal: $(document.createElement('div')),
+    message: $(document.createElement('div')),
+    list: $(document.createElement('div')),
+    btnCont: $(document.createElement('div')),
+    buttons: {
+      cancel: $(document.createElement('button')),
+      confirm: $(document.createElement('button'))
+    }
+  };
+  const on = (data)=>{
+    elements.cont.removeClass('hidden');
+    elements.buttons.confirm.on('click',()=>{ observer.notify('confirm'); });
+    elements.buttons.cancel.on('click',()=>{ observer.notify('cancel'); off(); });
+    elements.list.empty();
+    data.forEach((item, i) => {
+      let p = document.createElement('p');
+      p.textContent = item;
+      let css = 'p-2 mx-4 border-b border-gray-600'.split(' ');
+      css.forEach((style)=>{ p.classList.add(style); });
+      elements.list.append(p);
+    });
+
+  };
+  const off = ()=>{
+    elements.cont.addClass('hidden');
+    elements.buttons.confirm.off('click');
+    elements.buttons.cancel.off('click');
+  };
+
+  elements.cont.addClass('absolute w-screen h-screen top-0 left-0 z-10 flex justify-center items-center hidden')
+  .css('background-color','rgba(0,0,0,.7)').append(elements.modal);
+
+  elements.modal.addClass('bg-white p-4')
+  .css({width:'500px',height:'350px'})
+  .append(elements.message)
+  .append(elements.list)
+  .append(elements.btnCont);
+
+  elements.message.addClass('my-4 text-center')
+  .text('Seguro que quieres eleminar los siguientes usuarios :');
+
+  elements.list.addClass('w-full overflow-y-scroll px-4')
+  .css('height','calc(100% - 125px)');
+
+  elements.btnCont.addClass('w-full flex justify-around items-center my-4')
+  .append(elements.buttons.cancel)
+  .append(elements.buttons.confirm);
+
+  elements.buttons.confirm.addClass('flex items-center text-white text-sm bg-green-600 rounded p-2 mr-2')
+  .text('confirmar');
+  elements.buttons.cancel.addClass('flex items-center text-white text-sm bg-red-600 rounded p-2 mr-2')
+  .text('cancelar');
+
+  $('body').append(elements.cont);
+
+  return {
+    on,
+    off,
+    confirm: (fn)=>{ observer.register('confirm',fn); },
+    cancel: (fn)=>{ observer.unregister('cancel',fn); }
+  }
+
+}
+
+
+export { Observer, State ,View , Modal}

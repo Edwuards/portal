@@ -1,6 +1,6 @@
 import Router from 'page';
-import { User } from './user';
-import { View } from '../helpers';
+import { View, Modal } from '../helpers';
+import { Card } from './card';
 
 const Data = (()=>{
   const users = [];
@@ -19,9 +19,29 @@ const Data = (()=>{
   return users;
 })();
 
+
+
+
+function User(data){
+  const card = new Card(data);
+  const methods = {
+    'data': {
+      get: ()=>{ return data }
+    },
+    'card': {
+      get: ()=>{ return card }
+    }
+  }
+
+  Object.defineProperties(this,methods);
+
+}
+
 export default function(){
   let users = [];
+  let remove = [];
   const view = new View({name: 'user list',element: $('[data-users="list"]')});
+  const modal = Modal();
   const add = (user)=>{
     user = users[users.push(new User(user)) - 1];
     let { card } = user;
@@ -30,14 +50,28 @@ export default function(){
     });
     view.element.append(card.element);
   }
+  const deleteUsers = ()=>{
+    users = users.reduce((a,c,i)=>{
+        if(!remove[i]){ a.push(c); }
+        else{ c.card.element.remove();}
+        return a;
+    },[]);
+  }
+  const findSelectedUsers = ()=>{
+    remove = [];
+    users.forEach((user,i) => {
+      let { card } = user;
+      let selected = card.element.hasClass('delete');
+      if(selected){ remove[i] = user.data.firstname + ' ' + user.data.lastname; }
+    });
+
+    return remove;
+
+  }
   const selectCard = (e)=>{
     let el = $(e.currentTarget);
     el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
   }
-
-  Data.forEach(add);
-
-
 
   const methods = {
     'all': {
@@ -51,24 +85,9 @@ export default function(){
     },
     'delete': {
       writable: false,
-      value: ()=>{
-        let remove = [];
-        users.forEach((user,i) => {
-          let { card } = user;
-          let selected = card.element.hasClass('delete');
-          if(selected){ remove[i] = true; card.element.remove(); }
-        });
-
-        users = users.reduce((a,c,i)=>{
-            if(!remove[i]){ a.push(c); }
-            return a;
-        },[]);
-      }
+      value: ()=>{ modal.on(findSelectedUsers()); }
     }
   }
-
-  Object.defineProperties(view,methods);
-
 
   view.state.register({
     state: 'view users',
@@ -86,6 +105,16 @@ export default function(){
   });
 
   view.off = function(){ users.forEach((u)=>{ u.card.off(); }); }
+
+  modal.confirm(()=>{
+    deleteUsers();
+    modal.off();
+    Router('/users/view/all');
+  });
+
+  Object.defineProperties(view,methods);
+
+  Data.forEach(add);
 
   return view
 }
