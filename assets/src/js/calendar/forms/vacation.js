@@ -3,11 +3,11 @@ import { Form } from '../../form/form.js';
 export function Vacation(){
 
   const form = new Form({
-    title: 'Vacación',
     name: 'vacation',
     url: 'permisions/create',
   });
 
+  form.title = 'Vacación',
   form.color = 'bg-teal-600';
 
   form.init = function(){

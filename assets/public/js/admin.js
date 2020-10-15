@@ -4950,11 +4950,11 @@
   function Vacation(){
 
     const form = new Form({
-      title: 'Vacación',
       name: 'vacation',
       url: 'permisions/create',
     });
 
+    form.title = 'Vacación',
     form.color = 'bg-teal-600';
 
     form.init = function(){
@@ -4983,12 +4983,12 @@
   function HomeOffice(){
 
     const form = new Form({
-      title: 'Home Office',
       name: 'homeOffice',
       url: 'permisions/create',
     });
 
     form.color = 'bg-indigo-600';
+    form.title = 'Home Office';
 
     form.init = function(){
       this.buttons.name.send.events.on('click',this.send);
@@ -5023,9 +5023,10 @@
     });
 
 
+
+    form.title = 'Enfermedad',
+    form.color = 'bg-blue-600';
     form.init = function(){
-      this.title = 'Enfermedad',
-      this.color = 'bg-blue-600';
       this.buttons.name.send.events.on('click',this.send);
     };
 
@@ -5053,11 +5054,11 @@
   function Permission(){
 
     const form = new Form({
-      title: 'Permiso',
       name: 'permission',
       url: 'permisions/create',
     });
 
+    form.title ='Permiso';
     form.color = 'bg-green-600';
 
     form.init = function(){

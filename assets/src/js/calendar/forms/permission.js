@@ -3,11 +3,11 @@ import { Form } from '../../form/form.js';
 export function Permission(){
 
   const form = new Form({
-    title: 'Permiso',
     name: 'permission',
     url: 'permisions/create',
   });
 
+  form.title ='Permiso';
   form.color = 'bg-green-600';
 
   form.init = function(){

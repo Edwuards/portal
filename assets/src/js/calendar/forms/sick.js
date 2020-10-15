@@ -8,9 +8,10 @@ export function Sick(){
   });
 
 
+
+  form.title = 'Enfermedad',
+  form.color = 'bg-blue-600';
   form.init = function(){
-    this.title = 'Enfermedad',
-    this.color = 'bg-blue-600';
     this.buttons.name.send.events.on('click',this.send);
   }
 

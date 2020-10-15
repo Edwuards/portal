@@ -3,12 +3,12 @@ import { Form } from '../../form/form.js';
 export function HomeOffice(){
 
   const form = new Form({
-    title: 'Home Office',
     name: 'homeOffice',
     url: 'permisions/create',
   });
 
   form.color = 'bg-indigo-600';
+  form.title = 'Home Office';
 
   form.init = function(){
     this.buttons.name.send.events.on('click',this.send);
