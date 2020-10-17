@@ -4,9 +4,8 @@
    *
    */
 
-  require(APPPATH.'/models/Crud.php');
 
-  class UsersModel extends Crud
+  class UsersModel extends MY_Model
   {
 
     private $response = [ 'error'=>false, 'data'=>false ];
@@ -14,37 +13,33 @@
     function __construct()
     {
         parent::__construct('users');
+        $this->load->model('PersonsModel','persons');
+        $this->load->model('TypeOfUsersModel','userTypes');
     }
 
-    public function exist($correo)
-    {
-      $donde = [['email','=',$correo]];
-      $this->result = $this->get('id',$donde);
-      return count($this->result['data']) > 0 ? $this->result['data'][0]['id'] : false;
-    }
 
-    public function create($user)
+
+    public function create($data)
     {
-      $this->response = [ 'error'=>false, 'data'=>false ];
-      $exist = $this->exist($user['email']);
+      $user = $data['user'];
+      $userTypes = $data['userTypes'];
+      $exist = $this->persons->exist($user['email']);
 
       if($exist){
-        $this->response['error'] = true; $this->response['data'] = 'usuario con el correo '.$user['email'].' ya existe';
+        $this->response['error'] = true;
+        $this->response['data'] = 'usuario con el correo '.$user['email'].' ya existe';
+      }
+
+      if(!$this->response['error']){
+        $this->response = $this->persons->create($user);
       }
 
       if(!$this->response['error']){
         $random = rand(10,20);
         $multi = rand(2,6);
         for ($i=0; $i < 5; $i++) { $random *= $multi; }
-        $code = (string)$random;
-        if($user['avatar'] == ''){
-          $user['avatar'] = 'https://scontent.fmex1-1.fna.fbcdn.net/v/t1.0-9/87105879_2932147320180000_864174972170403840_n.png?_nc_cat=107&_nc_sid=85a577&_nc_ohc=iDIiMDlQrYoAX8EkUIZ&_nc_ht=scontent.fmex1-1.fna&oh=cd1a48c38e0769b499d0cdeab2d1fd67&oe=5EDF6664';
-        }
-        $user['verified'] = 0;
-        $user['role'] = 1;
-        $user['code'] = password_hash($random, PASSWORD_DEFAULT);
-
-        $this->response = $this->insert($user);
+        $verification = password_hash((string)$random, PASSWORD_DEFAULT);
+        
 
       }
 

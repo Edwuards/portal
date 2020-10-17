@@ -1,6 +1,6 @@
 <?php
 
-  class Crud extends CI_Model
+  class MY_Model extends CI_Model
   {
     private $table;
     private $response = [ 'error'=>0, 'data'=>false ];
@@ -272,7 +272,8 @@
       return $this->get($select,$where,$order,$limit,$join);
     }
 
-    public function email($email){
+    public function email($email)
+    {
 
       $this->load->library('email');
       $this->email->from('avisame@figment.com.mx', 'Figment');
@@ -284,14 +285,12 @@
       $this->email->send();
     }
 
-
     public function json($data)
     {
       $this->output
   		->set_content_type('application/json')
   		->set_output(json_encode($data));
     }
-
 
 
   }

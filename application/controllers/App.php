@@ -10,11 +10,12 @@ class App extends CI_Controller {
 		parent::__construct();
 		$this->load->helper('html');
 		$this->View = new View($this);
+		$this->load->model('UsersModel','users');
 	}
 
 	public function index()
 	{
-		echo 'h';
+		print_r($this->users->test());
 		// if(!$this->session->verified){ redirect('app/login'); }
 		// else{ redirect('app/dashboard',301); }
 	}
