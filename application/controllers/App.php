@@ -35,7 +35,7 @@ class App extends CI_Controller {
 	public function login()
 	{
 		$scripts = [
-			'js'=>['jquery'],
+			'js'=>['jquery','login'],
 			'css'=>['base','index']
 		];
 		$views = [ 'app/login' => [] ];

@@ -25,8 +25,11 @@ $html = [
         echo $html['password'];
       ?>
     </div>
+    <div class="error px-2 my-2 text-sm text-red-600">
+
+    </div>
     <div class="buttons flex items-center justify-center">
-      <button type="button" name="login" class="p-2 bg-blue-600 text-white rounded">Iniciar Sessión</button>
+      <button data-type="button" type="button" name="login" class="p-2 bg-blue-600 text-white rounded">Iniciar Sessión</button>
     </div>
   </form>
 </div>

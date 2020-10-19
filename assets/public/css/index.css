@@ -176,11 +176,13 @@ button[name="toggle"] {
 
 #login {
   width: 400px;
-  height: 400px; }
-  #login h1, #login .buttons {
+  height: 450px; }
+  #login h1 {
     height: 100px; }
   #login .inputs {
     height: 200px; }
+  #login .buttons, #login .error {
+    height: 50px; }
 
 [data-content].active {
   z-index: 20; }
