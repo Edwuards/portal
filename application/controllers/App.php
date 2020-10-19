@@ -15,14 +15,14 @@ class App extends CI_Controller {
 
 	public function index()
 	{
-		print_r($this->users->test());
-		// if(!$this->session->verified){ redirect('app/login'); }
-		// else{ redirect('app/dashboard',301); }
+
+		if(!$this->session->verified){ redirect('app/login'); }
+		else{ redirect('app/dashboard',301); }
 	}
 
 	public function dashboard()
 	{
-		// if(!$this->session->verified){ redirect('app/login'); }
+		if(!$this->session->verified){ redirect('app/login'); }
 		$dashboard = 'dashboard/admin';
 		$scripts = [
 			'js'=>['jquery','admin'],
@@ -32,44 +32,16 @@ class App extends CI_Controller {
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
-	public function verify($id,$code)
+	public function login()
 	{
-		$user = null;
-		$this->load->model('UsersModel','Users');
-		$where = [
-			['users.id','=',(string)$id],
-			['users.verified','=','0']
+		$scripts = [
+			'js'=>['jquery'],
+			'css'=>['base','index']
 		];
-
-		$response = $this->Users->get('email,code',$where);
-
-		if(!$response['error'])
-		{
-			$user = $response['data'][0];
-			$response['error'] = !password_verify($code,$user['code']);
-		}
-
-
-		if(!$response['error'])
-		{
-			unset($user['code']);
-			$scripts = [
-				'js'=>['jquery','verify'],
-				'css'=>['base','index']
-			];
-			$views = ['users/verify'=>['user'=>$user]];
-			$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Verificar']);
-		}
-		else{
-			redirect('app/login');
-		}
+		$views = [ 'app/login' => [] ];
+		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 
 	}
-
-
-
-
-
 
 
 
