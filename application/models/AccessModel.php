@@ -8,7 +8,6 @@
   class AccessModel extends MY_Model
   {
 
-    private $response = [ 'error'=>false, 'data'=>false ];
 
     function __construct()
     {
@@ -34,6 +33,38 @@
         'verification'=>$this->verificationCode(),
         'state'=>0
       ]);
+    }
+
+    public function setPassword($credentials)
+    {
+
+    }
+
+    public function login($credentials)
+    {
+      $where = [['person','=',$credentials['person']]];
+      $this->get('state,password',$where);
+      if(!$this->response['error']){
+        $password = $this->response['data'][0]['password'];
+        $state = $this->response['data'][0]['state'];
+      }
+
+      if(!$state){
+        $this->response['error'] = 1;
+        $this->response['data'] = 'Usuario no a sido verficado';
+      }
+
+      if(!$this->response['error']){
+        $verify = password_verify($credentials['password'],$password);
+        if(!$verify){
+          $this->response['error'] = 1;
+          $this->response['data'] = 'Credenciales incorrectas';
+        }
+      }
+
+      return $this->response;
+
+
     }
 
   }

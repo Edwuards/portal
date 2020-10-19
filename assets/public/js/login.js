@@ -3604,6 +3604,7 @@
     const form = new Form({name: 'login',url: 'users/login' });
     const { buttons } = form;
     const { email , password } = form.inputs.type.text;
+
     form.error = form.element.find('.error');
 
     form.send = function(){
@@ -3633,7 +3634,10 @@
       }
     });
 
-    buttons.name.login.events.on('click',form.send);
+    form.init = function(){
+      buttons.name.login.events.on('click',form.send);
+    };
+
 
     form.on();
   });

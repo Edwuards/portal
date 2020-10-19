@@ -3,7 +3,7 @@
   class MY_Model extends CI_Model
   {
     private $table;
-    private $response = [ 'error'=>0, 'data'=>false ];
+    protected $response = [ 'error'=>0, 'data'=>false ];
 
     public function __construct($table)
     {
@@ -12,7 +12,7 @@
       $this->table = $table;
     }
 
-    private function resetResponse(){
+    protected function resetResponse(){
       $this->response = [ 'error'=>0, 'data'=>false ];
     }
 

@@ -19,12 +19,12 @@
       $this->resetResponse();
       $where = [['email','=',$email]];
       $this->response = $this->get('id',$where);
-      if($this->response['data'] > 0){
+      if(count($this->response['data']) > 0){
         $this->response['data'] = $this->response['data'][0]['id'];
       }
       else{
         $this->response['error'] = 1;
-        $this->response['data'] = 'usuario con el correo '.$email.' ya existe';
+        $this->response['data'] = 'usuario con el correo '.$email.'no existe';
       }
 
       return $this->response;

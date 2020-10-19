@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require(APPPATH.'/objects/View.php');
 
-class App extends CI_Controller {
+class App extends MY_Controller {
 
 	private $View;
 	public function __construct()
@@ -16,13 +16,17 @@ class App extends CI_Controller {
 	public function index()
 	{
 
-		if(!$this->session->verified){ redirect('app/login'); }
-		else{ redirect('app/dashboard',301); }
+		$this->isLoggedIn();
+		redirect('app/dashboard',301);
 	}
 
 	public function dashboard()
 	{
+		$segment = $this->uri->segment(3,0);
 		if(!$this->session->verified){ redirect('app/login'); }
+		if(!$segment){ redirect('app/dashboard/calendar/'); }
+		else if($segment == 'logout'){ redirect('app/logout'); }
+		
 		$dashboard = 'dashboard/admin';
 		$scripts = [
 			'js'=>['jquery','admin'],
@@ -34,15 +38,24 @@ class App extends CI_Controller {
 
 	public function login()
 	{
-		$scripts = [
-			'js'=>['jquery','login'],
-			'css'=>['base','index']
-		];
-		$views = [ 'app/login' => [] ];
-		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
+		if(!$this->session->verified){
+			$scripts = [
+				'js'=>['jquery','login'],
+				'css'=>['base','index']
+			];
+			$views = [ 'app/login' => [] ];
+			$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
+		}
+		else{
+			redirect('app/dashboard/calendar/');
+		}
 
 	}
 
+	public function logout(){
+		$this->session->unset_userdata(['person','verified','users']);
+		redirect('app/login');
+	}
 
 
 }
