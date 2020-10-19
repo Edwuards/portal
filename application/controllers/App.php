@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 require(APPPATH.'/objects/View.php');
 
-class App extends CI_Controller {
+class App extends MY_Controller {
 
 	private $View;
 	public function __construct()
@@ -10,18 +10,23 @@ class App extends CI_Controller {
 		parent::__construct();
 		$this->load->helper('html');
 		$this->View = new View($this);
+		$this->load->model('UsersModel','users');
 	}
 
 	public function index()
 	{
-		echo 'h';
-		// if(!$this->session->verified){ redirect('app/login'); }
-		// else{ redirect('app/dashboard',301); }
+
+		$this->isLoggedIn();
+		redirect('app/dashboard',301);
 	}
 
 	public function dashboard()
 	{
-		// if(!$this->session->verified){ redirect('app/login'); }
+		$segment = $this->uri->segment(3,0);
+		if(!$this->session->verified){ redirect('app/login'); }
+		if(!$segment){ redirect('app/dashboard/calendar/'); }
+		else if($segment == 'logout'){ redirect('app/logout'); }
+		
 		$dashboard = 'dashboard/admin';
 		$scripts = [
 			'js'=>['jquery','admin'],
@@ -31,45 +36,26 @@ class App extends CI_Controller {
 		$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 	}
 
-	public function verify($id,$code)
+	public function login()
 	{
-		$user = null;
-		$this->load->model('UsersModel','Users');
-		$where = [
-			['users.id','=',(string)$id],
-			['users.verified','=','0']
-		];
-
-		$response = $this->Users->get('email,code',$where);
-
-		if(!$response['error'])
-		{
-			$user = $response['data'][0];
-			$response['error'] = !password_verify($code,$user['code']);
-		}
-
-
-		if(!$response['error'])
-		{
-			unset($user['code']);
+		if(!$this->session->verified){
 			$scripts = [
-				'js'=>['jquery','verify'],
+				'js'=>['jquery','login'],
 				'css'=>['base','index']
 			];
-			$views = ['users/verify'=>['user'=>$user]];
-			$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'Verificar']);
+			$views = [ 'app/login' => [] ];
+			$this->View->render(['scripts'=>$scripts,'views'=>$views,'title'=>'dashboard']);
 		}
 		else{
-			redirect('app/login');
+			redirect('app/dashboard/calendar/');
 		}
 
 	}
 
-
-
-
-
-
+	public function logout(){
+		$this->session->unset_userdata(['person','verified','users']);
+		redirect('app/login');
+	}
 
 
 }

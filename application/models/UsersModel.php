@@ -4,126 +4,104 @@
    *
    */
 
-  require(APPPATH.'/models/Crud.php');
 
-  class UsersModel extends Crud
+  class UsersModel extends MY_Model
   {
 
-    private $response = [ 'error'=>false, 'data'=>false ];
 
     function __construct()
     {
         parent::__construct('users');
+        $this->load->model('PersonsModel','Persons');
+        $this->load->model('AccessModel','Access');
     }
 
-    public function exist($correo)
+    private function addUserTypes($person,$types)
     {
-      $donde = [['email','=',$correo]];
-      $this->result = $this->get('id',$donde);
-      return count($this->result['data']) > 0 ? $this->result['data'][0]['id'] : false;
+      foreach ($types as $type) {
+        $this->insert([
+          'person'=>$person,
+          'type'=>$type,
+          'active'=>1
+        ]);
+      }
     }
 
-    public function create($user)
+    private function setSession($person)
     {
-      $this->response = [ 'error'=>false, 'data'=>false ];
-      $exist = $this->exist($user['email']);
+      $where = [
+        ['person','=',$person],
+        ['active','=','1']
+      ];
 
-      if($exist){
-        $this->response['error'] = true; $this->response['data'] = 'usuario con el correo '.$user['email'].' ya existe';
+      $users = [];
+      foreach ( $this->get('type',$where)['data'] as $user ){
+        array_push($users,$user['type']);
+      }
+
+      $apply = [
+        'users'=>$users,
+        'person'=>$person,
+        'verified'=>true
+      ];
+
+      $this->session->set_userdata($apply);
+
+    }
+
+    public function create($data)
+    {
+      /*
+        Data Structure
+        $user = [
+          'firstname'=>'',
+          'lastname'=>'',
+          'avatar'=>'',
+          'position'=>'',
+          'email'=>'',
+          'DOB'=>''
+        ];
+
+        $userTypes = [int,int]
+      */
+      $user = $data['user'];
+      $userTypes = $data['userTypes'];
+
+      $doesNotExist = $this->Persons->exist($user['email'])['error'];
+
+      if($doesNotExist){
+        $this->response = $this->Persons->create($user);
       }
 
       if(!$this->response['error']){
-        $random = rand(10,20);
-        $multi = rand(2,6);
-        for ($i=0; $i < 5; $i++) { $random *= $multi; }
-        $code = (string)$random;
-        if($user['avatar'] == ''){
-          $user['avatar'] = 'https://scontent.fmex1-1.fna.fbcdn.net/v/t1.0-9/87105879_2932147320180000_864174972170403840_n.png?_nc_cat=107&_nc_sid=85a577&_nc_ohc=iDIiMDlQrYoAX8EkUIZ&_nc_ht=scontent.fmex1-1.fna&oh=cd1a48c38e0769b499d0cdeab2d1fd67&oe=5EDF6664';
-        }
-        $user['verified'] = 0;
-        $user['role'] = 1;
-        $user['code'] = password_hash($random, PASSWORD_DEFAULT);
-
-        $this->response = $this->insert($user);
-
-      }
-
-      if(!$this->response['error']){
-        $id = (string)$this->response['data']['id'];
-        $this->response['data'] = $this->find([['users.id','=',$id]])['data'][0];
-        $this->response['data']['code'] = $code;
+        $person = (string)$this->response['data']['id'];
+        $this->addUserTypes($person,$userTypes);
+        $this->response = $this->Access->create($person);
       }
 
       return $this->response;
-    }
-
-    public function find($where = [],$order = [],$limit = [])
-    {
-      $select = '
-      users.id,
-      avatar,
-      CONCAT(name," ",lastname) as fullname,
-      name,
-      lastname,
-      email,
-      vacations,
-      work_position,
-      w.area as work_area,
-      w.title as position,
-      users.role,
-      ';
-      foreach (['work_start','birthday'] as $date) {
-        $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
-      }
-      // if(!count($order)){ $order = [['request.status','desc']]; }
-
-      $join = [
-        ['work_positions as w','work_position = w.id']
-      ];
-
-      return $this->join($select,$join,$where);
-
-
     }
 
     public function login($user)
     {
-      if(!$this->exist($user['email']))
-      {
-        $this->response['error'] = true;
-        $this->response['data'] = 'credenciales incorrectas';
-      }
+      $this->response = $this->Persons->exist($user['email']);
 
-      if(!$this->response['error'])
-      {
-        $where = [['email','=',$user['email']]];
-        $verify = $this->get('*',$where)['data'][0];
-        if(!password_verify($user['password'],$verify['password']))
-        {
-          $this->response['error'] = true;
-          $this->response['data'] = 'credenciales incorrectas';
-        }
+      if(!$this->response['error']){
+        $credentials = [
+          'person'=>$this->response['data'],
+          'password'=>$user['password']
+        ];
+        $this->response = $this->Access->login($credentials);
       }
 
       if(!$this->response['error']){
-        unset($verify['password']);
-        $verify = $this->find($where)['data'][0];
-        $this->session->set_userdata([
-          'id'=>$verify['id'],
-          'role'=>$verify['role'],
-          'name'=>$verify['fullname'],
-          'avatar'=>$verify['avatar'],
-          'position'=>$verify['position'],
-          'verified'=>true
-        ]);
-
-        $this->response['data'] = $verify;
+        $this->setSession($credentials['person']);
       }
-
 
       return $this->response;
 
     }
+
 
   }
 
