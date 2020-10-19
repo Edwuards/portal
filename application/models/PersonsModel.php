@@ -16,9 +16,18 @@
 
     public function exist($email)
     {
+      $this->resetResponse();
       $where = [['email','=',$email]];
-      $this->result = $this->get('id',$where);
-      return count($this->result['data']) > 0 ? $this->result['data'][0]['id'] : false;
+      $this->response = $this->get('id',$where);
+      if($this->response['data'] > 0){
+        $this->response['data'] = $this->response['data'][0]['id'];
+      }
+      else{
+        $this->response['error'] = 1;
+        $this->response['data'] = 'usuario con el correo '.$email.' ya existe';
+      }
+
+      return $this->response;
     }
 
     public function create($person)
