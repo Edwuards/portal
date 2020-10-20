@@ -21,5 +21,19 @@ class Users extends MY_Controller {
 
 	}
 
+	public function get()
+	{
+
+		$this->isPost();
+		$this->isLoggedIn();
+
+		$where = $this->input->post('where');
+		$where = $where ? $where : [];
+
+
+		$this->json($this->Users->find($where));
+
+	}
+
 
 }

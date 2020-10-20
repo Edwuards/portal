@@ -48,10 +48,28 @@
        return $this->insert($insert);
     }
 
-    public function find()
+    public function find($where = [])
     {
-      $where = [['email','=','cesar@figment.com.mx']];
-      return $this->get('id,firstname',$where);
+      $select = '
+      persons.id as id,
+      email,
+      firstname,
+      lastname,
+      avatar,
+      persons.position as position,
+      w.id as area,
+      ';
+
+      foreach(['started','created','DOB'] as $date){
+        $select .= 'UNIX_TIMESTAMP('.$date.') as '.$date.',';
+      }
+
+      $join = [
+        ['work_positions as w','w.id = persons.position']
+      ];
+
+      return $this->join($select,$join,$where);
+
     }
 
   }

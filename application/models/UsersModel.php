@@ -102,6 +102,17 @@
 
     }
 
+    public function find($where = [])
+    {
+
+      // validation of where clause goes here
+  		// if(!in_array(1,$this->session->users)){
+  		//  validate where clause since user is not admin
+  		// }
+
+      return $this->Persons->find($where);
+    }
+
 
   }
 

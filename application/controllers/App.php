@@ -26,10 +26,12 @@ class App extends MY_Controller {
 		if(!$this->session->verified){ redirect('app/login'); }
 		if(!$segment){ redirect('app/dashboard/calendar/'); }
 		else if($segment == 'logout'){ redirect('app/logout'); }
-		
-		$dashboard = 'dashboard/admin';
+
+		$user = in_array('1',$this->session->users) ? 'admin' : 'employee';
+		$dashboard = 'dashboard/'.$user;
+
 		$scripts = [
-			'js'=>['jquery','admin'],
+			'js'=>['jquery',$user],
 			'css'=>['base','index']
 		];
 		$views = [ $dashboard => [] ];

@@ -27,7 +27,14 @@
     }
 
     public function isLoggedIn(){
-      if(!$this->session->verified){ redirect('app/login'); }
+      if(!$this->session->verified){
+        if($method != 'post'){ redirect('app/login'); }
+        else{
+          $this->response['error'] = 1;
+          $this->response['message'] = 'Not Authenticated';
+          return $this->json($this->response);
+        }
+      }
     }
 
 
