@@ -21,7 +21,6 @@
 
 ?>
 
-</div>
 
 <div data-navbar="users" class="flex items-center w-full hidden">
   <?php echo $exit; ?>

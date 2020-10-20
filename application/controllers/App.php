@@ -5,6 +5,7 @@ require(APPPATH.'/objects/View.php');
 class App extends MY_Controller {
 
 	private $View;
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -58,6 +59,8 @@ class App extends MY_Controller {
 		$this->session->unset_userdata(['person','verified','users']);
 		redirect('app/login');
 	}
+
+
 
 
 }

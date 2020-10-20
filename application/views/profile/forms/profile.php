@@ -1,16 +1,5 @@
 <?php
-$options = [
-  'areas'=>'',
-  'positions'=>''
-];
-//
-// foreach ($work['positions'] as $position) {
-//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-// }
-// foreach ($work['areas'] as $area) {
-//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-// }
-//
+$options = WorkAreasOptions();
 
 $html = [
   'image'=> ImageInput([
@@ -29,7 +18,7 @@ $html = [
       ]
     ]
   ]),
-  'firstname' => TextInput([
+  'name' => TextInput([
     'css'=>['cont'=>'mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Nombre',
     'attrs'=>['name'=>'firstname'],
@@ -59,7 +48,7 @@ $html = [
   'birthday' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Cumpleaños',
-    'attrs'=>['name'=>'birthday'],
+    'attrs'=>['name'=>'DOB'],
   ]),
   'vacations' => NumberInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
@@ -77,13 +66,12 @@ $html = [
 
 ?>
 
-
-<form name="userProfile" class="bg-white">
+<form name="userProfile" class="bg-white p-10 shadow-lg">
   <div class="flex flex-col sm:flex-row items-center w-full my-4">
     <?php echo $html['image']; ?>
     <div class="flex flex-col justify-center w-full sm:ml-6">
       <div class="mb-2">
-        <?php echo $html['firstname']; ?>
+        <?php echo $html['name']; ?>
       </div>
       <div class="mb-2">
         <?php echo $html['lastname']; ?>
