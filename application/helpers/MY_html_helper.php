@@ -205,4 +205,21 @@
             </div>';
   }
 
+  function WorkAreasOptions(){
+    $ci =& get_instance();
+    $ci->load->model('WorkAreasModel','WorkAreas');
+    $result = ['positions'=>'','areas'=>''];
+    $positions = $ci->WorkAreas->positions()['data'];
+    $areas = $ci->WorkAreas->get('id,area')['data'];
+    foreach ($positions as $position) {
+      $result['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['position'].'</option>';
+    }
+    foreach ($areas as $area) {
+      $result['areas'] .= '<option  value="'.$area['id'].'">'.$area['area'].'</option>';
+    }
+
+    return $result;
+
+  }
+
 ?>

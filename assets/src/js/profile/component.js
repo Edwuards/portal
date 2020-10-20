@@ -23,11 +23,11 @@ export default function(){
 
   profile.load(userID);
 
-  view.on = function(){ toolbar.on(); }
-  view.off = function(){ toolbar.off(); }
+  view.on = function(){ toolbar.on(); profile.on(); }
+  view.off = function(){ toolbar.off(); profile.off(); }
 
   view.state.register({
-    state: 'view proile',
+    state: 'view profile',
     on: ()=>{
       profile.read();
       toolbar.state.value = 'view profile';
