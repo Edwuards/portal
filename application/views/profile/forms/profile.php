@@ -59,7 +59,7 @@ $html = [
   'birthday' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Cumpleaños',
-    'attrs'=>['name'=>'birthday'],
+    'attrs'=>['name'=>'DOB'],
   ]),
   'vacations' => NumberInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],

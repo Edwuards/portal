@@ -15247,21 +15247,93 @@
   function ToolBar$2(){ return new ToolBar('profile'); }
 
   function Profile(){
+    const form = new Form({
+      name: 'userProfile',
+      url: 'users/edit'
+    });
+    const load = (()=>{
+      const inputs = {};
+      let elements = form.inputs;
+      [
+        elements.type.image,
+        elements.type.text,
+        elements.type.date,
+        elements.type.select
+      ].forEach((type)=>{
+        for(let input in type){
+          input = type[input];
+          inputs[input.name] = input;
+        }
+      });
+
+      return (user)=>{
+        for(let prop in user){
+          if(inputs[prop]){ inputs[prop].value = user[prop]; }
+        }
+      }
+    })();
+
+
+    form.read = function(){
+      form.disable(true);
+    };
+
+    form.load = function(userID){
+      $.ajax({
+        method: 'POST',
+        url: `${window.location.origin}/users/get`,
+        data: { where : [['persons.id','=',userID]] },
+        success: (response)=>{
+          let { error , data} = response;
+          if(!error){
+            data = data[0];
+            ['started','DOB'].forEach((prop) => {
+              data[prop] = new Date(data[prop] * 1000);
+            });
+          }
+
+          load(data);
+
+        }
+      });
+
+    };
+
+    return form
+  }
+
+  function Profile$1(){
     const view = new View({ name:'profile', element: $('[data-content="profile"]') });
     const toolbar = ToolBar$2();
+    const userID = view.element.attr('data-id');
+    const profile = Profile();
 
     const routes = {
       '/profile/*': function(ctx,next){
         if(!(this.state.value == 'profile')){ this.state.value = 'profile'; }
         next();
       },
-      '/profile/': function(){
+      '/profile/view': function(){
+        view.state.value = 'view profile';
+      },
+      '/profile/edit': function(){
+        view.state.value = 'edit profile';
       }
-
     };
+
+    profile.load(userID);
 
     view.on = function(){ toolbar.on(); };
     view.off = function(){ toolbar.off(); };
+
+    view.state.register({
+      state: 'view proile',
+      on: ()=>{
+        profile.read();
+        toolbar.state.value = 'view profile';
+      },
+      off: ()=>{ return true }
+    });
 
     view.routes = [ routes ];
 
@@ -16479,7 +16551,7 @@
     return form
   }
 
-  function Profile$1(){
+  function Profile$2(){
     let user = undefined;
     const form = new Form({
       name: 'usersProfile',
@@ -16688,7 +16760,7 @@
   function Users(){
     return {
       create: Create(),
-      profile: Profile$1(),
+      profile: Profile$2(),
       list: List$1()
     }
   }
@@ -18266,7 +18338,7 @@
 
   var Components = {
     calendar: Calendar$2,
-    profile: Profile,
+    profile: Profile$1,
     solicitudes: Solicitudes$1,
     users: Users$1,
     teams: Teams$1
