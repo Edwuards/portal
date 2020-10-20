@@ -1,17 +1,5 @@
 <?php
-$options = [
-  'areas'=>'',
-  'positions'=>''
-];
-
-// foreach ($work['positions'] as $position) {
-//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-// }
-// foreach ($work['areas'] as $area) {
-//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-// }
-//
-
+$options = WorkAreasOptions();
 $html = [
   'image'=> ImageInput([
     'css'=>['cont'=>'items-center','img'=>'w-40 h-40 rounded-full overflow-hidden' ],
@@ -59,7 +47,7 @@ $html = [
   'birthday' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Cumpleaños',
-    'attrs'=>['name'=>'dob'],
+    'attrs'=>['name'=>'DOB'],
   ]),
   'vacations' => NumberInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
@@ -69,7 +57,7 @@ $html = [
   'work_start' => DateInput([
     'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1'],
     'label'=>'Fecha de ingreso',
-    'attrs'=>['name'=>'initialized'],
+    'attrs'=>['name'=>'started'],
   ]),
 
 ];

@@ -32,6 +32,10 @@ export default function(){
     form.disable(true);
   }
 
+  form.edit = function(){
+    form.inputs.type.image.avatar.disable(false);
+  }
+
   form.load = function(userID){
     $.ajax({
       method: 'POST',

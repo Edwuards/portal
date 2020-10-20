@@ -1,15 +1,5 @@
 <?php
-$options = [
-  'areas'=>'',
-  'positions'=>''
-];
-
-// foreach ($work['positions'] as $position) {
-//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-// }
-// foreach ($work['areas'] as $area) {
-//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-// }
+$options = WorkAreasOptions();
 
 $html = [
   'image'=> ImageInput([

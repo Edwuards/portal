@@ -21,6 +21,7 @@ export default function(){
     }
   }
 
+  toolbar.events.on('edit profile',profile.edit);
   profile.load(userID);
 
   view.on = function(){ toolbar.on(); profile.on(); }
@@ -33,7 +34,8 @@ export default function(){
       toolbar.state.value = 'view profile';
     },
     off: ()=>{ return true }
-  })
+  });
+  
 
   view.routes = [ routes ];
 

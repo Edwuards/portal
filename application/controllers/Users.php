@@ -30,7 +30,6 @@ class Users extends MY_Controller {
 		$where = $this->input->post('where');
 		$where = $where ? $where : [];
 
-
 		$this->json($this->Users->find($where));
 
 	}

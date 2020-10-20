@@ -5,6 +5,7 @@ require(APPPATH.'/objects/View.php');
 class App extends MY_Controller {
 
 	private $View;
+	
 	public function __construct()
 	{
 		parent::__construct();
