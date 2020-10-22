@@ -1,5 +1,6 @@
 import { Finder } from '../form/inputs';
 import { card } from '../templates/users';
+import Router from 'page';
 
 export function Card(data){
   const element = $(document.createElement('div'));
@@ -31,6 +32,10 @@ export function Card(data){
       }
     }
   }
+
+  buttons.name.profile.events.on('click',function(){
+    Router(`/users/view/profile/${user.data.id}`);
+  });
 
   Object.defineProperties(this,methods);
 

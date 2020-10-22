@@ -30,6 +30,7 @@ export default function(){
   toolbar.events.on('edit profile',users.profile.edit);
   toolbar.events.on('cancel edit profile',users.profile.cancel);
   toolbar.events.on('delete users',users.list.delete);
+  toolbar.events.on('create user',users.create.send);
 
   view.on = function(){ users.list.on(); toolbar.on(); }
   view.off = function(){ users.list.off(); toolbar.off(); }

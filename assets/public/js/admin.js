@@ -4417,6 +4417,7 @@
     'number':Input,
     'text':Input,
     'textarea':Input,
+    'checkbox':CheckBoxInput
   };
 
   function Finder(container){
@@ -4630,6 +4631,19 @@
     Object.defineProperties(this,methods);
   }
 
+  function CheckBoxInput(input){
+    Input.call(this,input);
+    const methods = {
+      'checked': {
+        get: ()=>{
+          return this.element[0].checked
+        }
+      }
+    };
+    Object.defineProperties(this,methods);
+  }
+
+
   function SelectInput(input){
     Input.call(this,input);
 
@@ -4694,6 +4708,9 @@
         set: (value)=>{
           if(value != ''){ instance.src = value; }
         },
+        get:()=>{ return props.data }
+      },
+      'file': {
         get:()=>{ return props.file }
       },
       'src':{
@@ -16500,6 +16517,7 @@
       'edit profile',
       'cancel edit profile',
       'delete users',
+      'create user'
     ]);
 
     const groups = {
@@ -16592,6 +16610,7 @@
     buttons.name.confirm.events.on('click',function(){
       let state = toolbar.state.value;
       if(state == 'delete users'){ observer.notify('delete users'); }
+      else if(state = 'create user'){ observer.notify('create user'); }
 
     });
 
@@ -16605,13 +16624,36 @@
       name: 'createUser',
       url: 'users/create'
     });
+    const inputs = form.inputs.type;
 
     form.container = $('[data-users="create"]');
 
-    form.on = function(){ form.container.removeClass('hidden'); };
+    form.on = function(){
+      form.container.removeClass('hidden');
+    };
 
     form.off = function(){ form.container.addClass('hidden'); };
 
+    form.send = function(){
+
+      let error = false;
+      let data = { userTypes: [] };
+
+      ['text','date','image','select'].forEach((type)=>{
+        type = inputs[type];
+        for(let input in type){ data[input] = type[input].value; }    });
+
+      for(let input in inputs.checkbox){
+        input = inputs.checkbox[input];
+        if(input.checked){ data.userTypes.push(input.value); }
+      }
+
+
+      console.log(data);
+
+      return {error,data}
+
+    };
 
     return form
   }
@@ -16699,30 +16741,14 @@
       }
     };
 
+    buttons.name.profile.events.on('click',function(){
+      page_js(`/users/view/profile/${user.data.id}`);
+    });
+
     Object.defineProperties(this,methods);
 
 
   }
-
-  const Data = (()=>{
-    const users = [];
-    for (let i = 1; i <= 20 ; i++) {
-      users.push({
-        id: i,
-        firstname: ['Cesar Edwuards','Pablo','Juan','Victor'][i%4],
-        lastname: 'Perez Robles',
-        email: 'ejemplo@figment.com.mx',
-        avatar: '/assets/public/img/placeholder.jpeg',
-        area: 'Diseño',
-        position: 'Diseñador Gráfico'
-      });
-    }
-
-    return users;
-  })();
-
-
-
 
   function User(data){
     const card = new Card$1(data);
@@ -16745,12 +16771,9 @@
     const view = new View({name: 'user list',element: $('[data-users="list"]')});
     const modal = Modal();
     const add = (user)=>{
+      user.avatar = `${window.location.origin}/assets/public/uploads/avatar/${user.avatar}`;
       user = users[users.push(new User(user)) - 1];
-      let { card } = user;
-      card.buttons.name.profile.events.on('click',function(){
-        page_js(`/users/view/profile/${user.data.id}`);
-      });
-      view.element.append(card.element);
+      view.element.append(user.card.element);
     };
     const deleteUsers = ()=>{
       users = users.reduce((a,c,i)=>{
@@ -16776,6 +16799,10 @@
     };
 
     const methods = {
+      'add':{
+        writable: false,
+        value: add
+      },
       'all': {
         get:()=>{ return users; }
       },
@@ -16817,17 +16844,22 @@
 
     Object.defineProperties(view,methods);
 
-    Data.forEach(add);
 
     return view
   }
 
   function Users(){
-    return {
-      create: Create(),
-      profile: Profile$2(),
-      list: List$1()
-    }
+    const create = Create();
+    const profile = Profile$2();
+    const list = List$1();
+
+    create.events.on('response',function(response){
+      const { error, data } = response;
+      if(!error){ list.add(data[0]); }
+    });
+
+
+    return { create, profile, list }
   }
 
   function Users$1(){
@@ -16859,6 +16891,7 @@
     toolbar.events.on('edit profile',users.profile.edit);
     toolbar.events.on('cancel edit profile',users.profile.cancel);
     toolbar.events.on('delete users',users.list.delete);
+    toolbar.events.on('create user',users.create.send);
 
     view.on = function(){ users.list.on(); toolbar.on(); };
     view.off = function(){ users.list.off(); toolbar.off(); };
@@ -18160,8 +18193,9 @@
 
   }
 
-  const Data$1 = (users)=>{
+  const Data = (users)=>{
     let teams = [];
+    if(users.length){
 
     for (var i = 0; i < 5; i++) {
       let team = {
@@ -18174,6 +18208,7 @@
       };
       for (var j = 0; j < 5; j++) { team.members.push(users[j]); }
       teams.push(team);
+    }
     }
 
     return teams;
@@ -18218,7 +18253,7 @@
       teams = teams.reduce((a,c,i)=>{
           if(!remove[i]){ a.push(c); }
           else{ c.card.element.remove();}
-          
+
           return a;
       },[]);
     };
@@ -18227,7 +18262,7 @@
       el[el.hasClass('delete') ? 'removeClass' : 'addClass']('delete');
     };
 
-    Data$1(users.all).forEach(add);
+    Data(users.all).forEach(add);
 
 
     const methods = {

@@ -14,6 +14,19 @@
         parent::__construct('persons');
     }
 
+    private function uploadAvatar($base64)
+    {
+
+      preg_match("^data:image\/(?<extension>(?:png|gif|jpg|jpeg));base64,(?<image>.+)$", $base64, $matchings);
+      $imageData = base64_decode($matchings['image']);
+      $extension = $matchings['extension'];
+      $filename = sprintf("%s.%s",(string)uniqid(),$extension);
+      while(file_exists(UPLOAD_DIR.'avatars/'.$filename)){ $filename = sprintf("%s.%s",(string)uniqid(),$extension); }
+      file_put_contents(UPLOAD_DIR.'avatars/'.$filename, $imageData);
+
+      return $filename;
+    }
+
     public function exist($email)
     {
       $this->resetResponse();
@@ -33,6 +46,9 @@
     public function create($person)
     {
        $this->resetResponse();
+
+       $person['avatar'] = $this->uploadAvatar($person['avatar']);
+
        $insert = [
          'firstname'=>'',
          'lastname'=>'',

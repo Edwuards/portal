@@ -43,12 +43,9 @@ export default function(){
   const view = new View({name: 'user list',element: $('[data-users="list"]')});
   const modal = Modal();
   const add = (user)=>{
+    user.avatar = `${window.location.origin}/assets/public/uploads/avatar/${user.avatar}`;
     user = users[users.push(new User(user)) - 1];
-    let { card } = user;
-    card.buttons.name.profile.events.on('click',function(){
-      Router(`/users/view/profile/${user.data.id}`);
-    });
-    view.element.append(card.element);
+    view.element.append(user.card.element);
   }
   const deleteUsers = ()=>{
     users = users.reduce((a,c,i)=>{
@@ -74,6 +71,10 @@ export default function(){
   }
 
   const methods = {
+    'add':{
+      writable: false,
+      value: add
+    },
     'all': {
       get:()=>{ return users; }
     },
@@ -115,7 +116,6 @@ export default function(){
 
   Object.defineProperties(view,methods);
 
-  Data.forEach(add);
 
   return view
 }

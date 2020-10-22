@@ -25,6 +25,24 @@
     return $ci->load->view('inputs/input',$overWrite,true);
   }
 
+  function CheckBoxInput($data){
+    $ci=& get_instance();
+    $overWrite = [
+      'css'=> [
+        'input-cont'=> isset($data['css']['input-cont']) ? $data['css']['input-cont'] : '',
+        'input'=> isset($data['css']['input']) ? $data['css']['input'] : '',
+        'cont'=> isset($data['css']['cont']) ? $data['css']['cont'] : '',
+      ],
+      'label'=> isset($data['label']) ? $data['label'] : '',
+      'attrs'=> isset($data['attrs']) ? $data['attrs'] : []
+    ];
+
+    $overWrite['type'] = 'checkbox';
+    $overWrite['attrs']['data-type'] = 'checkbox';
+
+    return $ci->load->view('inputs/input',$overWrite,true);
+  }
+
   function NumberInput($data){
     $ci=& get_instance();
     $overWrite = [
