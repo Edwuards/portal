@@ -1,17 +1,5 @@
 <?php
-$options = [
-  'areas'=>'',
-  'positions'=>''
-];
-
-// foreach ($work['positions'] as $position) {
-//   $options['positions'] .= '<option data-area="'.$position['area'].'" value="'.$position['id'].'">'.$position['title'].'</option>';
-// }
-// foreach ($work['areas'] as $area) {
-//   $options['areas'] .= '<option  value="'.$area['id'].'">'.$area['title'].'</option>';
-// }
-//
-
+$options = WorkAreasOptions();
 $html = [
   'image'=> ImageInput([
     'css'=>['cont'=>'items-center','img'=>'w-40 h-40 rounded-full overflow-hidden' ],
@@ -72,6 +60,20 @@ $html = [
     'attrs'=>['name'=>'initialized'],
   ]),
 
+
+];
+
+$permissions = [
+  'admin' => CheckBoxInput([
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1','input-cont'=>'items-center'],
+    'label'=>'Admin',
+    'attrs'=>['name'=>'admin','value'=>'1'],
+  ]),
+  'cms' => CheckBoxInput([
+    'css'=>['cont'=>'sm:w-1/2 mx-4 my-2','input'=>'pb-2 pl-1','input-cont'=>'items-center'],
+    'label'=>'CMS',
+    'attrs'=>['name'=>'cms','value'=>'3'],
+  ])
 ];
 
 
@@ -98,7 +100,20 @@ $html = [
     <?php echo $html['work_position']; ?>
   </div>
   <div class="flex flex-col my-4 sm:flex-row">
-    <?php echo $html['work_start']; ?>
-    <?php echo $html['vacations']; ?>
+    <?php
+      echo $html['work_start'];
+      echo $html['vacations'];
+    ?>
   </div>
+
+  <div class="mt-6">
+    <h3 class="text-lg text-gray-600 w-full  pt-2 text-center">
+      Escoger Permisos
+    </h3>
+    <div class="flex my-4">
+      <?php echo $permissions['admin']; ?>
+      <?php echo $permissions['cms']; ?>
+    </div>
+  </div>
+
 </form>

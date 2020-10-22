@@ -5,7 +5,7 @@ require(APPPATH.'/objects/View.php');
 class App extends MY_Controller {
 
 	private $View;
-	
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -60,6 +60,11 @@ class App extends MY_Controller {
 		redirect('app/login');
 	}
 
+
+	public function test()
+	{
+		$this->json(sprintf("%s.%s",(string)uniqid(),'png'));
+	}
 
 
 

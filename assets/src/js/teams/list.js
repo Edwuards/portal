@@ -4,6 +4,7 @@ import Router from 'page';
 
 const Data = (users)=>{
   let teams = [];
+  if(users.length){
 
   for (var i = 0; i < 5; i++) {
     let team = {
@@ -16,6 +17,7 @@ const Data = (users)=>{
     };
     for (var j = 0; j < 5; j++) { team.members.push(users[j]); }
     teams.push(team);
+  }
   }
 
   return teams;
@@ -60,7 +62,7 @@ export default function(users){
     teams = teams.reduce((a,c,i)=>{
         if(!remove[i]){ a.push(c); }
         else{ c.card.element.remove();}
-        
+
         return a;
     },[]);
   }

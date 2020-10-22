@@ -13,6 +13,7 @@ const Types = {
   'number':Input,
   'text':Input,
   'textarea':Input,
+  'checkbox':CheckBoxInput
 };
 
 function Finder(container){
@@ -226,6 +227,19 @@ function Input(input){
   Object.defineProperties(this,methods);
 }
 
+function CheckBoxInput(input){
+  Input.call(this,input);
+  const methods = {
+    'checked': {
+      get: ()=>{
+        return this.element[0].checked
+      }
+    }
+  }
+  Object.defineProperties(this,methods);
+}
+
+
 function SelectInput(input){
   Input.call(this,input);
 
@@ -290,6 +304,9 @@ function ImageInput({file,upload,preview}){
       set: (value)=>{
         if(value != ''){ instance.src = value; }
       },
+      get:()=>{ return props.data }
+    },
+    'file': {
       get:()=>{ return props.file }
     },
     'src':{

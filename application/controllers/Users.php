@@ -34,5 +34,16 @@ class Users extends MY_Controller {
 
 	}
 
+	public function create()
+	{
+		$this->isPost();
+		$this->isLoggedIn();
+
+		$user = $this->input->post(null);
+
+		$this->json($this->Users->create($user));
+
+	}
+
 
 }

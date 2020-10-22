@@ -9,6 +9,7 @@ export default function(){
     'edit profile',
     'cancel edit profile',
     'delete users',
+    'create user'
   ]);
 
   const groups = {
@@ -101,6 +102,7 @@ export default function(){
   buttons.name.confirm.events.on('click',function(){
     let state = toolbar.state.value;
     if(state == 'delete users'){ observer.notify('delete users'); }
+    else if(state = 'create user'){ observer.notify('create user'); }
 
   });
 

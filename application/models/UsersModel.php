@@ -27,6 +27,8 @@
       }
     }
 
+
+
     private function setSession($person)
     {
       $where = [
@@ -49,7 +51,7 @@
 
     }
 
-    public function create($data)
+    public function create($user)
     {
       /*
         Data Structure
@@ -64,20 +66,19 @@
 
         $userTypes = [int,int]
       */
-      $user = $data['user'];
-      $userTypes = $data['userTypes'];
 
-      $doesNotExist = $this->Persons->exist($user['email'])['error'];
+      $this->response = $this->Persons->exist($user['email'])['error'];
+      $doesNotExist = $this->response['error'];
 
-      if($doesNotExist){
-        $this->response = $this->Persons->create($user);
-      }
+      if($doesNotExist){ $this->response = $this->Persons->create($user); }
 
-      if(!$this->response['error']){
-        $person = (string)$this->response['data']['id'];
-        $this->addUserTypes($person,$userTypes);
-        $this->response = $this->Access->create($person);
-      }
+      // if(!$this->response['error']){
+      //   array_push($user['userTypes'],2);
+      //   $person = (string)$this->response['data'];
+      //   $this->addUserTypes($person,$user['userTypes']);
+      //   $this->Access->create($person);
+      //   $this->find([['persons.id','=',$person]]);
+      // }
 
       return $this->response;
     }
@@ -105,12 +106,28 @@
     public function find($where = [])
     {
 
-      // validation of where clause goes here
-  		// if(!in_array(1,$this->session->users)){
-  		//  validate where clause since user is not admin
-  		// }
 
-      return $this->Persons->find($where);
+      // validation of where clause goes here
+
+      $this->response = $this->Persons->find($where);
+
+      if(!$this->response['error']){
+        $persons = $this->response;
+
+        foreach ($persons['data'] as &$person) {
+          $this->get('type',[['person','=',(string)$person['id']]]);
+          $person['userTypes'] = (
+            !$this->response['error'] ?
+            array_map(function($data){ return $data['type']; },$this->response['data']) :
+            [] );
+        }unset($person);
+
+        $this->response = $persons;
+
+       }
+
+      return $this->response;
+
     }
 
 
